@@ -6,108 +6,89 @@
 
 @layer base {
   :root {
-    /* Primary - Soft Teal */
-    --primary: 173 58% 39%;
+    /* Purple Primary */
+    --primary: 262 83% 58%;
     --primary-foreground: 0 0% 100%;
-    --primary-light: 173 58% 95%;
-    --primary-dark: 173 58% 30%;
+    --primary-light: 262 60% 95%;
+    --primary-dark: 262 83% 45%;
+    --primary-muted: 262 40% 70%;
     
-    /* Background & Surfaces */
-    --background: 210 20% 98%;
-    --foreground: 220 20% 10%;
+    /* Background & Surfaces - Dark */
+    --background: 240 10% 4%;
+    --foreground: 0 0% 98%;
     
-    --card: 0 0% 100%;
-    --card-foreground: 220 20% 10%;
+    --card: 240 10% 8%;
+    --card-foreground: 0 0% 98%;
     
-    --popover: 0 0% 100%;
-    --popover-foreground: 220 20% 10%;
+    --popover: 240 10% 8%;
+    --popover-foreground: 0 0% 98%;
     
-    /* Secondary - Neutral Greys */
-    --secondary: 220 14% 96%;
-    --secondary-foreground: 220 20% 25%;
+    /* Secondary */
+    --secondary: 240 6% 15%;
+    --secondary-foreground: 0 0% 90%;
     
-    --muted: 220 14% 95%;
-    --muted-foreground: 220 10% 46%;
+    --muted: 240 6% 12%;
+    --muted-foreground: 240 5% 55%;
     
-    --accent: 173 40% 94%;
-    --accent-foreground: 173 58% 30%;
+    --accent: 262 30% 18%;
+    --accent-foreground: 262 80% 80%;
     
     /* Status Colors */
-    --success: 152 60% 40%;
+    --success: 142 70% 45%;
     --success-foreground: 0 0% 100%;
-    --success-light: 152 60% 95%;
+    --success-light: 142 40% 15%;
     
     --warning: 38 92% 50%;
-    --warning-foreground: 0 0% 100%;
-    --warning-light: 38 92% 95%;
+    --warning-foreground: 0 0% 10%;
+    --warning-light: 38 50% 15%;
     
     --destructive: 0 72% 51%;
     --destructive-foreground: 0 0% 100%;
-    --destructive-light: 0 72% 96%;
+    --destructive-light: 0 50% 15%;
     
     --info: 200 80% 50%;
     --info-foreground: 0 0% 100%;
-    --info-light: 200 80% 95%;
+    --info-light: 200 50% 15%;
     
     /* UI Elements */
-    --border: 220 13% 91%;
-    --input: 220 13% 91%;
-    --ring: 173 58% 39%;
+    --border: 240 6% 20%;
+    --input: 240 6% 15%;
+    --ring: 262 83% 58%;
     
-    --radius: 0.5rem;
+    --radius: 0.75rem;
+    
+    /* Agent Colors */
+    --agent-active: 262 83% 58%;
+    --agent-processing: 38 92% 50%;
+    --agent-complete: 142 70% 45%;
+    --agent-idle: 240 5% 40%;
     
     /* Gradients */
-    --gradient-primary: linear-gradient(135deg, hsl(173 58% 39%), hsl(190 60% 45%));
-    --gradient-hero: linear-gradient(135deg, hsl(173 40% 97%), hsl(200 40% 96%));
-    --gradient-card: linear-gradient(180deg, hsl(0 0% 100%), hsl(220 20% 99%));
+    --gradient-primary: linear-gradient(135deg, hsl(262 83% 58%), hsl(280 80% 55%));
+    --gradient-card: linear-gradient(180deg, hsl(240 10% 10%), hsl(240 10% 6%));
+    --gradient-hero: linear-gradient(135deg, hsl(262 60% 8%), hsl(240 10% 4%));
+    --gradient-glow: radial-gradient(ellipse at center, hsl(262 83% 58% / 0.15), transparent 70%);
     
     /* Shadows */
-    --shadow-sm: 0 1px 2px 0 hsl(220 20% 10% / 0.03);
-    --shadow-md: 0 4px 6px -1px hsl(220 20% 10% / 0.05), 0 2px 4px -2px hsl(220 20% 10% / 0.03);
-    --shadow-lg: 0 10px 15px -3px hsl(220 20% 10% / 0.05), 0 4px 6px -4px hsl(220 20% 10% / 0.03);
-    --shadow-card: 0 1px 3px hsl(220 20% 10% / 0.04), 0 1px 2px hsl(220 20% 10% / 0.03);
+    --shadow-sm: 0 1px 2px 0 hsl(0 0% 0% / 0.3);
+    --shadow-md: 0 4px 6px -1px hsl(0 0% 0% / 0.3), 0 2px 4px -2px hsl(0 0% 0% / 0.2);
+    --shadow-lg: 0 10px 15px -3px hsl(0 0% 0% / 0.4), 0 4px 6px -4px hsl(0 0% 0% / 0.2);
+    --shadow-card: 0 2px 8px hsl(0 0% 0% / 0.3), 0 0 1px hsl(262 83% 58% / 0.1);
+    --shadow-glow: 0 0 20px hsl(262 83% 58% / 0.3);
     
     /* Sidebar */
-    --sidebar-background: 0 0% 100%;
-    --sidebar-foreground: 220 20% 25%;
-    --sidebar-primary: 173 58% 39%;
+    --sidebar-background: 240 10% 6%;
+    --sidebar-foreground: 0 0% 90%;
+    --sidebar-primary: 262 83% 58%;
     --sidebar-primary-foreground: 0 0% 100%;
-    --sidebar-accent: 173 40% 96%;
-    --sidebar-accent-foreground: 173 58% 30%;
-    --sidebar-border: 220 13% 91%;
-    --sidebar-ring: 173 58% 39%;
+    --sidebar-accent: 262 30% 18%;
+    --sidebar-accent-foreground: 262 80% 80%;
+    --sidebar-border: 240 6% 18%;
+    --sidebar-ring: 262 83% 58%;
   }
 
   .dark {
-    --primary: 173 58% 50%;
-    --primary-foreground: 0 0% 100%;
-    --primary-light: 173 30% 15%;
-    --primary-dark: 173 58% 60%;
-    
-    --background: 220 20% 8%;
-    --foreground: 210 20% 98%;
-    
-    --card: 220 20% 10%;
-    --card-foreground: 210 20% 98%;
-    
-    --popover: 220 20% 10%;
-    --popover-foreground: 210 20% 98%;
-    
-    --secondary: 220 14% 15%;
-    --secondary-foreground: 210 20% 90%;
-    
-    --muted: 220 14% 15%;
-    --muted-foreground: 220 10% 60%;
-    
-    --accent: 173 30% 15%;
-    --accent-foreground: 173 58% 70%;
-    
-    --border: 220 14% 18%;
-    --input: 220 14% 18%;
-    --ring: 173 58% 50%;
-    
-    --sidebar-background: 220 20% 10%;
-    --sidebar-foreground: 210 20% 90%;
+    /* Same as root - dark by default */
   }
 }
 
@@ -139,12 +120,53 @@
     background: var(--gradient-card);
   }
   
+  .gradient-glow {
+    background: var(--gradient-glow);
+  }
+  
   .shadow-card {
     box-shadow: var(--shadow-card);
   }
   
   .shadow-elevated {
     box-shadow: var(--shadow-lg);
+  }
+  
+  .shadow-glow {
+    box-shadow: var(--shadow-glow);
+  }
+  
+  /* Agent status indicators */
+  .agent-pulse {
+    @apply relative;
+  }
+  
+  .agent-pulse::before {
+    content: '';
+    @apply absolute inset-0 rounded-full animate-ping opacity-30;
+    background: hsl(var(--agent-active));
+  }
+  
+  /* Glass effect for cards */
+  .glass-card {
+    @apply backdrop-blur-sm bg-card/80 border border-border/50;
+  }
+  
+  /* Journey step styles */
+  .journey-step {
+    @apply relative transition-all duration-300;
+  }
+  
+  .journey-step-active {
+    @apply ring-2 ring-primary ring-offset-2 ring-offset-background;
+  }
+  
+  .journey-step-complete {
+    @apply border-success/50;
+  }
+  
+  .journey-step-editable {
+    @apply hover:border-primary/50 cursor-pointer;
   }
 }
 
@@ -164,11 +186,20 @@
   .animate-pulse-soft {
     animation: pulseSoft 2s ease-in-out infinite;
   }
+  
+  .animate-glow {
+    animation: glow 2s ease-in-out infinite;
+  }
 
   .stagger-1 { animation-delay: 0.1s; }
   .stagger-2 { animation-delay: 0.2s; }
   .stagger-3 { animation-delay: 0.3s; }
   .stagger-4 { animation-delay: 0.4s; }
+  
+  .text-gradient {
+    @apply bg-clip-text text-transparent;
+    background: var(--gradient-primary);
+  }
 }
 
 @keyframes fadeIn {
@@ -189,4 +220,9 @@
 @keyframes pulseSoft {
   0%, 100% { opacity: 1; }
   50% { opacity: 0.7; }
+}
+
+@keyframes glow {
+  0%, 100% { box-shadow: 0 0 20px hsl(262 83% 58% / 0.3); }
+  50% { box-shadow: 0 0 30px hsl(262 83% 58% / 0.5); }
 }
