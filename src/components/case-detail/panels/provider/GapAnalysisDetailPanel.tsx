@@ -116,7 +116,7 @@ export function GapAnalysisDetailPanel() {
                   <div className="flex items-center justify-between mb-1">
                     <span className="text-sm font-medium">{item.gap}</span>
                     <StatusBadge 
-                      variant={item.impact === "Medium" ? "warning" : "secondary"} 
+                      variant={item.impact === "Medium" ? "warning" : "default"} 
                       size="sm"
                     >
                       {item.impact} Impact
