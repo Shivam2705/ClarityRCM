@@ -2,16 +2,24 @@ import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { DashboardHeader } from "@/components/dashboard/DashboardHeader";
 import { PersonaToggle, Persona } from "@/components/dashboard/PersonaToggle";
-import { CaseCard } from "@/components/dashboard/CaseCard";
 import { mockCases, Case } from "@/data/mockCases";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { Search, Filter, LayoutGrid, List, Plus } from "lucide-react";
+import { Badge } from "@/components/ui/badge";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
+import { Search, Filter, Plus } from "lucide-react";
+import { format } from "date-fns";
 
 export default function Dashboard() {
   const [persona, setPersona] = useState<Persona>("provider");
   const [searchQuery, setSearchQuery] = useState("");
-  const [viewMode, setViewMode] = useState<"grid" | "list">("grid");
   const navigate = useNavigate();
 
   const filteredCases = mockCases.filter((c) =>
@@ -31,6 +39,24 @@ export default function Dashboard() {
 
   const handleCaseClick = (caseData: Case) => {
     navigate(`/case/${caseData.id}`, { state: { persona } });
+  };
+
+  const getPriorityColor = (priority: Case["priority"]) => {
+    switch (priority) {
+      case "High": return "text-destructive";
+      case "Medium": return "text-warning";
+      case "Low": return "text-muted-foreground";
+    }
+  };
+
+  const getStatusVariant = (status: Case["status"]) => {
+    switch (status) {
+      case "New": return "info";
+      case "In Review": return "warning";
+      case "Submitted": return "default";
+      case "Approved": return "success";
+      case "Denied": return "destructive";
+    }
   };
 
   return (
@@ -55,23 +81,23 @@ export default function Dashboard() {
             <p className="text-sm text-muted-foreground">All Cases</p>
             <p className="text-2xl font-bold text-foreground">{statusCounts.all}</p>
           </div>
-          <div className="rounded-xl border bg-info-light p-4">
+          <div className="rounded-xl border bg-info/10 p-4">
             <p className="text-sm text-info">New</p>
             <p className="text-2xl font-bold text-info">{statusCounts.new}</p>
           </div>
-          <div className="rounded-xl border bg-warning-light p-4">
+          <div className="rounded-xl border bg-warning/10 p-4">
             <p className="text-sm text-warning">In Review</p>
             <p className="text-2xl font-bold text-warning">{statusCounts.inReview}</p>
           </div>
-          <div className="rounded-xl border bg-primary-light p-4">
+          <div className="rounded-xl border bg-primary/10 p-4">
             <p className="text-sm text-primary">Submitted</p>
             <p className="text-2xl font-bold text-primary">{statusCounts.submitted}</p>
           </div>
-          <div className="rounded-xl border bg-success-light p-4">
+          <div className="rounded-xl border bg-success/10 p-4">
             <p className="text-sm text-success">Approved</p>
             <p className="text-2xl font-bold text-success">{statusCounts.approved}</p>
           </div>
-          <div className="rounded-xl border bg-destructive-light p-4">
+          <div className="rounded-xl border bg-destructive/10 p-4">
             <p className="text-sm text-destructive">Denied</p>
             <p className="text-2xl font-bold text-destructive">{statusCounts.denied}</p>
           </div>
@@ -93,24 +119,6 @@ export default function Dashboard() {
               <Filter className="h-4 w-4 mr-2" />
               Filter
             </Button>
-            <div className="flex items-center rounded-lg border bg-card p-1">
-              <Button
-                variant={viewMode === "grid" ? "secondary" : "ghost"}
-                size="icon"
-                className="h-8 w-8"
-                onClick={() => setViewMode("grid")}
-              >
-                <LayoutGrid className="h-4 w-4" />
-              </Button>
-              <Button
-                variant={viewMode === "list" ? "secondary" : "ghost"}
-                size="icon"
-                className="h-8 w-8"
-                onClick={() => setViewMode("list")}
-              >
-                <List className="h-4 w-4" />
-              </Button>
-            </div>
             <Button variant="default">
               <Plus className="h-4 w-4 mr-2" />
               New Case
@@ -118,18 +126,55 @@ export default function Dashboard() {
           </div>
         </div>
 
-        {/* Cases grid */}
-        <div className={viewMode === "grid" 
-          ? "grid gap-4 sm:grid-cols-2 lg:grid-cols-3" 
-          : "flex flex-col gap-3"
-        }>
-          {filteredCases.map((caseData) => (
-            <CaseCard
-              key={caseData.id}
-              caseData={caseData}
-              onClick={() => handleCaseClick(caseData)}
-            />
-          ))}
+        {/* Cases Table */}
+        <div className="rounded-xl border bg-card shadow-card overflow-hidden">
+          <Table>
+            <TableHeader>
+              <TableRow className="bg-muted/50 hover:bg-muted/50">
+                <TableHead className="font-semibold">Case ID</TableHead>
+                <TableHead className="font-semibold">Name</TableHead>
+                <TableHead className="font-semibold">Procedure Name</TableHead>
+                <TableHead className="font-semibold">CPT Code</TableHead>
+                <TableHead className="font-semibold">Date</TableHead>
+                <TableHead className="font-semibold">Priority</TableHead>
+                <TableHead className="font-semibold">Status</TableHead>
+              </TableRow>
+            </TableHeader>
+            <TableBody>
+              {filteredCases.map((caseData) => (
+                <TableRow
+                  key={caseData.id}
+                  className="cursor-pointer hover:bg-primary/5 transition-colors"
+                  onClick={() => handleCaseClick(caseData)}
+                >
+                  <TableCell className="font-medium text-primary">{caseData.id}</TableCell>
+                  <TableCell>
+                    <div>
+                      <p className="font-medium">{caseData.patientName}</p>
+                      <p className="text-xs text-muted-foreground">{caseData.patientId}</p>
+                    </div>
+                  </TableCell>
+                  <TableCell className="max-w-[200px] truncate">{caseData.procedureName || "—"}</TableCell>
+                  <TableCell>
+                    <code className="text-sm bg-muted px-2 py-0.5 rounded">{caseData.procedureCode || "—"}</code>
+                  </TableCell>
+                  <TableCell className="text-muted-foreground">
+                    {format(new Date(caseData.lastUpdated), "MMM dd, yyyy")}
+                  </TableCell>
+                  <TableCell>
+                    <span className={`font-medium ${getPriorityColor(caseData.priority)}`}>
+                      {caseData.priority}
+                    </span>
+                  </TableCell>
+                  <TableCell>
+                    <Badge variant={getStatusVariant(caseData.status) as any}>
+                      {caseData.status}
+                    </Badge>
+                  </TableCell>
+                </TableRow>
+              ))}
+            </TableBody>
+          </Table>
         </div>
 
         {filteredCases.length === 0 && (
