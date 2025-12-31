@@ -5,6 +5,7 @@ import { PersonaToggle, Persona } from "@/components/dashboard/PersonaToggle";
 import { PreAuthProviderWorkflow } from "@/components/case-detail/PreAuthProviderWorkflow";
 import { PreAuthPayerWorkflow } from "@/components/case-detail/PreAuthPayerWorkflow";
 import { MedicalCodingWorkflow } from "@/components/case-detail/MedicalCodingWorkflow";
+import { ClinicalIntakeHeader } from "@/components/case-detail/ClinicalIntakeHeader";
 import { StatusBadge } from "@/components/ui/status-badge";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -35,30 +36,30 @@ export default function CaseDetail() {
       <DashboardHeader />
 
       <main className="container py-6">
-        {/* Back button & header */}
-        <div className="mb-6">
-          <Button variant="ghost" size="sm" onClick={() => navigate("/dashboard")} className="mb-4">
-            <ArrowLeft className="h-4 w-4 mr-2" />
-            Back to Dashboard
-          </Button>
+        {/* Back button */}
+        <Button variant="ghost" size="sm" onClick={() => navigate("/dashboard")} className="mb-4">
+          <ArrowLeft className="h-4 w-4 mr-2" />
+          Back to Dashboard
+        </Button>
 
-          <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
-            <div>
-              <div className="flex items-center gap-3 mb-2">
-                <h1 className="text-2xl font-bold text-foreground">{caseData.patientName}</h1>
-                <StatusBadge variant={statusVariant[caseData.status]}>{caseData.status}</StatusBadge>
-              </div>
-              <div className="flex items-center gap-4 text-sm text-muted-foreground">
-                <span>{caseData.patientId}</span>
-                <span>•</span>
-                <span>{caseData.procedureName}</span>
-                <span>•</span>
-                <span>{caseData.payerName}</span>
-              </div>
-            </div>
-            <PersonaToggle value={persona} onChange={setPersona} />
+        {/* Case Header with Status */}
+        <div className="flex flex-col gap-2 md:flex-row md:items-center md:justify-between mb-6">
+          <div className="flex items-center gap-3">
+            <h1 className="text-xl font-semibold text-foreground">Case: {caseData.id}</h1>
+            <StatusBadge variant={statusVariant[caseData.status]}>{caseData.status}</StatusBadge>
           </div>
+          <PersonaToggle value={persona} onChange={setPersona} />
         </div>
+
+        {/* Clinical Intake - Patient Information Header */}
+        <ClinicalIntakeHeader 
+          patientName={caseData.patientName}
+          patientId={caseData.patientId}
+          procedureName={caseData.procedureName}
+          procedureCode={caseData.procedureCode}
+          payerName={caseData.payerName}
+          orderingProvider={caseData.orderingProvider}
+        />
 
         {/* Tabs */}
         <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">

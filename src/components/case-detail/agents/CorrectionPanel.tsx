@@ -165,7 +165,7 @@ export function CorrectionPanel({ agent, gaps, isActive, onApplyCorrection, onPr
                         className="bg-background"
                       />
                       <p className="text-xs text-muted-foreground">
-                        BMI < 40 is typically recommended for elective TKA. Document current value from recent visit.
+                        BMI &lt; 40 is typically recommended for elective TKA. Document current value from recent visit.
                       </p>
                     </div>
                   ) : (
