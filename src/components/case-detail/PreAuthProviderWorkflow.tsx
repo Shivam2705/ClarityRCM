@@ -1,4 +1,5 @@
 import { useState, useCallback } from "react";
+import { useNavigate } from "react-router-dom";
 import { WorkflowSteps, WorkflowStep } from "./WorkflowSteps";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
@@ -16,19 +17,13 @@ import {
   CheckCircle2,
   XCircle,
   Bot,
-  Sparkles
+  Sparkles,
+  Mail,
+  FileWarning
 } from "lucide-react";
 
 // Simplified 6-step provider journey
 const initialSteps: WorkflowStep[] = [
-  { 
-    id: "clinical-intake", 
-    title: "Clinical Intake", 
-    description: "EHR order & patient data", 
-    status: "completed",
-    agentName: "Clinical Agent",
-    canEdit: true
-  },
   { 
     id: "eligibility", 
     title: "Eligibility & Benefits", 
@@ -105,8 +100,6 @@ export function PreAuthProviderWorkflow() {
 
   const renderPanel = () => {
     switch (currentStep) {
-      case "clinical-intake":
-        return <ClinicalIntakeSection isEditing={editingStep === "clinical-intake"} onSave={() => handleSaveCorrection("clinical-intake")} onCancel={handleCancelEdit} />;
       case "eligibility":
         return <EligibilitySection isEditing={editingStep === "eligibility"} onSave={() => handleSaveCorrection("eligibility")} onCancel={handleCancelEdit} />;
       case "prior-auth-decision":
@@ -385,6 +378,8 @@ interface GapAnalysisSectionProps {
 }
 
 function GapAnalysisSection({ onProceed, onEditStep, corrections }: GapAnalysisSectionProps) {
+  const navigate = useNavigate();
+  
   const gaps = [
     { 
       id: 1, 
@@ -402,6 +397,27 @@ function GapAnalysisSection({ onProceed, onEditStep, corrections }: GapAnalysisS
       step: "clinical-intake",
       recommendation: "Document current BMI (recommended < 40 for elective TKA)"
     },
+  ];
+
+  const missingDocuments = [
+    {
+      id: 1,
+      title: "Physical Therapy Discharge Summary",
+      description: "Final PT evaluation documenting treatment completion and outcomes",
+      severity: "high"
+    },
+    {
+      id: 2,
+      title: "Recent Lab Results (CBC, BMP)",
+      description: "Pre-operative lab work within 30 days required",
+      severity: "high"
+    },
+    {
+      id: 3,
+      title: "Cardiology Clearance Letter",
+      description: "Required for patients over 65 with cardiac history",
+      severity: "medium"
+    }
   ];
 
   const completedChecks = [
@@ -464,6 +480,29 @@ function GapAnalysisSection({ onProceed, onEditStep, corrections }: GapAnalysisS
         </div>
       )}
       
+      {/* Missing Clinical Documents */}
+      <div className="mb-6">
+        <h4 className="text-sm font-medium text-foreground mb-3 flex items-center gap-2">
+          <FileWarning className="h-4 w-4 text-destructive" />
+          Missing Clinical Documents ({missingDocuments.length})
+        </h4>
+        <div className="space-y-3">
+          {missingDocuments.map((doc) => (
+            <Card key={doc.id} className="p-4 bg-destructive/10 border-destructive/30">
+              <div className="flex items-start justify-between">
+                <div>
+                  <p className="text-sm font-medium text-foreground">{doc.title}</p>
+                  <p className="text-xs text-muted-foreground">{doc.description}</p>
+                </div>
+                <Badge variant={doc.severity === "high" ? "destructive" : "secondary"}>
+                  {doc.severity} priority
+                </Badge>
+              </div>
+            </Card>
+          ))}
+        </div>
+      </div>
+
       {/* Completed Checks */}
       <div className="mb-6">
         <h4 className="text-sm font-medium text-foreground mb-3 flex items-center gap-2">
@@ -481,6 +520,37 @@ function GapAnalysisSection({ onProceed, onEditStep, corrections }: GapAnalysisS
           </div>
         </Card>
       </div>
+
+      {/* Next Best Action */}
+      <Card className="p-4 bg-primary/10 border-primary/30 mb-6">
+        <h4 className="text-sm font-medium text-foreground mb-3 flex items-center gap-2">
+          <Sparkles className="h-4 w-4 text-primary" />
+          Next Best Action
+        </h4>
+        <div className="flex items-start gap-3 p-3 bg-background/50 rounded-lg mb-3">
+          <div className="h-8 w-8 rounded-full bg-primary/20 flex items-center justify-center shrink-0">
+            <Mail className="h-4 w-4 text-primary" />
+          </div>
+          <div className="flex-1">
+            <p className="text-sm font-medium text-foreground">Request for Missing Documents</p>
+            <p className="text-xs text-muted-foreground mt-0.5">
+              Send an email to the provider requesting the missing clinical documents to complete the prior authorization submission.
+            </p>
+          </div>
+        </div>
+        <Button 
+          variant="outline" 
+          className="w-full"
+          onClick={() => {
+            const subject = encodeURIComponent("Document Request - Prior Authorization");
+            const body = encodeURIComponent(`Dear Provider,\n\nWe are processing a prior authorization request and require the following documents:\n\n${missingDocuments.map((d, i) => `${i + 1}. ${d.title} - ${d.description}`).join('\n')}\n\nPlease provide these documents at your earliest convenience to avoid delays in authorization.\n\nThank you.`);
+            window.location.href = `mailto:?subject=${subject}&body=${body}`;
+          }}
+        >
+          <Mail className="h-4 w-4 mr-2" />
+          Request for Documents
+        </Button>
+      </Card>
       
       {/* Proceed Section */}
       <Card className="p-4 bg-primary/10 border-primary/30">

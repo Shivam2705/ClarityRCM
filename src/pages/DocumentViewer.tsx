@@ -16,7 +16,8 @@ import {
   ZoomOut,
   RotateCw,
   ChevronLeft,
-  ChevronRight
+  ChevronRight,
+  Mail
 } from "lucide-react";
 
 interface Document {
@@ -144,6 +145,18 @@ export default function DocumentViewer() {
               </div>
             </div>
             <div className="flex items-center gap-2">
+              <Button 
+                variant="outline" 
+                size="sm"
+                onClick={() => {
+                  const subject = encodeURIComponent(`Document Request - Case ${caseId}`);
+                  const body = encodeURIComponent(`Dear Team,\n\nI am writing to request the following missing documents for Case ${caseId}:\n\n1. [Document Name]\n2. [Document Name]\n\nPlease provide these documents at your earliest convenience.\n\nThank you.`);
+                  window.location.href = `mailto:?subject=${subject}&body=${body}`;
+                }}
+              >
+                <Mail className="h-4 w-4 mr-2" />
+                Request for Documents
+              </Button>
               <Button variant="outline" size="sm">
                 <Download className="h-4 w-4 mr-2" />
                 Download All
