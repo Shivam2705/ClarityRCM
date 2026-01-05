@@ -4,6 +4,7 @@ import { WorkflowSteps, WorkflowStep } from "./WorkflowSteps";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
+import { AuditLogsDialog } from "@/components/ui/audit-logs-dialog";
 import { 
   FileText, 
   Shield, 
@@ -22,7 +23,7 @@ import {
   FileWarning
 } from "lucide-react";
 
-// Simplified 6-step provider journey
+// Simplified 4-step provider journey (removed document-prep)
 const initialSteps: WorkflowStep[] = [
   { 
     id: "eligibility", 
@@ -38,14 +39,6 @@ const initialSteps: WorkflowStep[] = [
     description: "Policy lookup & decision tree", 
     status: "completed",
     agentName: "Policy Agent",
-    canEdit: true
-  },
-  { 
-    id: "document-prep", 
-    title: "Document Preparation", 
-    description: "Medical record summary", 
-    status: "completed",
-    agentName: "Document Agent",
     canEdit: true
   },
   { 
@@ -104,8 +97,6 @@ export function PreAuthProviderWorkflow() {
         return <EligibilitySection isEditing={editingStep === "eligibility"} onSave={() => handleSaveCorrection("eligibility")} onCancel={handleCancelEdit} />;
       case "prior-auth-decision":
         return <PriorAuthDecisionSection isEditing={editingStep === "prior-auth-decision"} onSave={() => handleSaveCorrection("prior-auth-decision")} onCancel={handleCancelEdit} />;
-      case "document-prep":
-        return <DocumentPrepSection isEditing={editingStep === "document-prep"} onSave={() => handleSaveCorrection("document-prep")} onCancel={handleCancelEdit} />;
       case "gap-analysis":
         return <GapAnalysisSection onProceed={handleProceedToSubmit} onEditStep={handleEditStep} corrections={corrections} />;
       case "submit-to-payer":
@@ -164,13 +155,16 @@ function AgentHeader({ name, status }: { name: string; status: "active" | "compl
           status === "complete" ? "text-success" : "text-muted-foreground"
         }`} />
       </div>
-      <div>
+      <div className="flex-1">
         <p className="text-xs text-muted-foreground uppercase tracking-wide">Agent</p>
         <p className="text-sm font-medium text-foreground">{name}</p>
       </div>
-      <Badge variant={status === "active" ? "default" : status === "complete" ? "outline" : "secondary"} className="ml-auto">
-        {status === "active" ? "Processing" : status === "complete" ? "Complete" : "Idle"}
-      </Badge>
+      <div className="flex items-center gap-2">
+        <AuditLogsDialog agentName={name} />
+        <Badge variant={status === "active" ? "default" : status === "complete" ? "outline" : "secondary"}>
+          {status === "active" ? "Processing" : status === "complete" ? "Complete" : "Idle"}
+        </Badge>
+      </div>
     </div>
   );
 }
@@ -297,10 +291,14 @@ function PriorAuthDecisionSection({ isEditing, onSave, onCancel }: SectionProps)
       <Card className="p-4 bg-secondary/30 border-border/50 mb-4">
         <h4 className="text-sm font-medium text-foreground mb-3">Decision Tree Evaluation</h4>
         <div className="space-y-3">
-          <DecisionNode label="Procedure Type: Joint Replacement" result="Requires PA" />
-          <DecisionNode label="Gold Card Status" result="Not Eligible" />
-          <DecisionNode label="Network Status: In-Network" result="Standard Review" />
-          <DecisionNode label="Medical Necessity Documentation" result="Required" />
+          <DecisionNode label="a. Identify Member's Health Plan" result="Aetna PPO Commercial" />
+          <DecisionNode label="b. Check CPT Code Against Prior Authorization List" result="27447 - Requires PA" />
+          <DecisionNode label="c. Verify Place of Service" result="Outpatient Hospital" />
+          <DecisionNode label="d. Review Diagnosis Codes (ICD-10)" result="M17.11 - Primary OA Right Knee" />
+          <DecisionNode label="e. Apply Medical Policy Guidelines" result="Meets Criteria" />
+          <DecisionNode label="f. Check Provider & Facility Network Status" result="In-Network" />
+          <DecisionNode label="g. Review Authorization History" result="No Prior Auths" />
+          <DecisionNode label="h. Final Determination" result="PA Required" />
         </div>
       </Card>
       

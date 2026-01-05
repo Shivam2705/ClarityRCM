@@ -4,6 +4,7 @@ import { DashboardHeader } from "@/components/dashboard/DashboardHeader";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { ScrollArea } from "@/components/ui/scroll-area";
+import { DocumentChatbot } from "@/components/document-viewer/DocumentChatbot";
 import { 
   ArrowLeft, 
   FileText, 
@@ -318,6 +319,12 @@ export default function DocumentViewer() {
             )}
           </div>
         </div>
+
+        {/* AI Chatbot */}
+        <DocumentChatbot 
+          documentName={selectedDoc.name} 
+          documentContent={selectedDoc.preview} 
+        />
       </main>
     </div>
   );
