@@ -165,7 +165,7 @@ export default function DocumentViewer() {
                   window.location.href = `mailto:?subject=${subject}&body=${body}`;
                 }}
               >
-                <FileUp className="h-4 w-4 mr-2" />
+                <Download className="h-4 w-4 mr-2" />
                 Upload Document
               </Button>
               <Button variant="outline" size="sm">
