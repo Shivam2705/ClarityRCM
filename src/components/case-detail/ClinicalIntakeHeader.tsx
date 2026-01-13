@@ -1,18 +1,29 @@
+import { useState } from "react";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { 
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
+import { 
   User, 
-  Building2, 
   Stethoscope, 
   FileText, 
-  Phone, 
-  MapPin,
+  Phone,
   CreditCard,
   Activity,
   Pill,
   AlertCircle,
-  Sparkles
+  Sparkles,
+  FileUp,
+  Eye,
+  Loader2,
+  RefreshCw
 } from "lucide-react";
 import { useNavigate, useParams } from "react-router-dom";
 
@@ -23,6 +34,8 @@ interface ClinicalIntakeHeaderProps {
   procedureCode?: string;
   payerName: string;
   orderingProvider: string;
+  hasDocuments?: boolean;
+  hasSummary?: boolean;
 }
 
 export function ClinicalIntakeHeader({ 
@@ -31,10 +44,14 @@ export function ClinicalIntakeHeader({
   procedureName, 
   procedureCode,
   payerName,
-  orderingProvider 
+  orderingProvider,
+  hasDocuments = true,
+  hasSummary = true
 }: ClinicalIntakeHeaderProps) {
   const navigate = useNavigate();
   const { caseId } = useParams();
+  const [isGeneratingSummary, setIsGeneratingSummary] = useState(false);
+  const [summaryGenerated, setSummaryGenerated] = useState(hasSummary);
 
   const patientInfo = {
     dob: "March 15, 1956",
@@ -60,11 +77,42 @@ export function ClinicalIntakeHeader({
     }
   };
 
+  // Payer details for tabular display
+  const payerDetails = [
+    { field: "Payer Name", value: payerName },
+    { field: "Member ID", value: patientInfo.insurance.memberId },
+    { field: "Group Number", value: patientInfo.insurance.groupNumber },
+    { field: "Plan Type", value: patientInfo.insurance.planType },
+    { field: "Network Status", value: "In-Network" },
+    { field: "Prior Auth Required", value: "Yes" },
+  ];
+
   const aiSummary = `${patientName}, a ${patientInfo.age.replace(' years', '-year-old')} ${patientInfo.gender.toLowerCase()} patient, presents with ${patientInfo.clinical.primaryDiagnosis} (${patientInfo.clinical.severity}) persisting for ${patientInfo.clinical.duration}. Currently managed with conservative treatment including NSAIDs (Meloxicam) and analgesics. Patient has well-controlled comorbidities including Type 2 Diabetes and Hypertension. Requesting ${procedureName} (CPT: ${procedureCode}). Known allergies to Penicillin and Sulfa drugs noted. Clinical documentation supports medical necessity for the requested procedure.`;
+
+  const handleGenerateSummary = () => {
+    if (!hasDocuments) {
+      navigate(`/case/${caseId}/documents`);
+      return;
+    }
+    setIsGeneratingSummary(true);
+    // Simulate AI generation
+    setTimeout(() => {
+      setIsGeneratingSummary(false);
+      setSummaryGenerated(true);
+    }, 2000);
+  };
+
+  const handleRegenerateSummary = () => {
+    setIsGeneratingSummary(true);
+    setTimeout(() => {
+      setIsGeneratingSummary(false);
+      setSummaryGenerated(true);
+    }, 2000);
+  };
 
   return (
     <Card className="p-4 bg-card border-border mb-4">
-      {/* Compact Header Row */}
+      {/* Compact Header Row with Action Buttons */}
       <div className="flex items-center justify-between mb-3">
         <div className="flex items-center gap-3">
           <div className="h-10 w-10 rounded-full bg-primary/20 flex items-center justify-center">
@@ -91,35 +139,90 @@ export function ClinicalIntakeHeader({
             </div>
           </div>
         </div>
-        <Button size="sm" onClick={() => navigate(`/case/${caseId}/documents`)}>
-          <FileText className="h-4 w-4 mr-2" />
-          View Documents
-        </Button>
-      </div>
-
-      {/* AI Generated Summary */}
-      <div className="p-3 rounded-lg bg-gradient-to-r from-primary/10 via-primary/5 to-transparent border border-primary/20 mb-3">
-        <div className="flex items-start gap-2">
-          <Sparkles className="h-4 w-4 text-primary mt-0.5 flex-shrink-0" />
-          <div>
-            <h4 className="text-xs font-semibold text-primary uppercase tracking-wide mb-1">AI Patient Summary</h4>
-            <p className="text-sm text-foreground/90 leading-relaxed">{aiSummary}</p>
-          </div>
+        <div className="flex items-center gap-2">
+          {summaryGenerated && (
+            <Button 
+              size="sm" 
+              variant="outline" 
+              onClick={handleRegenerateSummary}
+              disabled={isGeneratingSummary}
+            >
+              {isGeneratingSummary ? (
+                <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+              ) : (
+                <RefreshCw className="h-4 w-4 mr-2" />
+              )}
+              Regenerate Summary
+            </Button>
+          )}
+          <Button 
+            size="sm" 
+            variant="outline"
+            onClick={() => navigate(`/case/${caseId}/documents`)}
+          >
+            <FileUp className="h-4 w-4 mr-2" />
+            Add Document
+          </Button>
+          <Button size="sm" onClick={() => navigate(`/case/${caseId}/documents`)}>
+            <FileText className="h-4 w-4 mr-2" />
+            View Documents
+          </Button>
         </div>
       </div>
+
+      {/* AI Generated Summary or Generate Option */}
+      {summaryGenerated && hasDocuments ? (
+        <div className="p-3 rounded-lg bg-gradient-to-r from-primary/10 via-primary/5 to-transparent border border-primary/20 mb-3">
+          <div className="flex items-start gap-2">
+            <Sparkles className="h-4 w-4 text-primary mt-0.5 flex-shrink-0" />
+            <div>
+              <h4 className="text-xs font-semibold text-primary uppercase tracking-wide mb-1">AI Patient Summary</h4>
+              <p className="text-sm text-foreground/90 leading-relaxed">{aiSummary}</p>
+            </div>
+          </div>
+        </div>
+      ) : (
+        <div className="p-3 rounded-lg bg-muted/50 border border-border mb-3">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-2">
+              <Sparkles className="h-4 w-4 text-muted-foreground" />
+              <div>
+                <h4 className="text-xs font-semibold text-muted-foreground uppercase tracking-wide">AI Patient Summary</h4>
+                <p className="text-xs text-muted-foreground">
+                  {hasDocuments 
+                    ? "Documents available. Generate an AI summary for quick overview."
+                    : "No documents uploaded yet. Upload documents to generate patient summary."}
+                </p>
+              </div>
+            </div>
+            <Button 
+              size="sm" 
+              onClick={handleGenerateSummary}
+              disabled={isGeneratingSummary}
+            >
+              {isGeneratingSummary ? (
+                <>
+                  <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                  Generating...
+                </>
+              ) : hasDocuments ? (
+                <>
+                  <Sparkles className="h-4 w-4 mr-2" />
+                  Generate Summary
+                </>
+              ) : (
+                <>
+                  <Eye className="h-4 w-4 mr-2" />
+                  Upload & Analyze
+                </>
+              )}
+            </Button>
+          </div>
+        </div>
+      )}
 
       {/* Compact Info Grid */}
-      <div className="grid grid-cols-2 lg:grid-cols-5 gap-2">
-        {/* Insurance */}
-        <div className="p-2 rounded-md bg-secondary/20 border border-border/50">
-          <div className="flex items-center gap-1.5 mb-1">
-            <CreditCard className="h-3 w-3 text-muted-foreground" />
-            <span className="text-[10px] font-medium text-muted-foreground uppercase">Insurance</span>
-          </div>
-          <p className="text-xs font-medium text-foreground truncate">{patientInfo.insurance.payer}</p>
-          <p className="text-[10px] text-muted-foreground">{patientInfo.insurance.memberId}</p>
-        </div>
-
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-2 mb-3">
         {/* Provider */}
         <div className="p-2 rounded-md bg-secondary/20 border border-border/50">
           <div className="flex items-center gap-1.5 mb-1">
@@ -172,6 +275,40 @@ export function ClinicalIntakeHeader({
           </div>
         </div>
       </div>
+
+      {/* Payer Details Table */}
+      <Card className="bg-secondary/20 border-border/50">
+        <div className="flex items-center gap-1.5 p-2 border-b border-border/50">
+          <CreditCard className="h-3 w-3 text-muted-foreground" />
+          <span className="text-[10px] font-medium text-muted-foreground uppercase">Payer Details</span>
+        </div>
+        <Table>
+          <TableHeader>
+            <TableRow className="hover:bg-transparent">
+              {payerDetails.map((detail, idx) => (
+                <TableHead key={idx} className="text-[10px] font-medium h-8 py-1">
+                  {detail.field}
+                </TableHead>
+              ))}
+            </TableRow>
+          </TableHeader>
+          <TableBody>
+            <TableRow className="hover:bg-muted/30">
+              {payerDetails.map((detail, idx) => (
+                <TableCell key={idx} className="text-xs py-1.5 font-medium">
+                  {detail.field === "Prior Auth Required" ? (
+                    <Badge variant="outline" className="text-[10px] bg-warning/20 text-warning border-warning/30">
+                      {detail.value}
+                    </Badge>
+                  ) : (
+                    detail.value
+                  )}
+                </TableCell>
+              ))}
+            </TableRow>
+          </TableBody>
+        </Table>
+      </Card>
     </Card>
   );
 }
