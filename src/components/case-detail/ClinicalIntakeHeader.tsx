@@ -155,14 +155,6 @@ export function ClinicalIntakeHeader({
               Regenerate Summary
             </Button>
           )}
-          <Button 
-            size="sm" 
-            variant="outline"
-            onClick={() => navigate(`/case/${caseId}/documents`)}
-          >
-            <FileUp className="h-4 w-4 mr-2" />
-            Add Document
-          </Button>
           <Button size="sm" onClick={() => navigate(`/case/${caseId}/documents`)}>
             <FileText className="h-4 w-4 mr-2" />
             View Documents
