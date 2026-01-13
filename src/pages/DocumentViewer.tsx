@@ -5,12 +5,12 @@ import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { DocumentChatbot } from "@/components/document-viewer/DocumentChatbot";
-import { 
-  ArrowLeft, 
-  FileText, 
-  ClipboardList, 
-  Pill, 
-  TestTube, 
+import {
+  ArrowLeft,
+  FileText,
+  ClipboardList,
+  Pill,
+  TestTube,
   Image as ImageIcon,
   Download,
   ZoomIn,
@@ -18,7 +18,7 @@ import {
   RotateCw,
   ChevronLeft,
   ChevronRight,
-  Mail
+  Mail,
 } from "lucide-react";
 
 interface Document {
@@ -37,7 +37,8 @@ const documents: Document[] = [
     type: "medical-records",
     date: "Jan 10, 2024",
     pages: 5,
-    preview: "Patient presents with chronic right knee pain, Kellgren-Lawrence Grade IV osteoarthritis confirmed. Conservative treatment including physical therapy, NSAIDs, and corticosteroid injections have failed to provide adequate relief over the past 6 months."
+    preview:
+      "Patient presents with chronic right knee pain, Kellgren-Lawrence Grade IV osteoarthritis confirmed. Conservative treatment including physical therapy, NSAIDs, and corticosteroid injections have failed to provide adequate relief over the past 6 months.",
   },
   {
     id: "doc-2",
@@ -45,7 +46,8 @@ const documents: Document[] = [
     type: "medical-records",
     date: "Jan 8, 2024",
     pages: 3,
-    preview: "Recommendation for total knee arthroplasty based on clinical examination and imaging findings. Patient has exhausted conservative treatment options and meets surgical criteria."
+    preview:
+      "Recommendation for total knee arthroplasty based on clinical examination and imaging findings. Patient has exhausted conservative treatment options and meets surgical criteria.",
   },
   {
     id: "doc-3",
@@ -53,7 +55,8 @@ const documents: Document[] = [
     type: "medical-history",
     date: "Dec 15, 2023",
     pages: 8,
-    preview: "68-year-old female with history of hypertension (controlled), Type 2 Diabetes (HbA1c 6.8%), and osteoarthritis. No known drug allergies. Previous surgeries: Appendectomy (1985), Cholecystectomy (2010)."
+    preview:
+      "68-year-old female with history of hypertension (controlled), Type 2 Diabetes (HbA1c 6.8%), and osteoarthritis. No known drug allergies. Previous surgeries: Appendectomy (1985), Cholecystectomy (2010).",
   },
   {
     id: "doc-4",
@@ -61,7 +64,8 @@ const documents: Document[] = [
     type: "prescription",
     date: "Nov 20, 2023",
     pages: 1,
-    preview: "Meloxicam 15mg once daily for pain management. Patient has been on this medication for 4 months with minimal relief of symptoms."
+    preview:
+      "Meloxicam 15mg once daily for pain management. Patient has been on this medication for 4 months with minimal relief of symptoms.",
   },
   {
     id: "doc-5",
@@ -69,7 +73,7 @@ const documents: Document[] = [
     type: "prescription",
     date: "Nov 20, 2023",
     pages: 1,
-    preview: "Acetaminophen 500mg as needed for breakthrough pain. Maximum 3000mg per day."
+    preview: "Acetaminophen 500mg as needed for breakthrough pain. Maximum 3000mg per day.",
   },
   {
     id: "doc-6",
@@ -77,7 +81,8 @@ const documents: Document[] = [
     type: "medical-test",
     date: "Jan 5, 2024",
     pages: 2,
-    preview: "WBC: 7.2 x10^9/L (Normal)\nRBC: 4.5 x10^12/L (Normal)\nHemoglobin: 13.8 g/dL (Normal)\nHematocrit: 41.2% (Normal)\nPlatelets: 245 x10^9/L (Normal)"
+    preview:
+      "WBC: 7.2 x10^9/L (Normal)\nRBC: 4.5 x10^12/L (Normal)\nHemoglobin: 13.8 g/dL (Normal)\nHematocrit: 41.2% (Normal)\nPlatelets: 245 x10^9/L (Normal)",
   },
   {
     id: "doc-7",
@@ -85,7 +90,8 @@ const documents: Document[] = [
     type: "medical-test",
     date: "Jan 5, 2024",
     pages: 2,
-    preview: "Glucose: 112 mg/dL (Slightly elevated)\nBUN: 18 mg/dL (Normal)\nCreatinine: 0.9 mg/dL (Normal)\nSodium: 140 mEq/L (Normal)\nPotassium: 4.2 mEq/L (Normal)"
+    preview:
+      "Glucose: 112 mg/dL (Slightly elevated)\nBUN: 18 mg/dL (Normal)\nCreatinine: 0.9 mg/dL (Normal)\nSodium: 140 mEq/L (Normal)\nPotassium: 4.2 mEq/L (Normal)",
   },
   {
     id: "doc-8",
@@ -93,7 +99,8 @@ const documents: Document[] = [
     type: "imaging-report",
     date: "Dec 28, 2023",
     pages: 4,
-    preview: "FINDINGS:\n- Complete loss of articular cartilage in medial compartment\n- Subchondral bone marrow edema\n- Moderate joint effusion\n- Medial meniscus: Degenerative changes with complex tear\n- ACL/PCL: Intact\n\nIMPRESSION: Advanced tricompartmental osteoarthritis, most severe in medial compartment."
+    preview:
+      "FINDINGS:\n- Complete loss of articular cartilage in medial compartment\n- Subchondral bone marrow edema\n- Moderate joint effusion\n- Medial meniscus: Degenerative changes with complex tear\n- ACL/PCL: Intact\n\nIMPRESSION: Advanced tricompartmental osteoarthritis, most severe in medial compartment.",
   },
   {
     id: "doc-9",
@@ -101,8 +108,9 @@ const documents: Document[] = [
     type: "imaging-report",
     date: "Dec 15, 2023",
     pages: 2,
-    preview: "Weight-bearing AP and lateral views demonstrate:\n- Bone-on-bone contact in medial compartment\n- Osteophyte formation\n- Subchondral sclerosis\n- Kellgren-Lawrence Grade IV osteoarthritis"
-  }
+    preview:
+      "Weight-bearing AP and lateral views demonstrate:\n- Bone-on-bone contact in medial compartment\n- Osteophyte formation\n- Subchondral sclerosis\n- Kellgren-Lawrence Grade IV osteoarthritis",
+  },
 ];
 
 const documentCategories = [
@@ -120,9 +128,9 @@ export default function DocumentViewer() {
   const [zoom, setZoom] = useState(100);
   const [currentPage, setCurrentPage] = useState(1);
 
-  const getDocsByType = (type: string) => documents.filter(d => d.type === type);
+  const getDocsByType = (type: string) => documents.filter((d) => d.type === type);
   const getCategoryIcon = (type: string) => {
-    const category = documentCategories.find(c => c.type === type);
+    const category = documentCategories.find((c) => c.type === type);
     return category?.icon || FileText;
   };
 
@@ -146,17 +154,19 @@ export default function DocumentViewer() {
               </div>
             </div>
             <div className="flex items-center gap-2">
-              <Button 
-                variant="outline" 
+              <Button
+                variant="outline"
                 size="sm"
                 onClick={() => {
                   const subject = encodeURIComponent(`Document Request - Case ${caseId}`);
-                  const body = encodeURIComponent(`Dear Team,\n\nI am writing to request the following missing documents for Case ${caseId}:\n\n1. [Document Name]\n2. [Document Name]\n\nPlease provide these documents at your earliest convenience.\n\nThank you.`);
+                  const body = encodeURIComponent(
+                    `Dear Team,\n\nI am writing to request the following missing documents for Case ${caseId}:\n\n1. [Document Name]\n2. [Document Name]\n\nPlease provide these documents at your earliest convenience.\n\nThank you.`,
+                  );
                   window.location.href = `mailto:?subject=${subject}&body=${body}`;
                 }}
               >
-                <Mail className="h-4 w-4 mr-2" />
-                Request for Documents
+                <Upload className="h-4 w-4 mr-2" />
+                Upload Document
               </Button>
               <Button variant="outline" size="sm">
                 <Download className="h-4 w-4 mr-2" />
@@ -176,7 +186,7 @@ export default function DocumentViewer() {
                   const docs = getDocsByType(category.type);
                   const Icon = category.icon;
                   if (docs.length === 0) return null;
-                  
+
                   return (
                     <div key={category.type}>
                       <div className="flex items-center gap-2 mb-3">
@@ -202,7 +212,9 @@ export default function DocumentViewer() {
                             <div className="flex items-center gap-2 mt-1">
                               <span className="text-xs text-muted-foreground">{doc.date}</span>
                               <span className="text-xs text-muted-foreground">•</span>
-                              <span className="text-xs text-muted-foreground">{doc.pages} page{doc.pages > 1 ? 's' : ''}</span>
+                              <span className="text-xs text-muted-foreground">
+                                {doc.pages} page{doc.pages > 1 ? "s" : ""}
+                              </span>
                             </div>
                           </button>
                         ))}
@@ -249,13 +261,13 @@ export default function DocumentViewer() {
 
             {/* Document Content */}
             <div className="flex-1 overflow-auto p-6">
-              <Card 
+              <Card
                 className="mx-auto bg-white text-slate-900 shadow-lg"
-                style={{ 
-                  width: `${(8.5 * zoom / 100) * 72}px`, 
-                  minHeight: `${(11 * zoom / 100) * 72}px`,
+                style={{
+                  width: `${((8.5 * zoom) / 100) * 72}px`,
+                  minHeight: `${((11 * zoom) / 100) * 72}px`,
                   transform: `scale(${zoom / 100})`,
-                  transformOrigin: 'top center'
+                  transformOrigin: "top center",
                 }}
               >
                 <div className="p-8" style={{ fontSize: `${14 * (zoom / 100)}px` }}>
@@ -268,7 +280,9 @@ export default function DocumentViewer() {
                     <div className="flex items-center gap-4 text-sm text-slate-600">
                       <span>Case: {caseId}</span>
                       <span>•</span>
-                      <span>Page {currentPage} of {selectedDoc.pages}</span>
+                      <span>
+                        Page {currentPage} of {selectedDoc.pages}
+                      </span>
                     </div>
                   </div>
 
@@ -294,11 +308,11 @@ export default function DocumentViewer() {
             {/* Page Navigation */}
             {selectedDoc.pages > 1 && (
               <div className="flex items-center justify-center gap-4 py-3 border-t border-border bg-card/50">
-                <Button 
-                  variant="outline" 
+                <Button
+                  variant="outline"
                   size="sm"
                   disabled={currentPage === 1}
-                  onClick={() => setCurrentPage(p => Math.max(1, p - 1))}
+                  onClick={() => setCurrentPage((p) => Math.max(1, p - 1))}
                 >
                   <ChevronLeft className="h-4 w-4 mr-1" />
                   Previous
@@ -306,11 +320,11 @@ export default function DocumentViewer() {
                 <span className="text-sm text-muted-foreground">
                   Page {currentPage} of {selectedDoc.pages}
                 </span>
-                <Button 
-                  variant="outline" 
+                <Button
+                  variant="outline"
                   size="sm"
                   disabled={currentPage === selectedDoc.pages}
-                  onClick={() => setCurrentPage(p => Math.min(selectedDoc.pages, p + 1))}
+                  onClick={() => setCurrentPage((p) => Math.min(selectedDoc.pages, p + 1))}
                 >
                   Next
                   <ChevronRight className="h-4 w-4 ml-1" />
@@ -321,10 +335,7 @@ export default function DocumentViewer() {
         </div>
 
         {/* AI Chatbot */}
-        <DocumentChatbot 
-          documentName={selectedDoc.name} 
-          documentContent={selectedDoc.preview} 
-        />
+        <DocumentChatbot documentName={selectedDoc.name} documentContent={selectedDoc.preview} />
       </main>
     </div>
   );
