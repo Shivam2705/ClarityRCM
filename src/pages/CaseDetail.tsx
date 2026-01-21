@@ -6,10 +6,11 @@ import { PreAuthProviderWorkflow } from "@/components/case-detail/PreAuthProvide
 import { PreAuthPayerWorkflow } from "@/components/case-detail/PreAuthPayerWorkflow";
 import { MedicalCodingWorkflow } from "@/components/case-detail/MedicalCodingWorkflow";
 import { ClinicalIntakeHeader } from "@/components/case-detail/ClinicalIntakeHeader";
+import { DocumentRetrievalPanel } from "@/components/case-detail/panels/DocumentRetrievalPanel";
 import { StatusBadge } from "@/components/ui/status-badge";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { ArrowLeft, FileCheck, Code2 } from "lucide-react";
+import { ArrowLeft, FileCheck, Code2, FileText } from "lucide-react";
 import { mockCases } from "@/data/mockCases";
 
 export default function CaseDetail() {
@@ -74,6 +75,10 @@ export default function CaseDetail() {
               <Code2 className="h-4 w-4 mr-2" />
               Medical Coding
             </TabsTrigger>
+            <TabsTrigger value="documents" className="h-10 px-6 data-[state=active]:bg-card">
+              <FileText className="h-4 w-4 mr-2" />
+              View Documents
+            </TabsTrigger>
           </TabsList>
 
           <TabsContent value="pre-auth" className="mt-6">
@@ -86,6 +91,10 @@ export default function CaseDetail() {
 
           <TabsContent value="coding" className="mt-6">
             <MedicalCodingWorkflow />
+          </TabsContent>
+
+          <TabsContent value="documents" className="mt-6">
+            <DocumentRetrievalPanel />
           </TabsContent>
         </Tabs>
       </main>
