@@ -5,7 +5,7 @@ import { PersonaToggle, Persona } from "@/components/dashboard/PersonaToggle";
 import { mockCases, Case } from "@/data/mockCases";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
+import { StatusBadge } from "@/components/ui/status-badge";
 import {
   Table,
   TableBody,
@@ -172,9 +172,9 @@ export default function Dashboard() {
                   </TableCell>
                   <TableCell className="max-w-[200px] truncate">{caseData.procedureName || "—"}</TableCell>
                   <TableCell>
-                    <Badge variant={getStatusVariant(caseData.status) as any}>
+                    <StatusBadge variant={getStatusVariant(caseData.status)}>
                       {caseData.status}
-                    </Badge>
+                    </StatusBadge>
                   </TableCell>
                 </TableRow>
               ))}
