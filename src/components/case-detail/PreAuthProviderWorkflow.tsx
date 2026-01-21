@@ -1,4 +1,4 @@
-import { useState, useCallback } from "react";
+import { useState, useCallback, useEffect } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { WorkflowSteps, WorkflowStep } from "./WorkflowSteps";
 import { Button } from "@/components/ui/button";
@@ -75,6 +75,38 @@ export function PreAuthProviderWorkflow() {
   const [editingStep, setEditingStep] = useState<string | null>(null);
   const [corrections, setCorrections] = useState<Record<string, boolean>>({});
   const [eligibilityStatus, setEligibilityStatus] = useState<"idle" | "processing" | "eligible" | "not-eligible">("idle");
+  const [hasAutoRun, setHasAutoRun] = useState(false);
+
+  // Auto-run eligibility check on first page load
+  useEffect(() => {
+    if (!hasAutoRun && eligibilityStatus === "idle") {
+      setHasAutoRun(true);
+      // Start processing immediately
+      setEligibilityStatus("processing");
+      // Simulate eligibility check
+      setTimeout(() => {
+        const isEligible = true; // Simulated result
+        const status = isEligible ? "eligible" : "not-eligible";
+        setEligibilityStatus(status);
+        setSteps(prev => prev.map(s => {
+          if (s.id === "eligibility") {
+            return { 
+              ...s, 
+              status: "completed" as const,
+              eligibilityStatus: status
+            };
+          }
+          if (isEligible && s.id === "document-analysis") {
+            return { ...s, status: "active" as const, canEdit: true };
+          }
+          return s;
+        }));
+        if (isEligible) {
+          setCurrentStep("document-analysis");
+        }
+      }, 2000);
+    }
+  }, [hasAutoRun, eligibilityStatus]);
 
   // Check if user can access a step based on eligibility
   const canAccessStep = useCallback((stepId: string) => {
