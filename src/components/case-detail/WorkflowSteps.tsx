@@ -32,6 +32,7 @@ interface WorkflowStepsProps {
   currentStep: string;
   onStepClick?: (stepId: string) => void;
   onEditStep?: (stepId: string) => void;
+  lockedSteps?: string[];
   className?: string;
 }
 
@@ -68,15 +69,16 @@ const statusConfig: Record<StepStatus, { icon: typeof Circle; color: string; bgC
   },
 };
 
-export function WorkflowSteps({ steps, currentStep, onStepClick, onEditStep, className }: WorkflowStepsProps) {
+export function WorkflowSteps({ steps, currentStep, onStepClick, onEditStep, lockedSteps = [], className }: WorkflowStepsProps) {
   return (
     <div className={cn("space-y-1", className)}>
       {steps.map((step, index) => {
-        const config = statusConfig[step.status];
+        const isLocked = lockedSteps.includes(step.id);
+        const config = isLocked ? statusConfig.pending : statusConfig[step.status];
         const Icon = config.icon;
         const isActive = step.id === currentStep;
-        const isClickable = !!onStepClick;
-        const canEdit = step.canEdit && step.status === "completed" && onEditStep;
+        const isClickable = !!onStepClick && !isLocked;
+        const canEdit = step.canEdit && step.status === "completed" && onEditStep && !isLocked;
 
         return (
           <div key={step.id} className="relative">
@@ -93,14 +95,15 @@ export function WorkflowSteps({ steps, currentStep, onStepClick, onEditStep, cla
             <div
               className={cn(
                 "relative flex items-start gap-3 rounded-xl p-3 transition-all duration-200",
-                isActive && "bg-primary/10 ring-1 ring-primary/30",
+                isLocked && "opacity-50 cursor-not-allowed",
+                isActive && !isLocked && "bg-primary/10 ring-1 ring-primary/30",
                 isClickable && !isActive && "hover:bg-secondary/50 cursor-pointer",
                 step.hasCorrections && "ring-1 ring-warning/50"
               )}
             >
               <button
-                onClick={() => onStepClick?.(step.id)}
-                disabled={!isClickable}
+                onClick={() => !isLocked && onStepClick?.(step.id)}
+                disabled={!isClickable || isLocked}
                 className="flex items-start gap-3 flex-1 text-left"
               >
                 <div
