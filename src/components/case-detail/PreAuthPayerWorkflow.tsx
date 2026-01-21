@@ -30,7 +30,7 @@ const initialPayerSteps: WorkflowStep[] = [
     title: "Member Eligibility", 
     description: "Verification & benefits check", 
     status: "completed",
-    agentName: "Eligibility Agent"
+    eligibilityStatus: "eligible-pa-req"
   },
   { 
     id: "document-review", 
