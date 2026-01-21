@@ -159,13 +159,40 @@ interface SectionProps {
   onCancel?: () => void;
 }
 
-function AgentHeader({ name, status, showRunButton, onRun, isRunning }: { 
+type EligibilityStatus = "new" | "eligible" | "eligible-pa-req" | "not-eligible" | "pa-review" | "pa-submitted" | "pa-denied";
+type AgentStatus = "active" | "complete" | "idle";
+
+function getEligibilityStatusConfig(status: EligibilityStatus) {
+  switch (status) {
+    case "new":
+      return { label: "New", className: "bg-muted text-muted-foreground border-muted" };
+    case "eligible":
+      return { label: "Eligible", className: "bg-success/20 text-success border-success/30" };
+    case "eligible-pa-req":
+      return { label: "Eligible PA Req", className: "bg-warning/20 text-warning border-warning/30" };
+    case "not-eligible":
+      return { label: "Not Eligible", className: "bg-destructive/20 text-destructive border-destructive/30" };
+    case "pa-review":
+      return { label: "PA Review", className: "bg-warning/20 text-warning border-warning/30" };
+    case "pa-submitted":
+      return { label: "PA Submitted", className: "bg-success/20 text-success border-success/30" };
+    case "pa-denied":
+      return { label: "PA Denied", className: "bg-destructive/20 text-destructive border-destructive/30" };
+    default:
+      return { label: "New", className: "bg-muted text-muted-foreground border-muted" };
+  }
+}
+
+function AgentHeader({ name, status, eligibilityStatus, showRunButton, onRun, isRunning }: { 
   name: string; 
-  status: "active" | "complete" | "idle";
+  status: AgentStatus;
+  eligibilityStatus?: EligibilityStatus;
   showRunButton?: boolean;
   onRun?: () => void;
   isRunning?: boolean;
 }) {
+  const eligibilityConfig = eligibilityStatus ? getEligibilityStatusConfig(eligibilityStatus) : null;
+  
   return (
     <div className="flex items-center gap-3 mb-4">
       <div className={`h-10 w-10 rounded-xl flex items-center justify-center ${
@@ -200,9 +227,15 @@ function AgentHeader({ name, status, showRunButton, onRun, isRunning }: {
           </Button>
         )}
         <AuditLogsDialog agentName={name} />
-        <Badge variant={status === "active" ? "default" : status === "complete" ? "outline" : "secondary"}>
-          {status === "active" ? "Processing" : status === "complete" ? "Complete" : "Idle"}
-        </Badge>
+        {eligibilityConfig ? (
+          <Badge variant="outline" className={eligibilityConfig.className}>
+            {eligibilityConfig.label}
+          </Badge>
+        ) : (
+          <Badge variant={status === "active" ? "default" : status === "complete" ? "outline" : "secondary"}>
+            {status === "active" ? "Processing" : status === "complete" ? "Complete" : "Idle"}
+          </Badge>
+        )}
       </div>
     </div>
   );
@@ -211,12 +244,15 @@ function AgentHeader({ name, status, showRunButton, onRun, isRunning }: {
 function EligibilitySection({ isEditing, onSave, onCancel }: SectionProps) {
   const [isRunning, setIsRunning] = useState(false);
   const [hasResults, setHasResults] = useState(true);
+  const [eligibilityStatus, setEligibilityStatus] = useState<EligibilityStatus>("eligible-pa-req");
 
   const handleRunCheck = () => {
     setIsRunning(true);
     setTimeout(() => {
       setIsRunning(false);
       setHasResults(true);
+      // After running, set status based on results (demo: eligible with PA required)
+      setEligibilityStatus("eligible-pa-req");
     }, 2000);
   };
 
@@ -225,6 +261,7 @@ function EligibilitySection({ isEditing, onSave, onCancel }: SectionProps) {
       <AgentHeader 
         name="Eligibility Agent" 
         status={hasResults ? "complete" : "idle"}
+        eligibilityStatus={eligibilityStatus}
         showRunButton
         onRun={handleRunCheck}
         isRunning={isRunning}
