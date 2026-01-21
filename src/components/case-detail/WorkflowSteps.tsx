@@ -4,12 +4,25 @@ import { Button } from "@/components/ui/button";
 
 export type StepStatus = "completed" | "active" | "pending" | "warning" | "needs-review";
 
+export type EligibilityStatus = "new" | "eligible" | "eligible-pa-req" | "not-eligible" | "pa-review" | "pa-submitted" | "pa-denied";
+
+const eligibilityStatusConfig: Record<EligibilityStatus, { label: string; color: string; bgColor: string }> = {
+  "new": { label: "New", color: "text-muted-foreground", bgColor: "bg-muted" },
+  "eligible": { label: "Eligible", color: "text-success", bgColor: "bg-success/20" },
+  "eligible-pa-req": { label: "Eligible PA Req", color: "text-warning", bgColor: "bg-warning/20" },
+  "not-eligible": { label: "Not Eligible", color: "text-destructive", bgColor: "bg-destructive/20" },
+  "pa-review": { label: "PA Review", color: "text-warning", bgColor: "bg-warning/20" },
+  "pa-submitted": { label: "PA Submitted", color: "text-success", bgColor: "bg-success/20" },
+  "pa-denied": { label: "PA Denied", color: "text-destructive", bgColor: "bg-destructive/20" },
+};
+
 export interface WorkflowStep {
   id: string;
   title: string;
   description?: string;
   status: StepStatus;
   agentName?: string;
+  eligibilityStatus?: EligibilityStatus;
   hasCorrections?: boolean;
   canEdit?: boolean;
 }
@@ -120,7 +133,15 @@ export function WorkflowSteps({ steps, currentStep, onStepClick, onEditStep, cla
                       {step.description}
                     </p>
                   )}
-                  {step.agentName && (
+                  {step.eligibilityStatus ? (
+                    <span className={cn(
+                      "inline-flex text-[10px] px-2 py-0.5 rounded-full font-medium mt-1",
+                      eligibilityStatusConfig[step.eligibilityStatus].bgColor,
+                      eligibilityStatusConfig[step.eligibilityStatus].color
+                    )}>
+                      {eligibilityStatusConfig[step.eligibilityStatus].label}
+                    </span>
+                  ) : step.agentName && (
                     <p className="text-[10px] text-primary/70 mt-1 font-medium uppercase tracking-wide">
                       {step.agentName}
                     </p>
