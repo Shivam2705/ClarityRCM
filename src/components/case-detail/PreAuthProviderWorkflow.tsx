@@ -520,7 +520,7 @@ function DocumentAnalysisSection({ isEditing, onSave, onCancel, onComplete }: Se
   return (
     <Card className="p-6 bg-card border-border">
       <AgentHeader 
-        name="Document Agent" 
+        name="Agent"
         status={hasAnalysis ? "complete" : "idle"}
         showRunButton
         onRun={handleAnalyze}
