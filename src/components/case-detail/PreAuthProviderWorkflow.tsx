@@ -1,6 +1,6 @@
 import { useState, useCallback } from "react";
 import { useNavigate, useParams } from "react-router-dom";
-import { WorkflowSteps, WorkflowStep } from "./WorkflowSteps";
+import { WorkflowSteps, WorkflowStep, AgentEligibilityStatus } from "./WorkflowSteps";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -38,6 +38,7 @@ const initialSteps: WorkflowStep[] = [
     description: "Insurance verification", 
     status: "completed",
     agentName: "Eligibility Agent",
+    agentStatus: "eligible-pa-req",
     canEdit: true
   },
   { 
