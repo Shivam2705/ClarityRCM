@@ -124,7 +124,13 @@ export function ClinicalIntakeHeader({
             </div>
           </div>
         </div>
+        <div className="flex items-center gap-2">
+          <Button size="sm" onClick={() => navigate(`/case/${caseId}/documents`)}>
+            <FileText className="h-4 w-4 mr-2" />
+            View Documents
+          </Button>
         </div>
+      </div>
 
       {/* Compact Info Grid */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-2 mb-3">
