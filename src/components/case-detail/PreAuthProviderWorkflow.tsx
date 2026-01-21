@@ -302,7 +302,7 @@ function EligibilityHeader({
         }`} />
       </div>
       <div className="flex-1">
-        <p className="text-sm font-medium text-foreground">Eligibility Agent</p>
+        <p className="text-sm font-medium text-foreground">Agent</p>
       </div>
       <div className="flex items-center gap-2">
         {/* Status Badge */}
