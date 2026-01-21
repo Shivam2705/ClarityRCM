@@ -8,12 +8,14 @@ interface CaseCardProps {
   onClick: () => void;
 }
 
-const statusVariant: Record<Case["status"], "new" | "review" | "submitted" | "approved" | "denied"> = {
+const statusVariant: Record<Case["status"], "new" | "eligible" | "eligible-pa-req" | "not-eligible" | "pa-review" | "pa-submitted" | "pa-denied"> = {
   "New": "new",
-  "In Review": "review",
-  "Submitted": "submitted",
-  "Approved": "approved",
-  "Denied": "denied",
+  "Eligible": "eligible",
+  "Eligible PA Req": "eligible-pa-req",
+  "Not Eligible": "not-eligible",
+  "PA Review": "pa-review",
+  "PA Submitted": "pa-submitted",
+  "PA Denied": "pa-denied",
 };
 
 const priorityColors: Record<Case["priority"], string> = {

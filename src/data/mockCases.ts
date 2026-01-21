@@ -1,3 +1,5 @@
+export type CaseStatus = "New" | "Eligible" | "Eligible PA Req" | "Not Eligible" | "PA Review" | "PA Submitted" | "PA Denied";
+
 export interface Case {
   id: string;
   patientName: string;
@@ -6,7 +8,7 @@ export interface Case {
   encounterType: "Inpatient" | "Outpatient" | "Procedure";
   orderingProvider: string;
   payerName: string;
-  status: "New" | "In Review" | "Submitted" | "Approved" | "Denied";
+  status: CaseStatus;
   priority: "High" | "Medium" | "Low";
   lastUpdated: string;
   procedureCode?: string;
@@ -22,7 +24,7 @@ export const mockCases: Case[] = [
     encounterType: "Inpatient",
     orderingProvider: "Dr. Michael Chen",
     payerName: "Blue Cross Blue Shield",
-    status: "In Review",
+    status: "Eligible PA Req",
     priority: "High",
     lastUpdated: "2024-01-15T10:30:00Z",
     procedureCode: "27447",
@@ -50,7 +52,7 @@ export const mockCases: Case[] = [
     encounterType: "Procedure",
     orderingProvider: "Dr. James Park",
     payerName: "UnitedHealthcare",
-    status: "Submitted",
+    status: "PA Submitted",
     priority: "Low",
     lastUpdated: "2024-01-14T16:45:00Z",
     procedureCode: "43239",
@@ -64,7 +66,7 @@ export const mockCases: Case[] = [
     encounterType: "Inpatient",
     orderingProvider: "Dr. Lisa Martinez",
     payerName: "Cigna",
-    status: "Approved",
+    status: "Eligible",
     priority: "High",
     lastUpdated: "2024-01-14T14:20:00Z",
     procedureCode: "33533",
@@ -78,7 +80,7 @@ export const mockCases: Case[] = [
     encounterType: "Outpatient",
     orderingProvider: "Dr. Robert Kim",
     payerName: "Humana",
-    status: "Denied",
+    status: "PA Denied",
     priority: "Medium",
     lastUpdated: "2024-01-13T11:30:00Z",
     procedureCode: "77067",
@@ -92,7 +94,7 @@ export const mockCases: Case[] = [
     encounterType: "Procedure",
     orderingProvider: "Dr. Sarah Lee",
     payerName: "Medicare",
-    status: "In Review",
+    status: "PA Review",
     priority: "High",
     lastUpdated: "2024-01-15T08:00:00Z",
     procedureCode: "64483",

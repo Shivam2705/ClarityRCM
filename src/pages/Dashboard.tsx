@@ -31,10 +31,12 @@ export default function Dashboard() {
   const statusCounts = {
     all: mockCases.length,
     new: mockCases.filter((c) => c.status === "New").length,
-    inReview: mockCases.filter((c) => c.status === "In Review").length,
-    submitted: mockCases.filter((c) => c.status === "Submitted").length,
-    approved: mockCases.filter((c) => c.status === "Approved").length,
-    denied: mockCases.filter((c) => c.status === "Denied").length,
+    eligible: mockCases.filter((c) => c.status === "Eligible").length,
+    eligiblePaReq: mockCases.filter((c) => c.status === "Eligible PA Req").length,
+    notEligible: mockCases.filter((c) => c.status === "Not Eligible").length,
+    paReview: mockCases.filter((c) => c.status === "PA Review").length,
+    paSubmitted: mockCases.filter((c) => c.status === "PA Submitted").length,
+    paDenied: mockCases.filter((c) => c.status === "PA Denied").length,
   };
 
   const handleCaseClick = (caseData: Case) => {
@@ -51,11 +53,13 @@ export default function Dashboard() {
 
   const getStatusVariant = (status: Case["status"]) => {
     switch (status) {
-      case "New": return "info";
-      case "In Review": return "warning";
-      case "Submitted": return "default";
-      case "Approved": return "success";
-      case "Denied": return "destructive";
+      case "New": return "new";
+      case "Eligible": return "eligible";
+      case "Eligible PA Req": return "eligible-pa-req";
+      case "Not Eligible": return "not-eligible";
+      case "PA Review": return "pa-review";
+      case "PA Submitted": return "pa-submitted";
+      case "PA Denied": return "pa-denied";
     }
   };
 
@@ -81,25 +85,33 @@ export default function Dashboard() {
             <p className="text-sm text-muted-foreground">All Cases</p>
             <p className="text-2xl font-bold text-foreground">{statusCounts.all}</p>
           </div>
-          <div className="rounded-xl border bg-info/10 p-4">
-            <p className="text-sm text-info">New</p>
-            <p className="text-2xl font-bold text-info">{statusCounts.new}</p>
-          </div>
-          <div className="rounded-xl border bg-warning/10 p-4">
-            <p className="text-sm text-warning">In Review</p>
-            <p className="text-2xl font-bold text-warning">{statusCounts.inReview}</p>
-          </div>
-          <div className="rounded-xl border bg-primary/10 p-4">
-            <p className="text-sm text-primary">Submitted</p>
-            <p className="text-2xl font-bold text-primary">{statusCounts.submitted}</p>
+          <div className="rounded-xl border bg-muted p-4">
+            <p className="text-sm text-muted-foreground">New</p>
+            <p className="text-2xl font-bold text-muted-foreground">{statusCounts.new}</p>
           </div>
           <div className="rounded-xl border bg-success/10 p-4">
-            <p className="text-sm text-success">Approved</p>
-            <p className="text-2xl font-bold text-success">{statusCounts.approved}</p>
+            <p className="text-sm text-success">Eligible</p>
+            <p className="text-2xl font-bold text-success">{statusCounts.eligible}</p>
+          </div>
+          <div className="rounded-xl border bg-warning/10 p-4">
+            <p className="text-sm text-warning">Eligible PA Req</p>
+            <p className="text-2xl font-bold text-warning">{statusCounts.eligiblePaReq}</p>
           </div>
           <div className="rounded-xl border bg-destructive/10 p-4">
-            <p className="text-sm text-destructive">Denied</p>
-            <p className="text-2xl font-bold text-destructive">{statusCounts.denied}</p>
+            <p className="text-sm text-destructive">Not Eligible</p>
+            <p className="text-2xl font-bold text-destructive">{statusCounts.notEligible}</p>
+          </div>
+          <div className="rounded-xl border bg-warning/10 p-4">
+            <p className="text-sm text-warning">PA Review</p>
+            <p className="text-2xl font-bold text-warning">{statusCounts.paReview}</p>
+          </div>
+          <div className="rounded-xl border bg-success/10 p-4">
+            <p className="text-sm text-success">PA Submitted</p>
+            <p className="text-2xl font-bold text-success">{statusCounts.paSubmitted}</p>
+          </div>
+          <div className="rounded-xl border bg-destructive/10 p-4">
+            <p className="text-sm text-destructive">PA Denied</p>
+            <p className="text-2xl font-bold text-destructive">{statusCounts.paDenied}</p>
           </div>
         </div>
 

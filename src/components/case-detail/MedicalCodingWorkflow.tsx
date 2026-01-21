@@ -49,7 +49,7 @@ export function MedicalCodingWorkflow() {
             <div><p className="text-xs text-muted-foreground">Encounter</p><p className="font-medium">Inpatient Surgery</p></div>
             <div className="flex items-center justify-between pt-2 border-t">
               <span className="text-muted-foreground">Coding Status</span>
-              <StatusBadge variant="review">In Progress</StatusBadge>
+              <StatusBadge variant="pa-review">In Progress</StatusBadge>
             </div>
           </div>
         </div>
