@@ -375,19 +375,6 @@ function EligibilityHeader({
         <p className="text-sm font-medium text-foreground">Agent</p>
       </div>
       <div className="flex items-center gap-2">
-        {/* Status Badge */}
-        {eligibilityStatus === "eligible" && (
-          <Badge className="bg-success text-white">Eligible</Badge>
-        )}
-        {eligibilityStatus === "not-eligible" && (
-          <Badge className="bg-destructive text-white">Not Eligible</Badge>
-        )}
-        {eligibilityStatus === "processing" && (
-          <Badge variant="secondary" className="flex items-center gap-1">
-            <Loader2 className="h-3 w-3 animate-spin" />
-            Processing
-          </Badge>
-        )}
         
         {/* Run / Run Again Button */}
         <Button 
