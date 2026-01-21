@@ -123,7 +123,7 @@ export function WorkflowSteps({ steps, currentStep, onStepClick, onEditStep, loc
             {index < steps.length - 1 && (
               <div
                 className={cn(
-                  "absolute left-[30px] top-[48px] h-[calc(100%-24px)] w-0.5",
+                  "absolute left-[29px] top-[52px] h-[calc(100%-28px)] w-0.5",
                   step.status === "completed" ? "bg-gradient-to-b from-success/50 to-success/20" : "bg-border"
                 )}
               />
