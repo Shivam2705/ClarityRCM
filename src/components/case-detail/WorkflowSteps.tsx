@@ -123,7 +123,7 @@ export function WorkflowSteps({ steps, currentStep, onStepClick, onEditStep, loc
             {index < steps.length - 1 && (
               <div
                 className={cn(
-                  "absolute left-[29px] top-[52px] h-[calc(100%-28px)] w-0.5",
+                  "absolute left-[29px] top-[52px] h-[calc(100%-28px)] w-0.5 z-0",
                   step.status === "completed" ? "bg-gradient-to-b from-success/50 to-success/20" : "bg-border"
                 )}
               />
@@ -145,13 +145,14 @@ export function WorkflowSteps({ steps, currentStep, onStepClick, onEditStep, loc
               >
                 <div
                   className={cn(
-                    "flex h-9 w-9 shrink-0 items-center justify-center rounded-full transition-all",
-                    config.bgColor,
+                    "relative z-10 flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-background transition-all",
                     isActive && "ring-2 ring-offset-2 ring-offset-background",
                     isActive && config.ringColor
                   )}
                 >
-                  <Icon className={cn("h-4 w-4", config.color)} />
+                  {/* Opaque background prevents the connector line from showing through */}
+                  <div className={cn("absolute inset-0 rounded-full", config.bgColor)} />
+                  <Icon className={cn("relative h-4 w-4", config.color)} />
                 </div>
 
                 <div className="flex-1 min-w-0 pt-0.5">
