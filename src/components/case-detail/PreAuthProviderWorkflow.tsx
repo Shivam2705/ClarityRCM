@@ -605,29 +605,8 @@ function DocumentAnalysisSection({ isEditing, onSave, onCancel, onComplete }: Se
           size="sm"
           onClick={() => navigate(`/case/${caseId}/documents`)}
         >
-          <Eye className="h-4 w-4 mr-2" />
-          Preview Documents
-        </Button>
-        <Button 
-          variant="outline" 
-          size="sm"
-          onClick={() => navigate(`/case/${caseId}/documents`)}
-        >
           <FileUp className="h-4 w-4 mr-2" />
           Upload Document
-        </Button>
-        <Button 
-          variant="outline" 
-          size="sm"
-          onClick={handleAnalyze}
-          disabled={isAnalyzing}
-        >
-          {isAnalyzing ? (
-            <Loader2 className="h-4 w-4 mr-2 animate-spin" />
-          ) : (
-            <Sparkles className="h-4 w-4 mr-2" />
-          )}
-          Analyze Documents
         </Button>
       </div>
 
