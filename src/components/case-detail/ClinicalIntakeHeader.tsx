@@ -264,16 +264,16 @@ export function ClinicalIntakeHeader({
                 <h4 className="text-xs font-semibold text-primary uppercase tracking-wide">AI Patient Summary</h4>
                 <Button 
                   size="sm" 
-                  variant="ghost" 
+                  variant="outline" 
                   onClick={handleRegenerateSummary}
                   disabled={isGeneratingSummary}
-                  className="h-6 px-2"
                 >
                   {isGeneratingSummary ? (
-                    <Loader2 className="h-3 w-3 animate-spin" />
+                    <Loader2 className="h-4 w-4 mr-2 animate-spin" />
                   ) : (
-                    <RefreshCw className="h-3 w-3" />
+                    <RefreshCw className="h-4 w-4 mr-2" />
                   )}
+                  Regenerate Summary
                 </Button>
               </div>
               <p className="text-sm text-foreground/90 leading-relaxed">{aiSummary}</p>
