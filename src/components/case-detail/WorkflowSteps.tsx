@@ -6,11 +6,37 @@ export type StepStatus = "completed" | "active" | "pending" | "warning" | "needs
 
 export type EligibilityStatus = "new" | "eligible" | "eligible-pa-req" | "not-eligible" | "pa-review" | "pa-submitted" | "pa-denied";
 
-export type DocumentAnalysisStatus = "analyzed" | "in-progress";
+export type DocumentAnalysisStatus = "analyzed" | "in-progress" | "failed";
+
+export type PriorAuthDecisionStatus = "determined" | "in-progress" | "failed";
+
+export type GapAnalysisStatus = "complete" | "in-progress" | "gaps-found" | "failed";
+
+export type SubmissionStatus = "submitted" | "in-progress" | "failed";
 
 const documentAnalysisStatusConfig: Record<DocumentAnalysisStatus, { label: string; color: string; bgColor: string }> = {
   "analyzed": { label: "Analyzed", color: "text-success", bgColor: "bg-success/20" },
   "in-progress": { label: "In progress", color: "text-warning", bgColor: "bg-warning/20" },
+  "failed": { label: "Failed", color: "text-destructive", bgColor: "bg-destructive/20" },
+};
+
+const priorAuthDecisionStatusConfig: Record<PriorAuthDecisionStatus, { label: string; color: string; bgColor: string }> = {
+  "determined": { label: "Determined", color: "text-success", bgColor: "bg-success/20" },
+  "in-progress": { label: "In progress", color: "text-warning", bgColor: "bg-warning/20" },
+  "failed": { label: "Failed", color: "text-destructive", bgColor: "bg-destructive/20" },
+};
+
+const gapAnalysisStatusConfig: Record<GapAnalysisStatus, { label: string; color: string; bgColor: string }> = {
+  "complete": { label: "Complete", color: "text-success", bgColor: "bg-success/20" },
+  "in-progress": { label: "In progress", color: "text-warning", bgColor: "bg-warning/20" },
+  "gaps-found": { label: "Gaps Found", color: "text-warning", bgColor: "bg-warning/20" },
+  "failed": { label: "Failed", color: "text-destructive", bgColor: "bg-destructive/20" },
+};
+
+const submissionStatusConfig: Record<SubmissionStatus, { label: string; color: string; bgColor: string }> = {
+  "submitted": { label: "Submitted", color: "text-success", bgColor: "bg-success/20" },
+  "in-progress": { label: "In progress", color: "text-warning", bgColor: "bg-warning/20" },
+  "failed": { label: "Failed", color: "text-destructive", bgColor: "bg-destructive/20" },
 };
 
 const eligibilityStatusConfig: Record<EligibilityStatus, { label: string; color: string; bgColor: string }> = {
@@ -31,6 +57,9 @@ export interface WorkflowStep {
   agentName?: string;
   eligibilityStatus?: EligibilityStatus;
   documentAnalysisStatus?: DocumentAnalysisStatus;
+  priorAuthDecisionStatus?: PriorAuthDecisionStatus;
+  gapAnalysisStatus?: GapAnalysisStatus;
+  submissionStatus?: SubmissionStatus;
   hasCorrections?: boolean;
   canEdit?: boolean;
 }
@@ -159,6 +188,30 @@ export function WorkflowSteps({ steps, currentStep, onStepClick, onEditStep, loc
                       documentAnalysisStatusConfig[step.documentAnalysisStatus].color
                     )}>
                       {documentAnalysisStatusConfig[step.documentAnalysisStatus].label}
+                    </span>
+                  ) : step.priorAuthDecisionStatus ? (
+                    <span className={cn(
+                      "inline-flex text-[10px] px-2 py-0.5 rounded-full font-medium mt-1",
+                      priorAuthDecisionStatusConfig[step.priorAuthDecisionStatus].bgColor,
+                      priorAuthDecisionStatusConfig[step.priorAuthDecisionStatus].color
+                    )}>
+                      {priorAuthDecisionStatusConfig[step.priorAuthDecisionStatus].label}
+                    </span>
+                  ) : step.gapAnalysisStatus ? (
+                    <span className={cn(
+                      "inline-flex text-[10px] px-2 py-0.5 rounded-full font-medium mt-1",
+                      gapAnalysisStatusConfig[step.gapAnalysisStatus].bgColor,
+                      gapAnalysisStatusConfig[step.gapAnalysisStatus].color
+                    )}>
+                      {gapAnalysisStatusConfig[step.gapAnalysisStatus].label}
+                    </span>
+                  ) : step.submissionStatus ? (
+                    <span className={cn(
+                      "inline-flex text-[10px] px-2 py-0.5 rounded-full font-medium mt-1",
+                      submissionStatusConfig[step.submissionStatus].bgColor,
+                      submissionStatusConfig[step.submissionStatus].color
+                    )}>
+                      {submissionStatusConfig[step.submissionStatus].label}
                     </span>
                   ) : step.agentName && (
                     <p className="text-[10px] text-primary/70 mt-1 font-medium uppercase tracking-wide">
