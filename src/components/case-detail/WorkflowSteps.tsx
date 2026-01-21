@@ -174,47 +174,7 @@ export function WorkflowSteps({ steps, currentStep, onStepClick, onEditStep, loc
                       {step.description}
                     </p>
                   )}
-                  {step.eligibilityStatus ? (
-                    <span className={cn(
-                      "inline-flex text-[10px] px-2 py-0.5 rounded-full font-medium mt-1",
-                      eligibilityStatusConfig[step.eligibilityStatus].bgColor,
-                      eligibilityStatusConfig[step.eligibilityStatus].color
-                    )}>
-                      {eligibilityStatusConfig[step.eligibilityStatus].label}
-                    </span>
-                  ) : step.documentAnalysisStatus ? (
-                    <span className={cn(
-                      "inline-flex text-[10px] px-2 py-0.5 rounded-full font-medium mt-1",
-                      documentAnalysisStatusConfig[step.documentAnalysisStatus].bgColor,
-                      documentAnalysisStatusConfig[step.documentAnalysisStatus].color
-                    )}>
-                      {documentAnalysisStatusConfig[step.documentAnalysisStatus].label}
-                    </span>
-                  ) : step.priorAuthDecisionStatus ? (
-                    <span className={cn(
-                      "inline-flex text-[10px] px-2 py-0.5 rounded-full font-medium mt-1",
-                      priorAuthDecisionStatusConfig[step.priorAuthDecisionStatus].bgColor,
-                      priorAuthDecisionStatusConfig[step.priorAuthDecisionStatus].color
-                    )}>
-                      {priorAuthDecisionStatusConfig[step.priorAuthDecisionStatus].label}
-                    </span>
-                  ) : step.gapAnalysisStatus ? (
-                    <span className={cn(
-                      "inline-flex text-[10px] px-2 py-0.5 rounded-full font-medium mt-1",
-                      gapAnalysisStatusConfig[step.gapAnalysisStatus].bgColor,
-                      gapAnalysisStatusConfig[step.gapAnalysisStatus].color
-                    )}>
-                      {gapAnalysisStatusConfig[step.gapAnalysisStatus].label}
-                    </span>
-                  ) : step.submissionStatus ? (
-                    <span className={cn(
-                      "inline-flex text-[10px] px-2 py-0.5 rounded-full font-medium mt-1",
-                      submissionStatusConfig[step.submissionStatus].bgColor,
-                      submissionStatusConfig[step.submissionStatus].color
-                    )}>
-                      {submissionStatusConfig[step.submissionStatus].label}
-                    </span>
-                  ) : step.agentName && (
+                  {step.agentName && (
                     <p className="text-[10px] text-primary/70 mt-1 font-medium uppercase tracking-wide">
                       {step.agentName}
                     </p>
