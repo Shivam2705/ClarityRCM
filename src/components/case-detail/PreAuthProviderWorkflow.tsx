@@ -108,18 +108,15 @@ export function PreAuthProviderWorkflow() {
     }
   }, [hasAutoRun, eligibilityStatus]);
 
-  // Check if user can access a step based on eligibility
+  // Check if user can access a step based on eligibility and step status
   const canAccessStep = useCallback((stepId: string) => {
     if (stepId === "eligibility") return true;
     if (eligibilityStatus !== "eligible") return false;
     
-    const stepOrder = ["eligibility", "document-analysis", "prior-auth-decision", "gap-analysis", "submit-to-payer"];
-    const stepIndex = stepOrder.indexOf(stepId);
-    const currentIndex = stepOrder.indexOf(currentStep);
-    
-    // Allow access to completed steps and current step
-    return stepIndex <= currentIndex;
-  }, [eligibilityStatus, currentStep]);
+    // Find the step and check if it's completed or active
+    const step = steps.find(s => s.id === stepId);
+    return step?.status === "completed" || step?.status === "active";
+  }, [eligibilityStatus, steps]);
 
   const handleStepClick = useCallback((stepId: string) => {
     if (canAccessStep(stepId)) {
