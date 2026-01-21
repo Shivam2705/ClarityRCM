@@ -529,7 +529,7 @@ function DocumentAnalysisSection({ isEditing, onSave, onCancel, onComplete }: Se
       <h3 className="text-lg font-semibold text-foreground mb-4">Document Analysis & Summary</h3>
       
       {/* Action Buttons */}
-      <div className="flex gap-2 mb-4">
+      <div className="flex flex-wrap gap-2 mb-4">
         <Button 
           variant="outline" 
           size="sm"
