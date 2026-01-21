@@ -6,6 +6,13 @@ export type StepStatus = "completed" | "active" | "pending" | "warning" | "needs
 
 export type EligibilityStatus = "new" | "eligible" | "eligible-pa-req" | "not-eligible" | "pa-review" | "pa-submitted" | "pa-denied";
 
+export type DocumentAnalysisStatus = "analyzed" | "in-progress";
+
+const documentAnalysisStatusConfig: Record<DocumentAnalysisStatus, { label: string; color: string; bgColor: string }> = {
+  "analyzed": { label: "Analyzed", color: "text-success", bgColor: "bg-success/20" },
+  "in-progress": { label: "In progress", color: "text-warning", bgColor: "bg-warning/20" },
+};
+
 const eligibilityStatusConfig: Record<EligibilityStatus, { label: string; color: string; bgColor: string }> = {
   "new": { label: "New", color: "text-muted-foreground", bgColor: "bg-muted" },
   "eligible": { label: "Eligible", color: "text-success", bgColor: "bg-success/20" },
@@ -23,6 +30,7 @@ export interface WorkflowStep {
   status: StepStatus;
   agentName?: string;
   eligibilityStatus?: EligibilityStatus;
+  documentAnalysisStatus?: DocumentAnalysisStatus;
   hasCorrections?: boolean;
   canEdit?: boolean;
 }
@@ -143,6 +151,14 @@ export function WorkflowSteps({ steps, currentStep, onStepClick, onEditStep, loc
                       eligibilityStatusConfig[step.eligibilityStatus].color
                     )}>
                       {eligibilityStatusConfig[step.eligibilityStatus].label}
+                    </span>
+                  ) : step.documentAnalysisStatus ? (
+                    <span className={cn(
+                      "inline-flex text-[10px] px-2 py-0.5 rounded-full font-medium mt-1",
+                      documentAnalysisStatusConfig[step.documentAnalysisStatus].bgColor,
+                      documentAnalysisStatusConfig[step.documentAnalysisStatus].color
+                    )}>
+                      {documentAnalysisStatusConfig[step.documentAnalysisStatus].label}
                     </span>
                   ) : step.agentName && (
                     <p className="text-[10px] text-primary/70 mt-1 font-medium uppercase tracking-wide">

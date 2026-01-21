@@ -44,6 +44,7 @@ const initialSteps: WorkflowStep[] = [
     title: "Document Analysis", 
     description: "Document summary & review", 
     status: "pending",
+    documentAnalysisStatus: "in-progress",
     canEdit: false
   },
   { 
