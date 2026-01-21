@@ -131,7 +131,7 @@ export default function Dashboard() {
               <Filter className="h-4 w-4 mr-2" />
               Filter
             </Button>
-            <Button variant="default">
+            <Button variant="default" onClick={() => navigate("/case/new")}>
               <Plus className="h-4 w-4 mr-2" />
               New Case
             </Button>
