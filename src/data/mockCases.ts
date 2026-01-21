@@ -8,6 +8,7 @@ export interface Case {
   encounterType: "Inpatient" | "Outpatient" | "Procedure";
   orderingProvider: string;
   payerName: string;
+  groupId?: string;
   status: CaseStatus;
   priority: "High" | "Medium" | "Low";
   lastUpdated: string;
@@ -24,6 +25,7 @@ export const mockCases: Case[] = [
     encounterType: "Inpatient",
     orderingProvider: "Dr. Michael Chen",
     payerName: "Blue Cross Blue Shield",
+    groupId: "GRP-12345",
     status: "Eligible PA Req",
     priority: "High",
     lastUpdated: "2024-01-15T10:30:00Z",
@@ -38,6 +40,7 @@ export const mockCases: Case[] = [
     encounterType: "Outpatient",
     orderingProvider: "Dr. Emily Watson",
     payerName: "Aetna",
+    groupId: "GRP-67890",
     status: "New",
     priority: "Medium",
     lastUpdated: "2024-01-15T09:15:00Z",
@@ -52,6 +55,7 @@ export const mockCases: Case[] = [
     encounterType: "Procedure",
     orderingProvider: "Dr. James Park",
     payerName: "UnitedHealthcare",
+    groupId: "GRP-11223",
     status: "PA Submitted",
     priority: "Low",
     lastUpdated: "2024-01-14T16:45:00Z",
@@ -66,6 +70,7 @@ export const mockCases: Case[] = [
     encounterType: "Inpatient",
     orderingProvider: "Dr. Lisa Martinez",
     payerName: "Cigna",
+    groupId: "GRP-44556",
     status: "Eligible",
     priority: "High",
     lastUpdated: "2024-01-14T14:20:00Z",
@@ -80,6 +85,7 @@ export const mockCases: Case[] = [
     encounterType: "Outpatient",
     orderingProvider: "Dr. Robert Kim",
     payerName: "Humana",
+    groupId: "GRP-78901",
     status: "PA Denied",
     priority: "Medium",
     lastUpdated: "2024-01-13T11:30:00Z",
@@ -94,6 +100,7 @@ export const mockCases: Case[] = [
     encounterType: "Procedure",
     orderingProvider: "Dr. Sarah Lee",
     payerName: "Medicare",
+    groupId: "GRP-33445",
     status: "PA Review",
     priority: "High",
     lastUpdated: "2024-01-15T08:00:00Z",
