@@ -6,7 +6,7 @@ import { PreAuthProviderWorkflow } from "@/components/case-detail/PreAuthProvide
 import { PreAuthPayerWorkflow } from "@/components/case-detail/PreAuthPayerWorkflow";
 import { MedicalCodingWorkflow } from "@/components/case-detail/MedicalCodingWorkflow";
 import { ClinicalIntakeHeader } from "@/components/case-detail/ClinicalIntakeHeader";
-import { DocumentRetrievalPanel } from "@/components/case-detail/panels/DocumentRetrievalPanel";
+import { InlineDocumentViewer } from "@/components/case-detail/panels/InlineDocumentViewer";
 import { StatusBadge } from "@/components/ui/status-badge";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -75,11 +75,7 @@ export default function CaseDetail() {
               <Code2 className="h-4 w-4 mr-2" />
               Medical Coding
             </TabsTrigger>
-            <TabsTrigger 
-              value="documents" 
-              className="h-10 px-6 data-[state=active]:bg-card"
-              onClick={() => navigate(`/case/${caseId}/documents`)}
-            >
+            <TabsTrigger value="documents" className="h-10 px-6 data-[state=active]:bg-card">
               <FileText className="h-4 w-4 mr-2" />
               View Documents
             </TabsTrigger>
@@ -98,7 +94,7 @@ export default function CaseDetail() {
           </TabsContent>
 
           <TabsContent value="documents" className="mt-6">
-            <DocumentRetrievalPanel />
+            <InlineDocumentViewer caseId={caseId || "CASE-001"} />
           </TabsContent>
         </Tabs>
       </main>
