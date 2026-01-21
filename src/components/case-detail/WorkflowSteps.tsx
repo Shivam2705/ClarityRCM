@@ -1,11 +1,8 @@
 import { CheckCircle2, Circle, AlertCircle, Clock, Edit3, ChevronRight } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
 
 export type StepStatus = "completed" | "active" | "pending" | "warning" | "needs-review";
-
-export type AgentEligibilityStatus = "new" | "eligible" | "eligible-pa-req" | "not-eligible" | "pa-review" | "pa-submitted" | "pa-denied";
 
 export interface WorkflowStep {
   id: string;
@@ -13,7 +10,6 @@ export interface WorkflowStep {
   description?: string;
   status: StepStatus;
   agentName?: string;
-  agentStatus?: AgentEligibilityStatus;
   hasCorrections?: boolean;
   canEdit?: boolean;
 }
@@ -57,16 +53,6 @@ const statusConfig: Record<StepStatus, { icon: typeof Circle; color: string; bgC
     bgColor: "bg-destructive/20", 
     ringColor: "ring-destructive/30" 
   },
-};
-
-const agentStatusConfig: Record<AgentEligibilityStatus, { label: string; className: string }> = {
-  "new": { label: "New", className: "bg-muted text-muted-foreground border-muted" },
-  "eligible": { label: "Eligible", className: "bg-success/20 text-success border-success/30" },
-  "eligible-pa-req": { label: "Eligible PA Req", className: "bg-warning/20 text-warning border-warning/30" },
-  "not-eligible": { label: "Not Eligible", className: "bg-destructive/20 text-destructive border-destructive/30" },
-  "pa-review": { label: "PA Review", className: "bg-warning/20 text-warning border-warning/30" },
-  "pa-submitted": { label: "PA Submitted", className: "bg-success/20 text-success border-success/30" },
-  "pa-denied": { label: "PA Denied", className: "bg-destructive/20 text-destructive border-destructive/30" },
 };
 
 export function WorkflowSteps({ steps, currentStep, onStepClick, onEditStep, className }: WorkflowStepsProps) {
@@ -134,10 +120,10 @@ export function WorkflowSteps({ steps, currentStep, onStepClick, onEditStep, cla
                       {step.description}
                     </p>
                   )}
-                  {step.agentStatus && (
-                    <Badge variant="outline" className={cn("text-[9px] px-1.5 py-0.5 h-4 mt-1", agentStatusConfig[step.agentStatus].className)}>
-                      {agentStatusConfig[step.agentStatus].label}
-                    </Badge>
+                  {step.agentName && (
+                    <p className="text-[10px] text-primary/70 mt-1 font-medium uppercase tracking-wide">
+                      {step.agentName}
+                    </p>
                   )}
                 </div>
               </button>
