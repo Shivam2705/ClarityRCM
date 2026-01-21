@@ -222,47 +222,43 @@ export function InlineDocumentViewer({ caseId }: InlineDocumentViewerProps) {
 
           {/* Document Content */}
           <div className="flex-1 overflow-auto p-4">
-            <Card
-              className="mx-auto bg-white text-slate-900 shadow-lg"
-              style={{
-                width: `${((8.5 * zoom) / 100) * 72}px`,
-                minHeight: `${((11 * zoom) / 100) * 72}px`,
-                transform: `scale(${zoom / 100})`,
-                transformOrigin: "top center",
-              }}
-            >
-              <div className="p-6" style={{ fontSize: `${14 * (zoom / 100)}px` }}>
-                {/* Document Header */}
-                <div className="border-b border-slate-200 pb-3 mb-4">
-                  <div className="flex items-center justify-between mb-1.5">
-                    <h1 className="text-lg font-bold text-slate-900">{selectedDoc.name}</h1>
-                    <span className="text-xs text-slate-500">{selectedDoc.date}</span>
-                  </div>
-                  <div className="flex items-center gap-3 text-xs text-slate-600">
-                    <span>Case: {caseId}</span>
-                    <span>•</span>
-                    <span>
-                      Page {currentPage} of {selectedDoc.pages}
-                    </span>
-                  </div>
-                </div>
-
-                {/* Document Body */}
-                <div className="prose prose-sm max-w-none">
-                  <pre className="whitespace-pre-wrap font-sans text-slate-700 leading-relaxed text-sm">
-                    {selectedDoc.preview}
-                  </pre>
-
-                  {selectedDoc.pages > 1 && (
-                    <div className="mt-6 pt-6 border-t border-slate-200">
-                      <p className="text-slate-500 italic text-xs">
-                        Additional clinical details and supporting documentation continue on subsequent pages...
-                      </p>
+            <div className="flex justify-center">
+              <Card
+                className="bg-white text-slate-900 shadow-lg w-full max-w-2xl"
+              >
+                <div className="p-6">
+                  {/* Document Header */}
+                  <div className="border-b border-slate-200 pb-3 mb-4">
+                    <div className="flex items-center justify-between mb-1.5 gap-2">
+                      <h1 className="text-lg font-bold text-slate-900 truncate">{selectedDoc.name}</h1>
+                      <span className="text-xs text-slate-500 flex-shrink-0">{selectedDoc.date}</span>
                     </div>
-                  )}
+                    <div className="flex items-center gap-3 text-xs text-slate-600">
+                      <span>Case: {caseId}</span>
+                      <span>•</span>
+                      <span>
+                        Page {currentPage} of {selectedDoc.pages}
+                      </span>
+                    </div>
+                  </div>
+
+                  {/* Document Body */}
+                  <div className="prose prose-sm max-w-none">
+                    <pre className="whitespace-pre-wrap font-sans text-slate-700 leading-relaxed text-sm">
+                      {selectedDoc.preview}
+                    </pre>
+
+                    {selectedDoc.pages > 1 && (
+                      <div className="mt-6 pt-6 border-t border-slate-200">
+                        <p className="text-slate-500 italic text-xs">
+                          Additional clinical details and supporting documentation continue on subsequent pages...
+                        </p>
+                      </div>
+                    )}
+                  </div>
                 </div>
-              </div>
-            </Card>
+              </Card>
+            </div>
           </div>
 
           {/* Page Navigation */}
