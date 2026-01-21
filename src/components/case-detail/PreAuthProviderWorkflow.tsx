@@ -438,9 +438,6 @@ function AgentHeader({ name, status, showRunButton, onRun, isRunning }: {
           </Button>
         )}
         <AuditLogsDialog agentName={name} />
-        <Badge variant={status === "active" ? "default" : status === "complete" ? "outline" : "secondary"}>
-          {status === "active" ? "Processing" : status === "complete" ? "Complete" : "Idle"}
-        </Badge>
       </div>
     </div>
   );
