@@ -1,4 +1,4 @@
-import { Brain, LogOut, Settings, Bell } from "lucide-react";
+import { Brain, LogOut, Settings, Bell, Plus } from "lucide-react";
 import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 
@@ -14,6 +14,12 @@ export function DashboardHeader() {
         </Link>
 
         <div className="flex items-center gap-2">
+          <Button asChild>
+            <Link to="/case/new">
+              <Plus className="h-4 w-4 mr-2" />
+              New Case
+            </Link>
+          </Button>
           <Button variant="ghost" size="icon" className="relative">
             <Bell className="h-5 w-5" />
             <span className="absolute top-1.5 right-1.5 h-2 w-2 rounded-full bg-destructive" />
