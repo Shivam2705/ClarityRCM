@@ -75,7 +75,11 @@ export default function CaseDetail() {
               <Code2 className="h-4 w-4 mr-2" />
               Medical Coding
             </TabsTrigger>
-            <TabsTrigger value="documents" className="h-10 px-6 data-[state=active]:bg-card">
+            <TabsTrigger 
+              value="documents" 
+              className="h-10 px-6 data-[state=active]:bg-card"
+              onClick={() => navigate(`/case/${caseId}/documents`)}
+            >
               <FileText className="h-4 w-4 mr-2" />
               View Documents
             </TabsTrigger>
