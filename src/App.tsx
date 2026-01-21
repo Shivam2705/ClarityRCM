@@ -8,6 +8,7 @@ import Login from "./pages/Login";
 import Dashboard from "./pages/Dashboard";
 import CaseDetail from "./pages/CaseDetail";
 import DocumentViewer from "./pages/DocumentViewer";
+import NewCase from "./pages/NewCase";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -22,6 +23,7 @@ const App = () => (
           <Route path="/" element={<Landing />} />
           <Route path="/login" element={<Login />} />
           <Route path="/dashboard" element={<Dashboard />} />
+          <Route path="/case/new" element={<NewCase />} />
           <Route path="/case/:caseId" element={<CaseDetail />} />
           <Route path="/case/:caseId/documents" element={<DocumentViewer />} />
           <Route path="*" element={<NotFound />} />
