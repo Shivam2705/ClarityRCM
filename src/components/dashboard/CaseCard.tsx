@@ -45,9 +45,6 @@ export function CaseCard({ caseData, onClick }: CaseCardProps) {
             </h3>
             <p className="text-sm text-muted-foreground">{caseData.patientId}</p>
           </div>
-          <StatusBadge variant={statusVariant[caseData.status]}>
-            {caseData.status}
-          </StatusBadge>
         </div>
 
         {/* Procedure info */}
