@@ -141,21 +141,6 @@ export function ClinicalIntakeHeader({
           </div>
         </div>
         <div className="flex items-center gap-2">
-          {summaryGenerated && (
-            <Button 
-              size="sm" 
-              variant="outline" 
-              onClick={handleRegenerateSummary}
-              disabled={isGeneratingSummary}
-            >
-              {isGeneratingSummary ? (
-                <Loader2 className="h-4 w-4 mr-2 animate-spin" />
-              ) : (
-                <RefreshCw className="h-4 w-4 mr-2" />
-              )}
-              Regenerate Summary
-            </Button>
-          )}
           <Button size="sm" onClick={() => navigate(`/case/${caseId}/documents`)}>
             <FileText className="h-4 w-4 mr-2" />
             View Documents
