@@ -132,11 +132,12 @@ export default function Dashboard() {
             <TableHeader>
               <TableRow className="bg-muted/50 hover:bg-muted/50">
                 <TableHead className="font-semibold">Case ID</TableHead>
-                <TableHead className="font-semibold">Name</TableHead>
-                <TableHead className="font-semibold">Procedure Name</TableHead>
+                <TableHead className="font-semibold">Member ID</TableHead>
+                <TableHead className="font-semibold">Member Name</TableHead>
+                <TableHead className="font-semibold">DOB</TableHead>
+                <TableHead className="font-semibold">Payor Name</TableHead>
                 <TableHead className="font-semibold">CPT Code</TableHead>
-                <TableHead className="font-semibold">Date</TableHead>
-                <TableHead className="font-semibold">Priority</TableHead>
+                <TableHead className="font-semibold">Description</TableHead>
                 <TableHead className="font-semibold">Status</TableHead>
               </TableRow>
             </TableHeader>
@@ -148,24 +149,16 @@ export default function Dashboard() {
                   onClick={() => handleCaseClick(caseData)}
                 >
                   <TableCell className="font-medium text-primary">{caseData.id}</TableCell>
-                  <TableCell>
-                    <div>
-                      <p className="font-medium">{caseData.patientName}</p>
-                      <p className="text-xs text-muted-foreground">{caseData.patientId}</p>
-                    </div>
+                  <TableCell className="font-mono text-sm">{caseData.patientId}</TableCell>
+                  <TableCell className="font-medium">{caseData.patientName}</TableCell>
+                  <TableCell className="text-muted-foreground">
+                    {format(new Date(caseData.dateOfBirth), "MM/dd/yyyy")}
                   </TableCell>
-                  <TableCell className="max-w-[200px] truncate">{caseData.procedureName || "—"}</TableCell>
+                  <TableCell>{caseData.payerName}</TableCell>
                   <TableCell>
                     <code className="text-sm bg-muted px-2 py-0.5 rounded">{caseData.procedureCode || "—"}</code>
                   </TableCell>
-                  <TableCell className="text-muted-foreground">
-                    {format(new Date(caseData.lastUpdated), "MMM dd, yyyy")}
-                  </TableCell>
-                  <TableCell>
-                    <span className={`font-medium ${getPriorityColor(caseData.priority)}`}>
-                      {caseData.priority}
-                    </span>
-                  </TableCell>
+                  <TableCell className="max-w-[200px] truncate">{caseData.procedureName || "—"}</TableCell>
                   <TableCell>
                     <Badge variant={getStatusVariant(caseData.status) as any}>
                       {caseData.status}

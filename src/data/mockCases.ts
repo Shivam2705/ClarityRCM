@@ -2,6 +2,7 @@ export interface Case {
   id: string;
   patientName: string;
   patientId: string;
+  dateOfBirth: string;
   encounterType: "Inpatient" | "Outpatient" | "Procedure";
   orderingProvider: string;
   payerName: string;
@@ -17,6 +18,7 @@ export const mockCases: Case[] = [
     id: "CASE-001",
     patientName: "Sarah Johnson",
     patientId: "PT-78234",
+    dateOfBirth: "1965-03-12",
     encounterType: "Inpatient",
     orderingProvider: "Dr. Michael Chen",
     payerName: "Blue Cross Blue Shield",
@@ -30,6 +32,7 @@ export const mockCases: Case[] = [
     id: "CASE-002",
     patientName: "Robert Williams",
     patientId: "PT-45129",
+    dateOfBirth: "1978-07-22",
     encounterType: "Outpatient",
     orderingProvider: "Dr. Emily Watson",
     payerName: "Aetna",
@@ -43,6 +46,7 @@ export const mockCases: Case[] = [
     id: "CASE-003",
     patientName: "Maria Garcia",
     patientId: "PT-91823",
+    dateOfBirth: "1982-11-05",
     encounterType: "Procedure",
     orderingProvider: "Dr. James Park",
     payerName: "UnitedHealthcare",
@@ -56,6 +60,7 @@ export const mockCases: Case[] = [
     id: "CASE-004",
     patientName: "David Thompson",
     patientId: "PT-33847",
+    dateOfBirth: "1955-09-18",
     encounterType: "Inpatient",
     orderingProvider: "Dr. Lisa Martinez",
     payerName: "Cigna",
@@ -69,6 +74,7 @@ export const mockCases: Case[] = [
     id: "CASE-005",
     patientName: "Jennifer Brown",
     patientId: "PT-62951",
+    dateOfBirth: "1990-01-30",
     encounterType: "Outpatient",
     orderingProvider: "Dr. Robert Kim",
     payerName: "Humana",
@@ -82,6 +88,7 @@ export const mockCases: Case[] = [
     id: "CASE-006",
     patientName: "Michael Davis",
     patientId: "PT-18293",
+    dateOfBirth: "1970-06-14",
     encounterType: "Procedure",
     orderingProvider: "Dr. Sarah Lee",
     payerName: "Medicare",
