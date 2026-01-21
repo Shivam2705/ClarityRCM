@@ -148,6 +148,7 @@ export default function Dashboard() {
                 <TableHead className="font-semibold">Member Name</TableHead>
                 <TableHead className="font-semibold">DOB</TableHead>
                 <TableHead className="font-semibold">Payor Name</TableHead>
+                <TableHead className="font-semibold">Group ID</TableHead>
                 <TableHead className="font-semibold">CPT Code</TableHead>
                 <TableHead className="font-semibold">Description</TableHead>
                 <TableHead className="font-semibold">Status</TableHead>
@@ -167,6 +168,7 @@ export default function Dashboard() {
                     {format(new Date(caseData.dateOfBirth), "MM/dd/yyyy")}
                   </TableCell>
                   <TableCell>{caseData.payerName}</TableCell>
+                  <TableCell className="font-mono text-sm">{caseData.groupId || "—"}</TableCell>
                   <TableCell>
                     <code className="text-sm bg-muted px-2 py-0.5 rounded">{caseData.procedureCode || "—"}</code>
                   </TableCell>
