@@ -30,45 +30,42 @@ import {
   ClipboardList
 } from "lucide-react";
 
-// Simplified 4-step provider journey with always-enabled eligibility
+// Initial steps - only eligibility is active, others locked
 const initialSteps: WorkflowStep[] = [
   { 
     id: "eligibility", 
     title: "Eligibility & Benefits", 
     description: "Insurance verification", 
-    status: "completed",
-    eligibilityStatus: "eligible-pa-req",
+    status: "active",
     canEdit: true
   },
   { 
     id: "document-analysis", 
     title: "Document Analysis", 
     description: "Document summary & review", 
-    status: "completed",
-    agentName: "Document Agent",
-    canEdit: true
+    status: "pending",
+    canEdit: false
   },
   { 
     id: "prior-auth-decision", 
     title: "Prior Auth Decision", 
     description: "Pre-certification & policy check", 
-    status: "completed",
-    agentName: "Policy Agent",
-    canEdit: true
+    status: "pending",
+    canEdit: false
   },
   { 
     id: "gap-analysis", 
     title: "Gap Analysis & Review", 
     description: "Clinical audit & gaps", 
-    status: "active",
-    agentName: "Clinical Audit Agent"
+    status: "pending",
+    canEdit: false
   },
   { 
     id: "submit-to-payer", 
     title: "Submit to Payer", 
     description: "Final submission & notification", 
     status: "pending",
-    agentName: "Submission Agent"
+    canEdit: false
   },
 ];
 
@@ -77,11 +74,33 @@ export function PreAuthProviderWorkflow() {
   const [steps, setSteps] = useState<WorkflowStep[]>(initialSteps);
   const [editingStep, setEditingStep] = useState<string | null>(null);
   const [corrections, setCorrections] = useState<Record<string, boolean>>({});
+  const [eligibilityStatus, setEligibilityStatus] = useState<"idle" | "processing" | "eligible" | "not-eligible">("idle");
+
+  // Check if user can access a step based on eligibility
+  const canAccessStep = useCallback((stepId: string) => {
+    if (stepId === "eligibility") return true;
+    if (eligibilityStatus !== "eligible") return false;
+    
+    const stepOrder = ["eligibility", "document-analysis", "prior-auth-decision", "gap-analysis", "submit-to-payer"];
+    const stepIndex = stepOrder.indexOf(stepId);
+    const currentIndex = stepOrder.indexOf(currentStep);
+    
+    // Allow access to completed steps and current step
+    return stepIndex <= currentIndex;
+  }, [eligibilityStatus, currentStep]);
+
+  const handleStepClick = useCallback((stepId: string) => {
+    if (canAccessStep(stepId)) {
+      setCurrentStep(stepId);
+    }
+  }, [canAccessStep]);
 
   const handleEditStep = useCallback((stepId: string) => {
-    setEditingStep(stepId);
-    setCurrentStep(stepId);
-  }, []);
+    if (canAccessStep(stepId)) {
+      setEditingStep(stepId);
+      setCurrentStep(stepId);
+    }
+  }, [canAccessStep]);
 
   const handleSaveCorrection = useCallback((stepId: string) => {
     setCorrections(prev => ({ ...prev, [stepId]: true }));
@@ -97,28 +116,89 @@ export function PreAuthProviderWorkflow() {
     setCurrentStep("gap-analysis");
   }, []);
 
-  const handleProceedToSubmit = useCallback(() => {
-    setSteps(prev => prev.map(s => 
-      s.id === "gap-analysis" ? { ...s, status: "completed" as const } :
-      s.id === "submit-to-payer" ? { ...s, status: "active" as const } : s
-    ));
-    setCurrentStep("submit-to-payer");
+  // Handle eligibility check completion - unlocks next step
+  const handleEligibilityComplete = useCallback((status: "eligible" | "not-eligible") => {
+    setEligibilityStatus(status);
+    setSteps(prev => prev.map(s => {
+      if (s.id === "eligibility") {
+        return { 
+          ...s, 
+          status: "completed" as const,
+          eligibilityStatus: status === "eligible" ? "eligible" : "not-eligible"
+        };
+      }
+      if (status === "eligible" && s.id === "document-analysis") {
+        return { ...s, status: "active" as const, canEdit: true };
+      }
+      return s;
+    }));
+    if (status === "eligible") {
+      setCurrentStep("document-analysis");
+    }
   }, []);
+
+  // Progress to next step
+  const handleStepComplete = useCallback((completedStepId: string, nextStepId: string) => {
+    setSteps(prev => prev.map(s => {
+      if (s.id === completedStepId) {
+        return { ...s, status: "completed" as const, canEdit: true };
+      }
+      if (s.id === nextStepId) {
+        return { ...s, status: "active" as const, canEdit: false };
+      }
+      return s;
+    }));
+    setCurrentStep(nextStepId);
+  }, []);
+
+  const handleProceedToSubmit = useCallback(() => {
+    handleStepComplete("gap-analysis", "submit-to-payer");
+  }, [handleStepComplete]);
 
   const renderPanel = () => {
     switch (currentStep) {
       case "eligibility":
-        return <EligibilitySection isEditing={editingStep === "eligibility"} onSave={() => handleSaveCorrection("eligibility")} onCancel={handleCancelEdit} />;
+        return (
+          <EligibilitySection 
+            isEditing={editingStep === "eligibility"} 
+            onSave={() => handleSaveCorrection("eligibility")} 
+            onCancel={handleCancelEdit}
+            eligibilityStatus={eligibilityStatus}
+            onStatusChange={setEligibilityStatus}
+            onComplete={handleEligibilityComplete}
+          />
+        );
       case "document-analysis":
-        return <DocumentAnalysisSection isEditing={editingStep === "document-analysis"} onSave={() => handleSaveCorrection("document-analysis")} onCancel={handleCancelEdit} />;
+        return (
+          <DocumentAnalysisSection 
+            isEditing={editingStep === "document-analysis"} 
+            onSave={() => handleSaveCorrection("document-analysis")} 
+            onCancel={handleCancelEdit}
+            onComplete={() => handleStepComplete("document-analysis", "prior-auth-decision")}
+          />
+        );
       case "prior-auth-decision":
-        return <PriorAuthDecisionSection isEditing={editingStep === "prior-auth-decision"} onSave={() => handleSaveCorrection("prior-auth-decision")} onCancel={handleCancelEdit} />;
+        return (
+          <PriorAuthDecisionSection 
+            isEditing={editingStep === "prior-auth-decision"} 
+            onSave={() => handleSaveCorrection("prior-auth-decision")} 
+            onCancel={handleCancelEdit}
+            onComplete={() => handleStepComplete("prior-auth-decision", "gap-analysis")}
+          />
+        );
       case "gap-analysis":
         return <GapAnalysisSection onProceed={handleProceedToSubmit} onEditStep={handleEditStep} corrections={corrections} />;
       case "submit-to-payer":
         return <SubmitToPayerSection />;
       default:
-        return <EligibilitySection isEditing={false} />;
+        return (
+          <EligibilitySection 
+            isEditing={false}
+            eligibilityStatus={eligibilityStatus}
+            onStatusChange={setEligibilityStatus}
+            onComplete={handleEligibilityComplete}
+          />
+        );
     }
   };
 
@@ -139,8 +219,9 @@ export function PreAuthProviderWorkflow() {
             <WorkflowSteps
               steps={steps}
               currentStep={currentStep}
-              onStepClick={setCurrentStep}
+              onStepClick={handleStepClick}
               onEditStep={handleEditStep}
+              lockedSteps={eligibilityStatus !== "eligible" ? ["document-analysis", "prior-auth-decision", "gap-analysis", "submit-to-payer"] : []}
             />
           </Card>
         </div>
@@ -157,6 +238,78 @@ interface SectionProps {
   isEditing?: boolean;
   onSave?: () => void;
   onCancel?: () => void;
+  onComplete?: () => void;
+}
+
+interface EligibilitySectionProps {
+  isEditing?: boolean;
+  onSave?: () => void;
+  onCancel?: () => void;
+  eligibilityStatus: "idle" | "processing" | "eligible" | "not-eligible";
+  onStatusChange: (status: "idle" | "processing" | "eligible" | "not-eligible") => void;
+  onComplete: (status: "eligible" | "not-eligible") => void;
+}
+
+function EligibilityHeader({ 
+  status, 
+  eligibilityStatus,
+  onRun,
+  isRunning 
+}: { 
+  status: "idle" | "processing" | "complete";
+  eligibilityStatus: "idle" | "processing" | "eligible" | "not-eligible";
+  onRun: () => void;
+  isRunning: boolean;
+}) {
+  return (
+    <div className="flex items-center gap-3 mb-4">
+      <div className={`h-10 w-10 rounded-xl flex items-center justify-center ${
+        status === "processing" ? "bg-primary/20 ring-2 ring-primary/30" :
+        status === "complete" ? "bg-success/20" : "bg-muted"
+      }`}>
+        <Shield className={`h-5 w-5 ${
+          status === "processing" ? "text-primary animate-pulse-soft" :
+          status === "complete" ? "text-success" : "text-muted-foreground"
+        }`} />
+      </div>
+      <div className="flex-1">
+        <p className="text-sm font-medium text-foreground">Eligibility Check</p>
+      </div>
+      <div className="flex items-center gap-2">
+        {/* Status Badge */}
+        {eligibilityStatus === "eligible" && (
+          <Badge className="bg-success text-white">Eligible</Badge>
+        )}
+        {eligibilityStatus === "not-eligible" && (
+          <Badge className="bg-destructive text-white">Not Eligible</Badge>
+        )}
+        {eligibilityStatus === "processing" && (
+          <Badge variant="secondary" className="flex items-center gap-1">
+            <Loader2 className="h-3 w-3 animate-spin" />
+            Processing
+          </Badge>
+        )}
+        
+        {/* Run / Run Again Button */}
+        <Button 
+          variant="outline" 
+          size="sm" 
+          onClick={onRun}
+          disabled={isRunning}
+        >
+          {isRunning ? (
+            <Loader2 className="h-4 w-4 mr-1 animate-spin" />
+          ) : eligibilityStatus === "eligible" || eligibilityStatus === "not-eligible" ? (
+            <RefreshCw className="h-4 w-4 mr-1" />
+          ) : (
+            <Play className="h-4 w-4 mr-1" />
+          )}
+          {eligibilityStatus === "eligible" || eligibilityStatus === "not-eligible" ? "Run Again" : "Run Check"}
+        </Button>
+        <AuditLogsDialog agentName="Eligibility" />
+      </div>
+    </div>
+  );
 }
 
 function AgentHeader({ name, status, showRunButton, onRun, isRunning }: { 
@@ -178,7 +331,6 @@ function AgentHeader({ name, status, showRunButton, onRun, isRunning }: {
         }`} />
       </div>
       <div className="flex-1">
-        <p className="text-xs text-muted-foreground uppercase tracking-wide">Agent</p>
         <p className="text-sm font-medium text-foreground">{name}</p>
       </div>
       <div className="flex items-center gap-2">
@@ -208,24 +360,25 @@ function AgentHeader({ name, status, showRunButton, onRun, isRunning }: {
   );
 }
 
-function EligibilitySection({ isEditing, onSave, onCancel }: SectionProps) {
-  const [isRunning, setIsRunning] = useState(false);
-  const [hasResults, setHasResults] = useState(true);
-
+function EligibilitySection({ isEditing, onSave, onCancel, eligibilityStatus, onStatusChange, onComplete }: EligibilitySectionProps) {
   const handleRunCheck = () => {
-    setIsRunning(true);
+    onStatusChange("processing");
     setTimeout(() => {
-      setIsRunning(false);
-      setHasResults(true);
+      // Simulate eligibility result - can be changed to test different flows
+      const isEligible = true; // Change to false to test "Not Eligible" flow
+      const status = isEligible ? "eligible" : "not-eligible";
+      onComplete(status);
     }, 2000);
   };
 
+  const hasResults = eligibilityStatus === "eligible" || eligibilityStatus === "not-eligible";
+  const isRunning = eligibilityStatus === "processing";
+
   return (
     <Card className="p-6 bg-card border-border">
-      <AgentHeader 
-        name="Eligibility Agent" 
-        status={hasResults ? "complete" : "idle"}
-        showRunButton
+      <EligibilityHeader 
+        status={isRunning ? "processing" : hasResults ? "complete" : "idle"}
+        eligibilityStatus={eligibilityStatus}
         onRun={handleRunCheck}
         isRunning={isRunning}
       />
@@ -233,39 +386,61 @@ function EligibilitySection({ isEditing, onSave, onCancel }: SectionProps) {
       
       {hasResults ? (
         <div className="grid gap-4">
-          <Card className="p-4 bg-success/10 border-success/30">
+          <Card className={`p-4 ${eligibilityStatus === "eligible" ? "bg-success/10 border-success/30" : "bg-destructive/10 border-destructive/30"}`}>
             <div className="flex items-center gap-2 mb-2">
-              <Shield className="h-4 w-4 text-success" />
-              <span className="text-sm font-medium text-success">Eligibility Verified</span>
+              {eligibilityStatus === "eligible" ? (
+                <>
+                  <Shield className="h-4 w-4 text-success" />
+                  <span className="text-sm font-medium text-success">Eligibility Verified</span>
+                </>
+              ) : (
+                <>
+                  <XCircle className="h-4 w-4 text-destructive" />
+                  <span className="text-sm font-medium text-destructive">Not Eligible</span>
+                </>
+              )}
             </div>
-            <p className="text-xs text-muted-foreground">Member is active with valid coverage for requested procedure</p>
+            <p className="text-xs text-muted-foreground">
+              {eligibilityStatus === "eligible" 
+                ? "Member is active with valid coverage for requested procedure" 
+                : "Member coverage is not active or does not cover requested procedure"}
+            </p>
           </Card>
           
-          <div className="grid grid-cols-2 gap-4">
-            <InfoCard icon={<Shield className="h-4 w-4" />} label="Payer" value="Blue Cross Blue Shield" editable={isEditing} />
-            <InfoCard icon={<Shield className="h-4 w-4" />} label="Plan Type" value="PPO" editable={isEditing} />
-          </div>
-          
-          <Card className="p-4 bg-secondary/30 border-border/50">
-            <h4 className="text-sm font-medium text-foreground mb-2">Member Benefits</h4>
-            <div className="space-y-2 text-sm">
-              <DataRow label="Member ID" value="BCB-987654321" />
-              <DataRow label="Group Number" value="GRP-12345" />
-              <DataRow label="Effective Date" value="01/01/2024" />
-              <DataRow label="In-Network Deductible" value="$500 (Met)" highlight />
-              <DataRow label="Out-of-Pocket Max" value="$3,000 / $6,000" />
-            </div>
-          </Card>
-          
-          <Card className="p-4 bg-secondary/30 border-border/50">
-            <h4 className="text-sm font-medium text-foreground mb-2">Coverage Details</h4>
-            <div className="space-y-2 text-sm">
-              <DataRow label="Surgical Coverage" value="80% after deductible" />
-              <DataRow label="Prior Auth Required" value="Yes - Orthopedic Surgery" highlight />
-              <DataRow label="Network Status" value="In-Network Provider" />
-            </div>
-          </Card>
+          {eligibilityStatus === "eligible" && (
+            <>
+              <div className="grid grid-cols-2 gap-4">
+                <InfoCard icon={<Shield className="h-4 w-4" />} label="Payer" value="Blue Cross Blue Shield" editable={isEditing} />
+                <InfoCard icon={<Shield className="h-4 w-4" />} label="Plan Type" value="PPO" editable={isEditing} />
+              </div>
+              
+              <Card className="p-4 bg-secondary/30 border-border/50">
+                <h4 className="text-sm font-medium text-foreground mb-2">Member Benefits</h4>
+                <div className="space-y-2 text-sm">
+                  <DataRow label="Member ID" value="BCB-987654321" />
+                  <DataRow label="Group Number" value="GRP-12345" />
+                  <DataRow label="Effective Date" value="01/01/2024" />
+                  <DataRow label="In-Network Deductible" value="$500 (Met)" highlight />
+                  <DataRow label="Out-of-Pocket Max" value="$3,000 / $6,000" />
+                </div>
+              </Card>
+              
+              <Card className="p-4 bg-secondary/30 border-border/50">
+                <h4 className="text-sm font-medium text-foreground mb-2">Coverage Details</h4>
+                <div className="space-y-2 text-sm">
+                  <DataRow label="Surgical Coverage" value="80% after deductible" />
+                  <DataRow label="Prior Auth Required" value="Yes - Orthopedic Surgery" highlight />
+                  <DataRow label="Network Status" value="In-Network Provider" />
+                </div>
+              </Card>
+            </>
+          )}
         </div>
+      ) : isRunning ? (
+        <Card className="p-6 bg-primary/5 border-primary/20 text-center">
+          <Loader2 className="h-12 w-12 mx-auto text-primary mb-3 animate-spin" />
+          <p className="text-sm text-muted-foreground">Verifying member eligibility and benefits...</p>
+        </Card>
       ) : (
         <Card className="p-6 bg-muted/30 border-border/50 text-center">
           <Shield className="h-12 w-12 mx-auto text-muted-foreground mb-3" />
@@ -289,7 +464,7 @@ function EligibilitySection({ isEditing, onSave, onCancel }: SectionProps) {
   );
 }
 
-function DocumentAnalysisSection({ isEditing, onSave, onCancel }: SectionProps) {
+function DocumentAnalysisSection({ isEditing, onSave, onCancel, onComplete }: SectionProps) {
   const navigate = useNavigate();
   const { caseId } = useParams();
   const [isAnalyzing, setIsAnalyzing] = useState(false);
@@ -399,7 +574,7 @@ function DocumentAnalysisSection({ isEditing, onSave, onCancel }: SectionProps) 
         </Card>
       )}
       
-      {isEditing && (
+      {isEditing ? (
         <div className="flex gap-3 mt-6 pt-4 border-t border-border">
           <Button onClick={onSave} className="flex-1">
             <CheckCircle2 className="h-4 w-4 mr-2" />
@@ -410,12 +585,19 @@ function DocumentAnalysisSection({ isEditing, onSave, onCancel }: SectionProps) 
             Cancel
           </Button>
         </div>
+      ) : hasAnalysis && onComplete && (
+        <div className="flex justify-end mt-6 pt-4 border-t border-border">
+          <Button onClick={onComplete}>
+            Proceed to Prior Auth Decision
+            <ArrowRight className="h-4 w-4 ml-2" />
+          </Button>
+        </div>
       )}
     </Card>
   );
 }
 
-function PriorAuthDecisionSection({ isEditing, onSave, onCancel }: SectionProps) {
+function PriorAuthDecisionSection({ isEditing, onSave, onCancel, onComplete }: SectionProps) {
   const [isRunning, setIsRunning] = useState(false);
   const [hasResults, setHasResults] = useState(true);
 
@@ -446,7 +628,7 @@ function PriorAuthDecisionSection({ isEditing, onSave, onCancel }: SectionProps)
               <div className="h-6 w-6 rounded-full bg-primary/20 flex items-center justify-center">
                 <ClipboardList className="h-3 w-3 text-primary" />
               </div>
-              <h4 className="text-sm font-medium text-foreground">Agent 1: Pre-certification List Analysis</h4>
+              <h4 className="text-sm font-medium text-foreground">Pre-certification List Analysis</h4>
               <Badge variant="outline" className="ml-auto text-xs">CPT: 27447</Badge>
             </div>
             <div className="space-y-2 text-sm ml-8">
@@ -463,7 +645,7 @@ function PriorAuthDecisionSection({ isEditing, onSave, onCancel }: SectionProps)
               <div className="h-6 w-6 rounded-full bg-primary/20 flex items-center justify-center">
                 <GitBranch className="h-3 w-3 text-primary" />
               </div>
-              <h4 className="text-sm font-medium text-foreground">Agent 2: State Policy Analysis</h4>
+              <h4 className="text-sm font-medium text-foreground">State Policy Analysis</h4>
               <Badge variant="outline" className="ml-auto text-xs">Illinois</Badge>
             </div>
             <div className="space-y-2 text-sm ml-8">
@@ -509,7 +691,7 @@ function PriorAuthDecisionSection({ isEditing, onSave, onCancel }: SectionProps)
         </Card>
       )}
       
-      {isEditing && (
+      {isEditing ? (
         <div className="flex gap-3 mt-6 pt-4 border-t border-border">
           <Button onClick={onSave} className="flex-1">
             <CheckCircle2 className="h-4 w-4 mr-2" />
@@ -518,6 +700,13 @@ function PriorAuthDecisionSection({ isEditing, onSave, onCancel }: SectionProps)
           <Button variant="outline" onClick={onCancel}>
             <XCircle className="h-4 w-4 mr-2" />
             Cancel
+          </Button>
+        </div>
+      ) : hasResults && onComplete && (
+        <div className="flex justify-end mt-6 pt-4 border-t border-border">
+          <Button onClick={onComplete}>
+            Proceed to Gap Analysis
+            <ArrowRight className="h-4 w-4 ml-2" />
           </Button>
         </div>
       )}
