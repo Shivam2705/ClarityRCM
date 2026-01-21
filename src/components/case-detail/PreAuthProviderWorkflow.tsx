@@ -44,7 +44,6 @@ const initialSteps: WorkflowStep[] = [
     title: "Document Analysis", 
     description: "Document summary & review", 
     status: "pending",
-    documentAnalysisStatus: "in-progress",
     canEdit: false
   },
   { 
@@ -77,37 +76,96 @@ export function PreAuthProviderWorkflow() {
   const [corrections, setCorrections] = useState<Record<string, boolean>>({});
   const [eligibilityStatus, setEligibilityStatus] = useState<"idle" | "processing" | "eligible" | "not-eligible">("idle");
   const [hasAutoRun, setHasAutoRun] = useState(false);
+  const [workflowPhase, setWorkflowPhase] = useState<"eligibility" | "document-analysis" | "prior-auth" | "gap-analysis" | "complete">("eligibility");
 
-  // Auto-run eligibility check on first page load
+  // Auto-run workflow sequentially through all steps
   useEffect(() => {
     if (!hasAutoRun && eligibilityStatus === "idle") {
       setHasAutoRun(true);
-      // Start processing immediately
+      // Start eligibility processing
       setEligibilityStatus("processing");
-      // Simulate eligibility check
+      
+      // Phase 1: Eligibility (2 seconds)
       setTimeout(() => {
-        const isEligible = true; // Simulated result
+        const isEligible = true;
         const status = isEligible ? "eligible" : "not-eligible";
         setEligibilityStatus(status);
         setSteps(prev => prev.map(s => {
           if (s.id === "eligibility") {
-            return { 
-              ...s, 
-              status: "completed" as const,
-              eligibilityStatus: status
-            };
+            return { ...s, status: "completed" as const, eligibilityStatus: status };
           }
           if (isEligible && s.id === "document-analysis") {
-            return { ...s, status: "active" as const, canEdit: true };
+            return { ...s, status: "active" as const, documentAnalysisStatus: "in-progress" as const, canEdit: false };
           }
           return s;
         }));
         if (isEligible) {
           setCurrentStep("document-analysis");
+          setWorkflowPhase("document-analysis");
         }
       }, 2000);
     }
   }, [hasAutoRun, eligibilityStatus]);
+
+  // Phase 2: Document Analysis auto-run
+  useEffect(() => {
+    if (workflowPhase === "document-analysis") {
+      const timer = setTimeout(() => {
+        setSteps(prev => prev.map(s => {
+          if (s.id === "document-analysis") {
+            return { ...s, status: "completed" as const, documentAnalysisStatus: "analyzed" as const, canEdit: true };
+          }
+          if (s.id === "prior-auth-decision") {
+            return { ...s, status: "active" as const, priorAuthDecisionStatus: "in-progress" as const, canEdit: false };
+          }
+          return s;
+        }));
+        setCurrentStep("prior-auth-decision");
+        setWorkflowPhase("prior-auth");
+      }, 2000);
+      return () => clearTimeout(timer);
+    }
+  }, [workflowPhase]);
+
+  // Phase 3: Prior Auth Decision auto-run
+  useEffect(() => {
+    if (workflowPhase === "prior-auth") {
+      const timer = setTimeout(() => {
+        setSteps(prev => prev.map(s => {
+          if (s.id === "prior-auth-decision") {
+            return { ...s, status: "completed" as const, priorAuthDecisionStatus: "determined" as const, canEdit: true };
+          }
+          if (s.id === "gap-analysis") {
+            return { ...s, status: "active" as const, gapAnalysisStatus: "in-progress" as const, canEdit: false };
+          }
+          return s;
+        }));
+        setCurrentStep("gap-analysis");
+        setWorkflowPhase("gap-analysis");
+      }, 2000);
+      return () => clearTimeout(timer);
+    }
+  }, [workflowPhase]);
+
+  // Phase 4: Gap Analysis auto-run
+  useEffect(() => {
+    if (workflowPhase === "gap-analysis") {
+      const timer = setTimeout(() => {
+        setSteps(prev => prev.map(s => {
+          if (s.id === "gap-analysis") {
+            return { ...s, status: "completed" as const, gapAnalysisStatus: "gaps-found" as const, canEdit: true };
+          }
+          if (s.id === "submit-to-payer") {
+            return { ...s, status: "active" as const, submissionStatus: "in-progress" as const, canEdit: false };
+          }
+          return s;
+        }));
+        setCurrentStep("submit-to-payer");
+        setWorkflowPhase("complete");
+      }, 2000);
+      return () => clearTimeout(timer);
+    }
+  }, [workflowPhase]);
 
   // Check if user can access a step based on eligibility and step status
   const canAccessStep = useCallback((stepId: string) => {
@@ -251,7 +309,18 @@ export function PreAuthProviderWorkflow() {
               currentStep={currentStep}
               onStepClick={handleStepClick}
               onEditStep={handleEditStep}
-              lockedSteps={eligibilityStatus !== "eligible" ? ["document-analysis", "prior-auth-decision", "gap-analysis", "submit-to-payer"] : []}
+              lockedSteps={
+                eligibilityStatus !== "eligible" 
+                  ? ["document-analysis", "prior-auth-decision", "gap-analysis", "submit-to-payer"]
+                  : steps.reduce((locked, step, index, arr) => {
+                      // Lock all steps after any step that's "active" (in-progress)
+                      const activeIndex = arr.findIndex(s => s.status === "active");
+                      if (activeIndex >= 0 && index > activeIndex) {
+                        locked.push(step.id);
+                      }
+                      return locked;
+                    }, [] as string[])
+              }
             />
           </Card>
         </div>
@@ -642,7 +711,7 @@ function PriorAuthDecisionSection({ isEditing, onSave, onCancel, onComplete }: S
   return (
     <Card className="p-6 bg-card border-border">
       <AgentHeader 
-        name="Policy Agent" 
+        name="Agent"
         status={hasResults ? "complete" : "idle"}
         showRunButton
         onRun={handleRunCheck}
@@ -820,7 +889,7 @@ function GapAnalysisSection({ onProceed, onEditStep, corrections }: GapAnalysisS
   return (
     <Card className="p-6 bg-card border-border">
       <AgentHeader 
-        name="Clinical Audit Agent" 
+        name="Agent"
         status={hasResults ? "complete" : "idle"}
         showRunButton
         onRun={handleRunCheck}
@@ -1025,7 +1094,7 @@ function SubmitToPayerSection() {
 
   return (
     <Card className="p-6 bg-card border-border">
-      <AgentHeader name="Submission Agent" status={submitted ? "complete" : "active"} />
+      <AgentHeader name="Agent" status={submitted ? "complete" : "active"} />
       <h3 className="text-lg font-semibold text-foreground mb-4">Submit to Payer</h3>
       
       {!submitted ? (
