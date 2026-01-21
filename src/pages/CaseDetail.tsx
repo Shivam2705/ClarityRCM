@@ -23,12 +23,14 @@ export default function CaseDetail() {
 
   const caseData = mockCases.find((c) => c.id === caseId) || mockCases[0];
 
-  const statusVariant: Record<string, "new" | "review" | "submitted" | "approved" | "denied"> = {
+  const statusVariant: Record<string, "new" | "eligible" | "eligible-pa-req" | "not-eligible" | "pa-review" | "pa-submitted" | "pa-denied"> = {
     "New": "new",
-    "In Review": "review",
-    "Submitted": "submitted",
-    "Approved": "approved",
-    "Denied": "denied",
+    "Eligible": "eligible",
+    "Eligible PA Req": "eligible-pa-req",
+    "Not Eligible": "not-eligible",
+    "PA Review": "pa-review",
+    "PA Submitted": "pa-submitted",
+    "PA Denied": "pa-denied",
   };
 
   return (
