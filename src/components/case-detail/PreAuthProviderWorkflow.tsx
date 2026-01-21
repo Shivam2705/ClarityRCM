@@ -37,7 +37,7 @@ const initialSteps: WorkflowStep[] = [
     title: "Eligibility & Benefits", 
     description: "Insurance verification", 
     status: "completed",
-    agentName: "Eligibility Agent",
+    eligibilityStatus: "eligible-pa-req",
     canEdit: true
   },
   { 
