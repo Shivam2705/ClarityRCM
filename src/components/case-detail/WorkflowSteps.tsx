@@ -134,17 +134,10 @@ export function WorkflowSteps({ steps, currentStep, onStepClick, onEditStep, cla
                       {step.description}
                     </p>
                   )}
-                  {step.agentName && (
-                    <div className="flex items-center gap-2 mt-1">
-                      <p className="text-[10px] text-primary/70 font-medium uppercase tracking-wide">
-                        {step.agentName}
-                      </p>
-                      {step.agentStatus && (
-                        <Badge variant="outline" className={cn("text-[9px] px-1.5 py-0 h-4", agentStatusConfig[step.agentStatus].className)}>
-                          {agentStatusConfig[step.agentStatus].label}
-                        </Badge>
-                      )}
-                    </div>
+                  {step.agentStatus && (
+                    <Badge variant="outline" className={cn("text-[9px] px-1.5 py-0.5 h-4 mt-1", agentStatusConfig[step.agentStatus].className)}>
+                      {agentStatusConfig[step.agentStatus].label}
+                    </Badge>
                   )}
                 </div>
               </button>
