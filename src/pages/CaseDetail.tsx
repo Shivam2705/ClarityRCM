@@ -49,7 +49,6 @@ export default function CaseDetail() {
         <div className="flex flex-col gap-2 md:flex-row md:items-center md:justify-between mb-6">
           <div className="flex items-center gap-3">
             <h1 className="text-xl font-semibold text-foreground">Case: {caseData.id}</h1>
-            <StatusBadge variant={statusVariant[caseData.status]}>{caseData.status}</StatusBadge>
           </div>
           <PersonaToggle value={persona} onChange={setPersona} />
         </div>
