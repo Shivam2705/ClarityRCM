@@ -14,6 +14,7 @@ export interface Case {
   lastUpdated: string;
   procedureCode?: string;
   procedureName?: string;
+  hasGaps?: boolean;
 }
 
 export const mockCases: Case[] = [
@@ -31,6 +32,7 @@ export const mockCases: Case[] = [
     lastUpdated: "2024-01-15T10:30:00Z",
     procedureCode: "27447",
     procedureName: "Total Knee Replacement",
+    hasGaps: true,
   },
   {
     id: "CASE-002",
@@ -41,11 +43,12 @@ export const mockCases: Case[] = [
     orderingProvider: "Dr. Emily Watson",
     payerName: "Aetna",
     groupId: "GRP-67890",
-    status: "New",
+    status: "Eligible",
     priority: "Medium",
     lastUpdated: "2024-01-15T09:15:00Z",
     procedureCode: "70553",
     procedureName: "MRI Brain with Contrast",
+    hasGaps: false,
   },
   {
     id: "CASE-003",

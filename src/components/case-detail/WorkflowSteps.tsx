@@ -21,13 +21,13 @@ const documentAnalysisStatusConfig: Record<DocumentAnalysisStatus, { label: stri
 };
 
 const priorAuthDecisionStatusConfig: Record<PriorAuthDecisionStatus, { label: string; color: string; bgColor: string }> = {
-  "determined": { label: "Determined", color: "text-success", bgColor: "bg-success/20" },
-  "in-progress": { label: "In progress", color: "text-warning", bgColor: "bg-warning/20" },
+  "determined": { label: "Ready", color: "text-success", bgColor: "bg-success/20" },
+  "in-progress": { label: "Checking", color: "text-warning", bgColor: "bg-warning/20" },
   "failed": { label: "Failed", color: "text-destructive", bgColor: "bg-destructive/20" },
 };
 
 const gapAnalysisStatusConfig: Record<GapAnalysisStatus, { label: string; color: string; bgColor: string }> = {
-  "complete": { label: "Complete", color: "text-success", bgColor: "bg-success/20" },
+  "complete": { label: "No Gaps", color: "text-success", bgColor: "bg-success/20" },
   "in-progress": { label: "In progress", color: "text-warning", bgColor: "bg-warning/20" },
   "gaps-found": { label: "Gaps Found", color: "text-warning", bgColor: "bg-warning/20" },
   "failed": { label: "Failed", color: "text-destructive", bgColor: "bg-destructive/20" },
