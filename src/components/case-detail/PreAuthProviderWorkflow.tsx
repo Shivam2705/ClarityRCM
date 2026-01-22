@@ -1079,37 +1079,6 @@ function GapAnalysisSection({ onProceed, onEditStep, corrections, hasGaps }: Gap
 
       {hasResults ? (
         <>
-          {/* Agent: Clinical Policy Fetch */}
-          <Card className="p-4 bg-secondary/30 border-border/50 mb-4">
-            <div className="flex items-center gap-2 mb-3">
-              <div className="h-6 w-6 rounded-full bg-primary/20 flex items-center justify-center">
-                <ClipboardList className="h-3 w-3 text-primary" />
-              </div>
-              <h4 className="text-sm font-medium text-foreground">Clinical Audit Agent - Policy Fetch</h4>
-              <Badge variant="outline" className="ml-auto text-xs text-success border-success/30">
-                Complete
-              </Badge>
-            </div>
-            <div className="space-y-2 text-sm ml-8">
-              <DataRow label="Policy ID" value="BCBS-ORTHO-2024-TKA-001" />
-              <DataRow label="Policy Name" value="Total Knee Arthroplasty Medical Necessity" />
-              <DataRow label="Criteria Checked" value="12 requirements evaluated" />
-              <DataRow label="Match Score" value="10/12 (83%)" highlight />
-            </div>
-          </Card>
-
-          {/* Agent: Gap Analysis */}
-          <Card className="p-4 bg-secondary/30 border-border/50 mb-4">
-            <div className="flex items-center gap-2 mb-3">
-              <div className="h-6 w-6 rounded-full bg-primary/20 flex items-center justify-center">
-                <FileSearch className="h-3 w-3 text-primary" />
-              </div>
-              <h4 className="text-sm font-medium text-foreground">Gap Analysis Agent</h4>
-              <Badge variant="outline" className="ml-auto text-xs text-warning border-warning/30">
-                {gaps.length} Gaps Found
-              </Badge>
-            </div>
-          </Card>
 
           {/* Identified Gaps */}
           {gaps.length > 0 && (
