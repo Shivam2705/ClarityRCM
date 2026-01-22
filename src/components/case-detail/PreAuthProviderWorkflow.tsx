@@ -28,6 +28,7 @@ import {
   ThumbsUp,
   ThumbsDown,
   ClipboardList,
+  HelpCircle,
 } from "lucide-react";
 
 // Initial steps - only eligibility is active, others locked
@@ -807,14 +808,14 @@ function PriorAuthDecisionSection({ isEditing, onSave, onCancel, onComplete }: S
               </div>
               <h4 className="text-sm font-medium text-foreground">State Policy Analysis</h4>
               <Badge variant="outline" className="ml-auto text-xs">
-                Illinois
+                Texas
               </Badge>
             </div>
             <div className="space-y-2 text-sm ml-8">
-              <DataRow label="State" value="Illinois" />
-              <DataRow label="State Mandate" value="No additional state requirements" />
-              <DataRow label="Timely Filing" value="Within 14 days of service" />
-              <DataRow label="Appeal Rights" value="2 levels internal, external review available" />
+              <PolicyCheckRow label="Licensed Texas Provider" status="applicable" />
+              <PolicyCheckRow label="Fully-Insured Commercial Plan" status="applicable" />
+              <PolicyCheckRow label="CPT 27130 Gold Card Status" status="not-available" />
+              <PolicyCheckRow label="90% Approval Threshold Met" status="unknown" />
             </div>
           </Card>
 
@@ -1418,6 +1419,43 @@ function DecisionNode({ label, result, status }: { label: string; result: string
       >
         {result}
       </Badge>
+    </div>
+  );
+}
+
+function PolicyCheckRow({ label, status }: { label: string; status: "applicable" | "not-available" | "unknown" }) {
+  const getStatusConfig = () => {
+    switch (status) {
+      case "applicable":
+        return {
+          icon: <CheckCircle2 className="h-4 w-4 text-success" />,
+          text: "Applicable",
+          className: "text-success",
+        };
+      case "not-available":
+        return {
+          icon: <XCircle className="h-4 w-4 text-destructive" />,
+          text: "Not Available / Not Confirmed",
+          className: "text-destructive",
+        };
+      case "unknown":
+        return {
+          icon: <HelpCircle className="h-4 w-4 text-warning" />,
+          text: "Unknown",
+          className: "text-warning",
+        };
+    }
+  };
+
+  const config = getStatusConfig();
+
+  return (
+    <div className="flex justify-between items-center">
+      <span className="text-muted-foreground">{label}</span>
+      <div className="flex items-center gap-2">
+        {config.icon}
+        <span className={`text-sm font-medium ${config.className}`}>{config.text}</span>
+      </div>
     </div>
   );
 }
