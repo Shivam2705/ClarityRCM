@@ -6,14 +6,7 @@ import { mockCases, Case } from "@/data/mockCases";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { StatusBadge } from "@/components/ui/status-badge";
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@/components/ui/table";
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Search, Filter, Plus } from "lucide-react";
 import { format } from "date-fns";
 
@@ -22,10 +15,11 @@ export default function Dashboard() {
   const [searchQuery, setSearchQuery] = useState("");
   const navigate = useNavigate();
 
-  const filteredCases = mockCases.filter((c) =>
-    c.patientName.toLowerCase().includes(searchQuery.toLowerCase()) ||
-    c.patientId.toLowerCase().includes(searchQuery.toLowerCase()) ||
-    c.payerName.toLowerCase().includes(searchQuery.toLowerCase())
+  const filteredCases = mockCases.filter(
+    (c) =>
+      c.patientName.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      c.patientId.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      c.payerName.toLowerCase().includes(searchQuery.toLowerCase()),
   );
 
   const statusCounts = {
@@ -45,21 +39,31 @@ export default function Dashboard() {
 
   const getPriorityColor = (priority: Case["priority"]) => {
     switch (priority) {
-      case "High": return "text-destructive";
-      case "Medium": return "text-warning";
-      case "Low": return "text-muted-foreground";
+      case "High":
+        return "text-destructive";
+      case "Medium":
+        return "text-warning";
+      case "Low":
+        return "text-muted-foreground";
     }
   };
 
   const getStatusVariant = (status: Case["status"]) => {
     switch (status) {
-      case "New": return "new";
-      case "Eligible": return "eligible";
-      case "Eligible PA Req": return "eligible-pa-req";
-      case "Not Eligible": return "not-eligible";
-      case "PA Review": return "pa-review";
-      case "PA Submitted": return "pa-submitted";
-      case "PA Denied": return "pa-denied";
+      case "New":
+        return "new";
+      case "Eligible":
+        return "eligible";
+      case "Eligible PA Req":
+        return "eligible-pa-req";
+      case "Not Eligible":
+        return "not-eligible";
+      case "PA Review":
+        return "pa-review";
+      case "PA Submitted":
+        return "pa-submitted";
+      case "PA Denied":
+        return "pa-denied";
     }
   };
 
@@ -73,14 +77,16 @@ export default function Dashboard() {
           <div>
             <h1 className="text-3xl font-bold text-foreground">Case Dashboard</h1>
             <p className="text-muted-foreground mt-1">
-              {persona === "provider" ? "Manage pre-authorization requests and coding workflows" : "Review and process authorization requests"}
+              {persona === "provider"
+                ? "Manage pre-authorization requests and coding workflows"
+                : "Review and process authorization requests"}
             </p>
           </div>
           <PersonaToggle value={persona} onChange={setPersona} />
         </div>
 
         {/* Stats cards */}
-        <div className="mb-8 grid grid-cols-2 gap-4 md:grid-cols-6">
+        <div className="mb-8 grid grid-cols-2 gap-4 md:grid-cols-4">
           <div className="rounded-xl border bg-card p-4 shadow-card">
             <p className="text-sm text-muted-foreground">All Cases</p>
             <p className="text-2xl font-bold text-foreground">{statusCounts.all}</p>
@@ -172,9 +178,7 @@ export default function Dashboard() {
                   </TableCell>
                   <TableCell className="max-w-[200px] truncate">{caseData.procedureName || "—"}</TableCell>
                   <TableCell>
-                    <StatusBadge variant={getStatusVariant(caseData.status)}>
-                      {caseData.status}
-                    </StatusBadge>
+                    <StatusBadge variant={getStatusVariant(caseData.status)}>{caseData.status}</StatusBadge>
                   </TableCell>
                 </TableRow>
               ))}
