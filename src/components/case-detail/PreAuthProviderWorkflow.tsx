@@ -5,12 +5,12 @@ import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { AuditLogsDialog } from "@/components/ui/audit-logs-dialog";
-import { 
-  FileText, 
-  Shield, 
-  GitBranch, 
-  FileSearch, 
-  AlertTriangle, 
+import {
+  FileText,
+  Shield,
+  GitBranch,
+  FileSearch,
+  AlertTriangle,
   Send,
   ArrowRight,
   Edit3,
@@ -27,45 +27,45 @@ import {
   FileUp,
   ThumbsUp,
   ThumbsDown,
-  ClipboardList
+  ClipboardList,
 } from "lucide-react";
 
 // Initial steps - only eligibility is active, others locked
 const initialSteps: WorkflowStep[] = [
-  { 
-    id: "eligibility", 
-    title: "Eligibility & Benefits", 
-    description: "Insurance verification", 
+  {
+    id: "eligibility",
+    title: "Eligibility & Benefits",
+    description: "Insurance verification",
     status: "active",
-    canEdit: true
+    canEdit: true,
   },
-  { 
-    id: "document-analysis", 
-    title: "Document Analysis", 
-    description: "Document summary & review", 
+  {
+    id: "document-analysis",
+    title: "Document Analysis",
+    description: "Document summary & review",
     status: "pending",
-    canEdit: false
+    canEdit: false,
   },
-  { 
-    id: "prior-auth-decision", 
-    title: "Prior Auth Readiness Check", 
-    description: "Pre-certification & policy check", 
+  {
+    id: "prior-auth-decision",
+    title: "Prior Auth Readiness Check",
+    description: "Pre-certification & policy check",
     status: "pending",
-    canEdit: false
+    canEdit: false,
   },
-  { 
-    id: "gap-analysis", 
-    title: "Gap Analysis & Review", 
-    description: "Clinical audit & gaps", 
+  {
+    id: "gap-analysis",
+    title: "Gap Analysis & Review",
+    description: "Clinical audit & gaps",
     status: "pending",
-    canEdit: false
+    canEdit: false,
   },
-  { 
-    id: "submit-to-payer", 
-    title: "Submit to Payer", 
-    description: "Final submission & notification", 
+  {
+    id: "submit-to-payer",
+    title: "Submit to Payer",
+    description: "Final submission & notification",
     status: "pending",
-    canEdit: false
+    canEdit: false,
   },
 ];
 
@@ -75,9 +75,13 @@ export function PreAuthProviderWorkflow() {
   const [steps, setSteps] = useState<WorkflowStep[]>(initialSteps);
   const [editingStep, setEditingStep] = useState<string | null>(null);
   const [corrections, setCorrections] = useState<Record<string, boolean>>({});
-  const [eligibilityStatus, setEligibilityStatus] = useState<"idle" | "processing" | "eligible" | "not-eligible">("idle");
+  const [eligibilityStatus, setEligibilityStatus] = useState<"idle" | "processing" | "eligible" | "not-eligible">(
+    "idle",
+  );
   const [hasAutoRun, setHasAutoRun] = useState(false);
-  const [workflowPhase, setWorkflowPhase] = useState<"eligibility" | "document-analysis" | "prior-auth" | "gap-analysis" | "complete">("eligibility");
+  const [workflowPhase, setWorkflowPhase] = useState<
+    "eligibility" | "document-analysis" | "prior-auth" | "gap-analysis" | "complete"
+  >("eligibility");
 
   // Determine if this case has gaps based on caseId
   const caseHasGaps = caseId === "CASE-001";
@@ -88,21 +92,28 @@ export function PreAuthProviderWorkflow() {
       setHasAutoRun(true);
       // Start eligibility processing
       setEligibilityStatus("processing");
-      
+
       // Phase 1: Eligibility (2 seconds)
       setTimeout(() => {
         const isEligible = true;
         const status = isEligible ? "eligible" : "not-eligible";
         setEligibilityStatus(status);
-        setSteps(prev => prev.map(s => {
-          if (s.id === "eligibility") {
-            return { ...s, status: "completed" as const, eligibilityStatus: status };
-          }
-          if (isEligible && s.id === "document-analysis") {
-            return { ...s, status: "active" as const, documentAnalysisStatus: "in-progress" as const, canEdit: false };
-          }
-          return s;
-        }));
+        setSteps((prev) =>
+          prev.map((s) => {
+            if (s.id === "eligibility") {
+              return { ...s, status: "completed" as const, eligibilityStatus: status };
+            }
+            if (isEligible && s.id === "document-analysis") {
+              return {
+                ...s,
+                status: "active" as const,
+                documentAnalysisStatus: "in-progress" as const,
+                canEdit: false,
+              };
+            }
+            return s;
+          }),
+        );
         if (isEligible) {
           setCurrentStep("document-analysis");
           setWorkflowPhase("document-analysis");
@@ -115,15 +126,22 @@ export function PreAuthProviderWorkflow() {
   useEffect(() => {
     if (workflowPhase === "document-analysis") {
       const timer = setTimeout(() => {
-        setSteps(prev => prev.map(s => {
-          if (s.id === "document-analysis") {
-            return { ...s, status: "completed" as const, documentAnalysisStatus: "analyzed" as const, canEdit: true };
-          }
-          if (s.id === "prior-auth-decision") {
-            return { ...s, status: "active" as const, priorAuthDecisionStatus: "in-progress" as const, canEdit: false };
-          }
-          return s;
-        }));
+        setSteps((prev) =>
+          prev.map((s) => {
+            if (s.id === "document-analysis") {
+              return { ...s, status: "completed" as const, documentAnalysisStatus: "analyzed" as const, canEdit: true };
+            }
+            if (s.id === "prior-auth-decision") {
+              return {
+                ...s,
+                status: "active" as const,
+                priorAuthDecisionStatus: "in-progress" as const,
+                canEdit: false,
+              };
+            }
+            return s;
+          }),
+        );
         setCurrentStep("prior-auth-decision");
         setWorkflowPhase("prior-auth");
       }, 2000);
@@ -135,23 +153,30 @@ export function PreAuthProviderWorkflow() {
   useEffect(() => {
     if (workflowPhase === "prior-auth") {
       const timer = setTimeout(() => {
-        setSteps(prev => prev.map(s => {
-          if (s.id === "prior-auth-decision") {
-            return { ...s, status: "completed" as const, priorAuthDecisionStatus: "determined" as const, canEdit: true };
-          }
-          if (s.id === "gap-analysis") {
-            // If case has gaps, make gap analysis active; otherwise skip to submission
-            if (caseHasGaps) {
-              return { ...s, status: "active" as const, gapAnalysisStatus: "in-progress" as const, canEdit: false };
-            } else {
-              return { ...s, status: "completed" as const, gapAnalysisStatus: "complete" as const, canEdit: false };
+        setSteps((prev) =>
+          prev.map((s) => {
+            if (s.id === "prior-auth-decision") {
+              return {
+                ...s,
+                status: "completed" as const,
+                priorAuthDecisionStatus: "determined" as const,
+                canEdit: true,
+              };
             }
-          }
-          if (!caseHasGaps && s.id === "submit-to-payer") {
-            return { ...s, status: "active" as const, submissionStatus: "in-progress" as const, canEdit: false };
-          }
-          return s;
-        }));
+            if (s.id === "gap-analysis") {
+              // If case has gaps, make gap analysis active; otherwise skip to submission
+              if (caseHasGaps) {
+                return { ...s, status: "active" as const, gapAnalysisStatus: "in-progress" as const, canEdit: false };
+              } else {
+                return { ...s, status: "completed" as const, gapAnalysisStatus: "complete" as const, canEdit: false };
+              }
+            }
+            if (!caseHasGaps && s.id === "submit-to-payer") {
+              return { ...s, status: "active" as const, submissionStatus: "in-progress" as const, canEdit: false };
+            }
+            return s;
+          }),
+        );
         if (caseHasGaps) {
           setCurrentStep("gap-analysis");
           setWorkflowPhase("gap-analysis");
@@ -168,15 +193,17 @@ export function PreAuthProviderWorkflow() {
   useEffect(() => {
     if (workflowPhase === "gap-analysis" && caseHasGaps) {
       const timer = setTimeout(() => {
-        setSteps(prev => prev.map(s => {
-          if (s.id === "gap-analysis") {
-            return { ...s, status: "completed" as const, gapAnalysisStatus: "gaps-found" as const, canEdit: true };
-          }
-          if (s.id === "submit-to-payer") {
-            return { ...s, status: "active" as const, submissionStatus: "in-progress" as const, canEdit: false };
-          }
-          return s;
-        }));
+        setSteps((prev) =>
+          prev.map((s) => {
+            if (s.id === "gap-analysis") {
+              return { ...s, status: "completed" as const, gapAnalysisStatus: "gaps-found" as const, canEdit: true };
+            }
+            if (s.id === "submit-to-payer") {
+              return { ...s, status: "active" as const, submissionStatus: "in-progress" as const, canEdit: false };
+            }
+            return s;
+          }),
+        );
         setCurrentStep("submit-to-payer");
         setWorkflowPhase("complete");
       }, 2000);
@@ -185,33 +212,40 @@ export function PreAuthProviderWorkflow() {
   }, [workflowPhase, caseHasGaps]);
 
   // Check if user can access a step based on eligibility and step status
-  const canAccessStep = useCallback((stepId: string) => {
-    if (stepId === "eligibility") return true;
-    if (eligibilityStatus !== "eligible") return false;
-    
-    // Find the step and check if it's completed or active
-    const step = steps.find(s => s.id === stepId);
-    return step?.status === "completed" || step?.status === "active";
-  }, [eligibilityStatus, steps]);
+  const canAccessStep = useCallback(
+    (stepId: string) => {
+      if (stepId === "eligibility") return true;
+      if (eligibilityStatus !== "eligible") return false;
 
-  const handleStepClick = useCallback((stepId: string) => {
-    if (canAccessStep(stepId)) {
-      setCurrentStep(stepId);
-    }
-  }, [canAccessStep]);
+      // Find the step and check if it's completed or active
+      const step = steps.find((s) => s.id === stepId);
+      return step?.status === "completed" || step?.status === "active";
+    },
+    [eligibilityStatus, steps],
+  );
 
-  const handleEditStep = useCallback((stepId: string) => {
-    if (canAccessStep(stepId)) {
-      setEditingStep(stepId);
-      setCurrentStep(stepId);
-    }
-  }, [canAccessStep]);
+  const handleStepClick = useCallback(
+    (stepId: string) => {
+      if (canAccessStep(stepId)) {
+        setCurrentStep(stepId);
+      }
+    },
+    [canAccessStep],
+  );
+
+  const handleEditStep = useCallback(
+    (stepId: string) => {
+      if (canAccessStep(stepId)) {
+        setEditingStep(stepId);
+        setCurrentStep(stepId);
+      }
+    },
+    [canAccessStep],
+  );
 
   const handleSaveCorrection = useCallback((stepId: string) => {
-    setCorrections(prev => ({ ...prev, [stepId]: true }));
-    setSteps(prev => prev.map(s => 
-      s.id === stepId ? { ...s, hasCorrections: true } : s
-    ));
+    setCorrections((prev) => ({ ...prev, [stepId]: true }));
+    setSteps((prev) => prev.map((s) => (s.id === stepId ? { ...s, hasCorrections: true } : s)));
     setEditingStep(null);
     setCurrentStep("gap-analysis");
   }, []);
@@ -224,19 +258,21 @@ export function PreAuthProviderWorkflow() {
   // Handle eligibility check completion - unlocks next step
   const handleEligibilityComplete = useCallback((status: "eligible" | "not-eligible") => {
     setEligibilityStatus(status);
-    setSteps(prev => prev.map(s => {
-      if (s.id === "eligibility") {
-        return { 
-          ...s, 
-          status: "completed" as const,
-          eligibilityStatus: status === "eligible" ? "eligible" : "not-eligible"
-        };
-      }
-      if (status === "eligible" && s.id === "document-analysis") {
-        return { ...s, status: "active" as const, canEdit: true };
-      }
-      return s;
-    }));
+    setSteps((prev) =>
+      prev.map((s) => {
+        if (s.id === "eligibility") {
+          return {
+            ...s,
+            status: "completed" as const,
+            eligibilityStatus: status === "eligible" ? "eligible" : "not-eligible",
+          };
+        }
+        if (status === "eligible" && s.id === "document-analysis") {
+          return { ...s, status: "active" as const, canEdit: true };
+        }
+        return s;
+      }),
+    );
     if (status === "eligible") {
       setCurrentStep("document-analysis");
     }
@@ -244,15 +280,17 @@ export function PreAuthProviderWorkflow() {
 
   // Progress to next step
   const handleStepComplete = useCallback((completedStepId: string, nextStepId: string) => {
-    setSteps(prev => prev.map(s => {
-      if (s.id === completedStepId) {
-        return { ...s, status: "completed" as const, canEdit: true };
-      }
-      if (s.id === nextStepId) {
-        return { ...s, status: "active" as const, canEdit: false };
-      }
-      return s;
-    }));
+    setSteps((prev) =>
+      prev.map((s) => {
+        if (s.id === completedStepId) {
+          return { ...s, status: "completed" as const, canEdit: true };
+        }
+        if (s.id === nextStepId) {
+          return { ...s, status: "active" as const, canEdit: false };
+        }
+        return s;
+      }),
+    );
     setCurrentStep(nextStepId);
   }, []);
 
@@ -264,9 +302,9 @@ export function PreAuthProviderWorkflow() {
     switch (currentStep) {
       case "eligibility":
         return (
-          <EligibilitySection 
-            isEditing={editingStep === "eligibility"} 
-            onSave={() => handleSaveCorrection("eligibility")} 
+          <EligibilitySection
+            isEditing={editingStep === "eligibility"}
+            onSave={() => handleSaveCorrection("eligibility")}
             onCancel={handleCancelEdit}
             eligibilityStatus={eligibilityStatus}
             onStatusChange={setEligibilityStatus}
@@ -275,29 +313,36 @@ export function PreAuthProviderWorkflow() {
         );
       case "document-analysis":
         return (
-          <DocumentAnalysisSection 
-            isEditing={editingStep === "document-analysis"} 
-            onSave={() => handleSaveCorrection("document-analysis")} 
+          <DocumentAnalysisSection
+            isEditing={editingStep === "document-analysis"}
+            onSave={() => handleSaveCorrection("document-analysis")}
             onCancel={handleCancelEdit}
             onComplete={() => handleStepComplete("document-analysis", "prior-auth-decision")}
           />
         );
       case "prior-auth-decision":
         return (
-          <PriorAuthDecisionSection 
-            isEditing={editingStep === "prior-auth-decision"} 
-            onSave={() => handleSaveCorrection("prior-auth-decision")} 
+          <PriorAuthDecisionSection
+            isEditing={editingStep === "prior-auth-decision"}
+            onSave={() => handleSaveCorrection("prior-auth-decision")}
             onCancel={handleCancelEdit}
             onComplete={() => handleStepComplete("prior-auth-decision", "gap-analysis")}
           />
         );
       case "gap-analysis":
-        return <GapAnalysisSection onProceed={handleProceedToSubmit} onEditStep={handleEditStep} corrections={corrections} hasGaps={caseHasGaps} />;
+        return (
+          <GapAnalysisSection
+            onProceed={handleProceedToSubmit}
+            onEditStep={handleEditStep}
+            corrections={corrections}
+            hasGaps={caseHasGaps}
+          />
+        );
       case "submit-to-payer":
         return <SubmitToPayerSection />;
       default:
         return (
-          <EligibilitySection 
+          <EligibilitySection
             isEditing={false}
             eligibilityStatus={eligibilityStatus}
             onStatusChange={setEligibilityStatus}
@@ -327,11 +372,11 @@ export function PreAuthProviderWorkflow() {
               onStepClick={handleStepClick}
               onEditStep={handleEditStep}
               lockedSteps={
-                eligibilityStatus !== "eligible" 
+                eligibilityStatus !== "eligible"
                   ? ["document-analysis", "prior-auth-decision", "gap-analysis", "submit-to-payer"]
                   : steps.reduce((locked, step, index, arr) => {
                       // Lock all steps after any step that's "active" (in-progress)
-                      const activeIndex = arr.findIndex(s => s.status === "active");
+                      const activeIndex = arr.findIndex((s) => s.status === "active");
                       if (activeIndex >= 0 && index > activeIndex) {
                         locked.push(step.id);
                       }
@@ -342,9 +387,7 @@ export function PreAuthProviderWorkflow() {
           </Card>
         </div>
       </div>
-      <div className="flex-1 min-w-0">
-        {renderPanel()}
-      </div>
+      <div className="flex-1 min-w-0">{renderPanel()}</div>
     </div>
   );
 }
@@ -366,12 +409,12 @@ interface EligibilitySectionProps {
   onComplete: (status: "eligible" | "not-eligible") => void;
 }
 
-function EligibilityHeader({ 
-  status, 
+function EligibilityHeader({
+  status,
   eligibilityStatus,
   onRun,
-  isRunning 
-}: { 
+  isRunning,
+}: {
   status: "idle" | "processing" | "complete";
   eligibilityStatus: "idle" | "processing" | "eligible" | "not-eligible";
   onRun: () => void;
@@ -379,27 +422,31 @@ function EligibilityHeader({
 }) {
   return (
     <div className="flex items-center gap-3 mb-4">
-      <div className={`h-10 w-10 rounded-xl flex items-center justify-center ${
-        status === "processing" ? "bg-primary/20 ring-2 ring-primary/30" :
-        status === "complete" ? "bg-success/20" : "bg-muted"
-      }`}>
-        <Shield className={`h-5 w-5 ${
-          status === "processing" ? "text-primary animate-pulse-soft" :
-          status === "complete" ? "text-success" : "text-muted-foreground"
-        }`} />
+      <div
+        className={`h-10 w-10 rounded-xl flex items-center justify-center ${
+          status === "processing"
+            ? "bg-primary/20 ring-2 ring-primary/30"
+            : status === "complete"
+              ? "bg-success/20"
+              : "bg-muted"
+        }`}
+      >
+        <Shield
+          className={`h-5 w-5 ${
+            status === "processing"
+              ? "text-primary animate-pulse-soft"
+              : status === "complete"
+                ? "text-success"
+                : "text-muted-foreground"
+          }`}
+        />
       </div>
       <div className="flex-1">
         <p className="text-sm font-medium text-foreground">Agent</p>
       </div>
       <div className="flex items-center gap-2">
-        
         {/* Run / Run Again Button */}
-        <Button 
-          variant="outline" 
-          size="sm" 
-          onClick={onRun}
-          disabled={isRunning}
-        >
+        <Button variant="outline" size="sm" onClick={onRun} disabled={isRunning}>
           {isRunning ? (
             <Loader2 className="h-4 w-4 mr-1 animate-spin" />
           ) : eligibilityStatus === "eligible" || eligibilityStatus === "not-eligible" ? (
@@ -415,8 +462,14 @@ function EligibilityHeader({
   );
 }
 
-function AgentHeader({ name, status, showRunButton, onRun, isRunning }: { 
-  name: string; 
+function AgentHeader({
+  name,
+  status,
+  showRunButton,
+  onRun,
+  isRunning,
+}: {
+  name: string;
   status: "active" | "complete" | "idle";
   showRunButton?: boolean;
   onRun?: () => void;
@@ -424,26 +477,31 @@ function AgentHeader({ name, status, showRunButton, onRun, isRunning }: {
 }) {
   return (
     <div className="flex items-center gap-3 mb-4">
-      <div className={`h-10 w-10 rounded-xl flex items-center justify-center ${
-        status === "active" ? "bg-primary/20 ring-2 ring-primary/30" :
-        status === "complete" ? "bg-success/20" : "bg-muted"
-      }`}>
-        <Sparkles className={`h-5 w-5 ${
-          status === "active" ? "text-primary animate-pulse-soft" :
-          status === "complete" ? "text-success" : "text-muted-foreground"
-        }`} />
+      <div
+        className={`h-10 w-10 rounded-xl flex items-center justify-center ${
+          status === "active"
+            ? "bg-primary/20 ring-2 ring-primary/30"
+            : status === "complete"
+              ? "bg-success/20"
+              : "bg-muted"
+        }`}
+      >
+        <Sparkles
+          className={`h-5 w-5 ${
+            status === "active"
+              ? "text-primary animate-pulse-soft"
+              : status === "complete"
+                ? "text-success"
+                : "text-muted-foreground"
+          }`}
+        />
       </div>
       <div className="flex-1">
         <p className="text-sm font-medium text-foreground">{name}</p>
       </div>
       <div className="flex items-center gap-2">
         {showRunButton && (
-          <Button 
-            variant="outline" 
-            size="sm" 
-            onClick={onRun}
-            disabled={isRunning}
-          >
+          <Button variant="outline" size="sm" onClick={onRun} disabled={isRunning}>
             {isRunning ? (
               <Loader2 className="h-4 w-4 mr-1 animate-spin" />
             ) : status === "complete" ? (
@@ -460,7 +518,14 @@ function AgentHeader({ name, status, showRunButton, onRun, isRunning }: {
   );
 }
 
-function EligibilitySection({ isEditing, onSave, onCancel, eligibilityStatus, onStatusChange, onComplete }: EligibilitySectionProps) {
+function EligibilitySection({
+  isEditing,
+  onSave,
+  onCancel,
+  eligibilityStatus,
+  onStatusChange,
+  onComplete,
+}: EligibilitySectionProps) {
   const handleRunCheck = () => {
     onStatusChange("processing");
     setTimeout(() => {
@@ -476,17 +541,19 @@ function EligibilitySection({ isEditing, onSave, onCancel, eligibilityStatus, on
 
   return (
     <Card className="p-6 bg-card border-border">
-      <EligibilityHeader 
+      <EligibilityHeader
         status={isRunning ? "processing" : hasResults ? "complete" : "idle"}
         eligibilityStatus={eligibilityStatus}
         onRun={handleRunCheck}
         isRunning={isRunning}
       />
       <h3 className="text-lg font-semibold text-foreground mb-4">Insurance & Eligibility Verification</h3>
-      
+
       {hasResults ? (
         <div className="grid gap-4">
-          <Card className={`p-4 ${eligibilityStatus === "eligible" ? "bg-success/10 border-success/30" : "bg-destructive/10 border-destructive/30"}`}>
+          <Card
+            className={`p-4 ${eligibilityStatus === "eligible" ? "bg-success/10 border-success/30" : "bg-destructive/10 border-destructive/30"}`}
+          >
             <div className="flex items-center gap-2 mb-2">
               {eligibilityStatus === "eligible" ? (
                 <>
@@ -501,19 +568,24 @@ function EligibilitySection({ isEditing, onSave, onCancel, eligibilityStatus, on
               )}
             </div>
             <p className="text-xs text-muted-foreground">
-              {eligibilityStatus === "eligible" 
-                ? "Member is active with valid coverage for requested procedure" 
+              {eligibilityStatus === "eligible"
+                ? "Member is active with valid coverage for requested procedure"
                 : "Member coverage is not active or does not cover requested procedure"}
             </p>
           </Card>
-          
+
           {eligibilityStatus === "eligible" && (
             <>
               <div className="grid grid-cols-2 gap-4">
-                <InfoCard icon={<Shield className="h-4 w-4" />} label="Payer" value="Blue Cross Blue Shield" editable={isEditing} />
+                <InfoCard
+                  icon={<Shield className="h-4 w-4" />}
+                  label="Payer"
+                  value="Blue Cross Blue Shield"
+                  editable={isEditing}
+                />
                 <InfoCard icon={<Shield className="h-4 w-4" />} label="Plan Type" value="PPO" editable={isEditing} />
               </div>
-              
+
               <Card className="p-4 bg-secondary/30 border-border/50">
                 <h4 className="text-sm font-medium text-foreground mb-2">Member Benefits</h4>
                 <div className="space-y-2 text-sm">
@@ -524,7 +596,7 @@ function EligibilitySection({ isEditing, onSave, onCancel, eligibilityStatus, on
                   <DataRow label="Out-of-Pocket Max" value="$3,000 / $6,000" />
                 </div>
               </Card>
-              
+
               <Card className="p-4 bg-secondary/30 border-border/50">
                 <h4 className="text-sm font-medium text-foreground mb-2">Coverage Details</h4>
                 <div className="space-y-2 text-sm">
@@ -544,10 +616,12 @@ function EligibilitySection({ isEditing, onSave, onCancel, eligibilityStatus, on
       ) : (
         <Card className="p-6 bg-muted/30 border-border/50 text-center">
           <Shield className="h-12 w-12 mx-auto text-muted-foreground mb-3" />
-          <p className="text-sm text-muted-foreground mb-3">Click "Run Check" to verify member eligibility and benefits</p>
+          <p className="text-sm text-muted-foreground mb-3">
+            Click "Run Check" to verify member eligibility and benefits
+          </p>
         </Card>
       )}
-      
+
       {isEditing && (
         <div className="flex gap-3 mt-6 pt-4 border-t border-border">
           <Button onClick={onSave} className="flex-1">
@@ -590,7 +664,7 @@ function DocumentAnalysisSection({ isEditing, onSave, onCancel, onComplete }: Se
 
   return (
     <Card className="p-6 bg-card border-border">
-      <AgentHeader 
+      <AgentHeader
         name="Agent"
         status={hasAnalysis ? "complete" : "idle"}
         showRunButton
@@ -598,14 +672,10 @@ function DocumentAnalysisSection({ isEditing, onSave, onCancel, onComplete }: Se
         isRunning={isAnalyzing}
       />
       <h3 className="text-lg font-semibold text-foreground mb-4">Document Analysis & Summary</h3>
-      
+
       {/* Action Buttons */}
       <div className="flex flex-wrap gap-2 mb-4">
-        <Button 
-          variant="outline" 
-          size="sm"
-          onClick={() => navigate(`/case/${caseId}/documents`)}
-        >
+        <Button variant="outline" size="sm" onClick={() => navigate(`/case/${caseId}/documents`)}>
           <FileUp className="h-4 w-4 mr-2" />
           Upload Document
         </Button>
@@ -629,7 +699,11 @@ function DocumentAnalysisSection({ isEditing, onSave, onCancel, onComplete }: Se
             <h4 className="text-sm font-medium text-foreground mb-3">Retrieved Documents ({documents.length})</h4>
             <div className="space-y-2">
               {documents.map((doc, idx) => (
-                <div key={idx} className="flex items-center gap-3 p-2 rounded-lg bg-background/50 hover:bg-background cursor-pointer" onClick={() => navigate(`/case/${caseId}/documents`)}>
+                <div
+                  key={idx}
+                  className="flex items-center gap-3 p-2 rounded-lg bg-background/50 hover:bg-background cursor-pointer"
+                  onClick={() => navigate(`/case/${caseId}/documents`)}
+                >
                   <FileSearch className="h-4 w-4 text-muted-foreground" />
                   <div className="flex-1 min-w-0">
                     <p className="text-sm text-foreground truncate">{doc.name}</p>
@@ -649,10 +723,12 @@ function DocumentAnalysisSection({ isEditing, onSave, onCancel, onComplete }: Se
       ) : (
         <Card className="p-6 bg-muted/30 border-border/50 text-center">
           <FileText className="h-12 w-12 mx-auto text-muted-foreground mb-3" />
-          <p className="text-sm text-muted-foreground mb-3">Upload documents and click "Analyze Documents" to generate summary</p>
+          <p className="text-sm text-muted-foreground mb-3">
+            Upload documents and click "Analyze Documents" to generate summary
+          </p>
         </Card>
       )}
-      
+
       {isEditing ? (
         <div className="flex gap-3 mt-6 pt-4 border-t border-border">
           <Button onClick={onSave} className="flex-1">
@@ -664,13 +740,16 @@ function DocumentAnalysisSection({ isEditing, onSave, onCancel, onComplete }: Se
             Cancel
           </Button>
         </div>
-      ) : hasAnalysis && onComplete && (
-        <div className="flex justify-end mt-6 pt-4 border-t border-border">
-          <Button onClick={onComplete}>
-            Proceed to Readiness Check
-            <ArrowRight className="h-4 w-4 ml-2" />
-          </Button>
-        </div>
+      ) : (
+        hasAnalysis &&
+        onComplete && (
+          <div className="flex justify-end mt-6 pt-4 border-t border-border">
+            <Button onClick={onComplete}>
+              Proceed to Readiness Check
+              <ArrowRight className="h-4 w-4 ml-2" />
+            </Button>
+          </div>
+        )
       )}
     </Card>
   );
@@ -690,7 +769,7 @@ function PriorAuthDecisionSection({ isEditing, onSave, onCancel, onComplete }: S
 
   return (
     <Card className="p-6 bg-card border-border">
-      <AgentHeader 
+      <AgentHeader
         name="Agent"
         status={hasResults ? "complete" : "idle"}
         showRunButton
@@ -698,7 +777,7 @@ function PriorAuthDecisionSection({ isEditing, onSave, onCancel, onComplete }: S
         isRunning={isRunning}
       />
       <h3 className="text-lg font-semibold text-foreground mb-4">Prior Auth Readiness Check</h3>
-      
+
       {hasResults ? (
         <div className="grid gap-4">
           {/* Agent 1: Pre-certification List Analysis */}
@@ -708,7 +787,9 @@ function PriorAuthDecisionSection({ isEditing, onSave, onCancel, onComplete }: S
                 <ClipboardList className="h-3 w-3 text-primary" />
               </div>
               <h4 className="text-sm font-medium text-foreground">Pre-certification List Analysis</h4>
-              <Badge variant="outline" className="ml-auto text-xs">CPT: 27447</Badge>
+              <Badge variant="outline" className="ml-auto text-xs">
+                CPT: 27447
+              </Badge>
             </div>
             <div className="space-y-2 text-sm ml-8">
               <DataRow label="CPT Code Lookup" value="27447 - Total Knee Arthroplasty" />
@@ -725,7 +806,9 @@ function PriorAuthDecisionSection({ isEditing, onSave, onCancel, onComplete }: S
                 <GitBranch className="h-3 w-3 text-primary" />
               </div>
               <h4 className="text-sm font-medium text-foreground">State Policy Analysis</h4>
-              <Badge variant="outline" className="ml-auto text-xs">Illinois</Badge>
+              <Badge variant="outline" className="ml-auto text-xs">
+                Illinois
+              </Badge>
             </div>
             <div className="space-y-2 text-sm ml-8">
               <DataRow label="State" value="Illinois" />
@@ -740,13 +823,21 @@ function PriorAuthDecisionSection({ isEditing, onSave, onCancel, onComplete }: S
             <h4 className="text-sm font-medium text-foreground mb-3">Decision Tree Evaluation</h4>
             <div className="space-y-2">
               <DecisionNode label="a. Identify Member's Health Plan" result="BCBS PPO" status="pass" />
-              <DecisionNode label="b. Check CPT Code Against Prior Authorization List" result="27447 - Requires PA" status="warn" />
+              <DecisionNode
+                label="b. Check CPT Code Against Prior Authorization List"
+                result="27447 - Requires PA"
+                status="warn"
+              />
               <DecisionNode label="c. Verify Place of Service" result="Outpatient Hospital" status="pass" />
-              <DecisionNode label="d. Review Diagnosis Codes (ICD-10)" result="M17.11 - Primary OA Right Knee" status="pass" />
+              <DecisionNode
+                label="d. Review Diagnosis Codes (ICD-10)"
+                result="M17.11 - Primary OA Right Knee"
+                status="pass"
+              />
               <DecisionNode label="e. Apply Medical Policy Guidelines" result="Meets Criteria" status="pass" />
               <DecisionNode label="f. Check Provider & Facility Network Status" result="In-Network" status="pass" />
               <DecisionNode label="g. Review Authorization History" result="No Prior Auths" status="pass" />
-              <DecisionNode label="h. Final Determination" result="PA Required" status="warn" />
+              <DecisionNode label="h. Final Determination" result="Gap found" status="warn" />
             </div>
           </Card>
 
@@ -772,7 +863,8 @@ function PriorAuthDecisionSection({ isEditing, onSave, onCancel, onComplete }: S
               <div className="flex-1">
                 <span className="text-base font-semibold text-warning">Prior Authorization Required</span>
                 <p className="text-xs text-muted-foreground mt-1">
-                  Based on CPT code 27447 (Total Knee Arthroplasty), BCBS pre-certification list, and medical policy guidelines. Procedure requires prior authorization with supporting clinical documentation.
+                  Based on CPT code 27447 (Total Knee Arthroplasty), BCBS pre-certification list, and medical policy
+                  guidelines. Procedure requires prior authorization with supporting clinical documentation.
                 </p>
                 <p className="text-xs text-warning mt-2 font-medium">
                   2 documentation gaps identified → Gap Analysis step will help resolve these issues
@@ -784,10 +876,12 @@ function PriorAuthDecisionSection({ isEditing, onSave, onCancel, onComplete }: S
       ) : (
         <Card className="p-6 bg-muted/30 border-border/50 text-center">
           <GitBranch className="h-12 w-12 mx-auto text-muted-foreground mb-3" />
-          <p className="text-sm text-muted-foreground mb-3">Click "Run Check" to analyze prior authorization requirements</p>
+          <p className="text-sm text-muted-foreground mb-3">
+            Click "Run Check" to analyze prior authorization requirements
+          </p>
         </Card>
       )}
-      
+
       {isEditing ? (
         <div className="flex gap-3 mt-6 pt-4 border-t border-border">
           <Button onClick={onSave} className="flex-1">
@@ -799,13 +893,16 @@ function PriorAuthDecisionSection({ isEditing, onSave, onCancel, onComplete }: S
             Cancel
           </Button>
         </div>
-      ) : hasResults && onComplete && (
-        <div className="flex justify-end mt-6 pt-4 border-t border-border">
-          <Button onClick={onComplete}>
-            Proceed to Gap Analysis
-            <ArrowRight className="h-4 w-4 ml-2" />
-          </Button>
-        </div>
+      ) : (
+        hasResults &&
+        onComplete && (
+          <div className="flex justify-end mt-6 pt-4 border-t border-border">
+            <Button onClick={onComplete}>
+              Proceed to Gap Analysis
+              <ArrowRight className="h-4 w-4 ml-2" />
+            </Button>
+          </div>
+        )
       )}
     </Card>
   );
@@ -822,46 +919,50 @@ function GapAnalysisSection({ onProceed, onEditStep, corrections, hasGaps }: Gap
   const [isRunning, setIsRunning] = useState(false);
   const [hasResults, setHasResults] = useState(true);
   const [notes, setNotes] = useState<string>("");
-  
-  const gaps = hasGaps ? [
-    { 
-      id: 1, 
-      title: "WOMAC Score Missing", 
-      description: "Functional assessment score not documented",
-      severity: "high",
-      step: "document-analysis",
-      recommendation: "Add WOMAC or KOOS score to clinical documentation"
-    },
-    { 
-      id: 2, 
-      title: "BMI Documentation", 
-      description: "Current BMI not recorded in clinical notes",
-      severity: "medium",
-      step: "document-analysis",
-      recommendation: "Document current BMI (recommended < 40 for elective TKA)"
-    },
-  ] : [];
 
-  const missingDocuments = hasGaps ? [
-    {
-      id: 1,
-      title: "Physical Therapy Discharge Summary",
-      description: "Final PT evaluation documenting treatment completion and outcomes",
-      severity: "high"
-    },
-    {
-      id: 2,
-      title: "Recent Lab Results (CBC, BMP)",
-      description: "Pre-operative lab work within 30 days required",
-      severity: "high"
-    },
-    {
-      id: 3,
-      title: "Cardiology Clearance Letter",
-      description: "Required for patients over 65 with cardiac history",
-      severity: "medium"
-    }
-  ] : [];
+  const gaps = hasGaps
+    ? [
+        {
+          id: 1,
+          title: "WOMAC Score Missing",
+          description: "Functional assessment score not documented",
+          severity: "high",
+          step: "document-analysis",
+          recommendation: "Add WOMAC or KOOS score to clinical documentation",
+        },
+        {
+          id: 2,
+          title: "BMI Documentation",
+          description: "Current BMI not recorded in clinical notes",
+          severity: "medium",
+          step: "document-analysis",
+          recommendation: "Document current BMI (recommended < 40 for elective TKA)",
+        },
+      ]
+    : [];
+
+  const missingDocuments = hasGaps
+    ? [
+        {
+          id: 1,
+          title: "Physical Therapy Discharge Summary",
+          description: "Final PT evaluation documenting treatment completion and outcomes",
+          severity: "high",
+        },
+        {
+          id: 2,
+          title: "Recent Lab Results (CBC, BMP)",
+          description: "Pre-operative lab work within 30 days required",
+          severity: "high",
+        },
+        {
+          id: 3,
+          title: "Cardiology Clearance Letter",
+          description: "Required for patients over 65 with cardiac history",
+          severity: "medium",
+        },
+      ]
+    : [];
 
   const completedChecks = [
     "Diagnosis code matches procedure indication",
@@ -872,16 +973,16 @@ function GapAnalysisSection({ onProceed, onEditStep, corrections, hasGaps }: Gap
   ];
 
   // Prediction based on gap analysis
-  const approvalPrediction = hasGaps 
+  const approvalPrediction = hasGaps
     ? {
         prediction: "Likely Approved",
         confidence: 85,
-        reason: "Clinical documentation strongly supports medical necessity. Minor gaps identified are addressable."
+        reason: "Clinical documentation strongly supports medical necessity. Minor gaps identified are addressable.",
       }
     : {
         prediction: "Approved",
         confidence: 98,
-        reason: "All clinical criteria met. Documentation is complete and fully supports medical necessity."
+        reason: "All clinical criteria met. Documentation is complete and fully supports medical necessity.",
       };
 
   const handleRunCheck = () => {
@@ -896,15 +997,9 @@ function GapAnalysisSection({ onProceed, onEditStep, corrections, hasGaps }: Gap
   if (!hasGaps) {
     return (
       <Card className="p-6 bg-card border-border">
-        <AgentHeader 
-          name="Agent"
-          status="complete"
-          showRunButton
-          onRun={handleRunCheck}
-          isRunning={isRunning}
-        />
+        <AgentHeader name="Agent" status="complete" showRunButton onRun={handleRunCheck} isRunning={isRunning} />
         <h3 className="text-lg font-semibold text-foreground mb-4">Gap Analysis & Review</h3>
-        
+
         {/* No Gaps Banner */}
         <Card className="p-4 bg-success/10 border-success/30 mb-6">
           <div className="flex items-center gap-3">
@@ -912,7 +1007,8 @@ function GapAnalysisSection({ onProceed, onEditStep, corrections, hasGaps }: Gap
             <div className="flex-1">
               <span className="text-base font-semibold text-success">No Gaps Identified</span>
               <p className="text-xs text-muted-foreground mt-1">
-                All required clinical documentation is complete. This case meets all payer requirements for prior authorization.
+                All required clinical documentation is complete. This case meets all payer requirements for prior
+                authorization.
               </p>
             </div>
           </div>
@@ -942,9 +1038,7 @@ function GapAnalysisSection({ onProceed, onEditStep, corrections, hasGaps }: Gap
             <ThumbsUp className="h-5 w-5 text-success" />
             <div className="flex-1">
               <div className="flex items-center gap-2">
-                <span className="text-base font-semibold text-success">
-                  {approvalPrediction.prediction}
-                </span>
+                <span className="text-base font-semibold text-success">{approvalPrediction.prediction}</span>
                 <Badge variant="outline" className="text-xs">
                   {approvalPrediction.confidence}% confidence
                 </Badge>
@@ -974,7 +1068,7 @@ function GapAnalysisSection({ onProceed, onEditStep, corrections, hasGaps }: Gap
   // Has gaps scenario - show full gap analysis
   return (
     <Card className="p-6 bg-card border-border">
-      <AgentHeader 
+      <AgentHeader
         name="Agent"
         status={hasResults ? "complete" : "idle"}
         showRunButton
@@ -982,7 +1076,7 @@ function GapAnalysisSection({ onProceed, onEditStep, corrections, hasGaps }: Gap
         isRunning={isRunning}
       />
       <h3 className="text-lg font-semibold text-foreground mb-4">Gap Analysis & Review</h3>
-      
+
       {hasResults ? (
         <>
           {/* Agent: Clinical Policy Fetch */}
@@ -992,7 +1086,9 @@ function GapAnalysisSection({ onProceed, onEditStep, corrections, hasGaps }: Gap
                 <ClipboardList className="h-3 w-3 text-primary" />
               </div>
               <h4 className="text-sm font-medium text-foreground">Clinical Audit Agent - Policy Fetch</h4>
-              <Badge variant="outline" className="ml-auto text-xs text-success border-success/30">Complete</Badge>
+              <Badge variant="outline" className="ml-auto text-xs text-success border-success/30">
+                Complete
+              </Badge>
             </div>
             <div className="space-y-2 text-sm ml-8">
               <DataRow label="Policy ID" value="BCBS-ORTHO-2024-TKA-001" />
@@ -1009,7 +1105,9 @@ function GapAnalysisSection({ onProceed, onEditStep, corrections, hasGaps }: Gap
                 <FileSearch className="h-3 w-3 text-primary" />
               </div>
               <h4 className="text-sm font-medium text-foreground">Gap Analysis Agent</h4>
-              <Badge variant="outline" className="ml-auto text-xs text-warning border-warning/30">{gaps.length} Gaps Found</Badge>
+              <Badge variant="outline" className="ml-auto text-xs text-warning border-warning/30">
+                {gaps.length} Gaps Found
+              </Badge>
             </div>
           </Card>
 
@@ -1022,7 +1120,10 @@ function GapAnalysisSection({ onProceed, onEditStep, corrections, hasGaps }: Gap
               </h4>
               <div className="space-y-3">
                 {gaps.map((gap) => (
-                  <Card key={gap.id} className={`p-4 border-warning/30 ${corrections[gap.step] ? 'bg-success/10 border-success/30' : 'bg-warning/10'}`}>
+                  <Card
+                    key={gap.id}
+                    className={`p-4 border-warning/30 ${corrections[gap.step] ? "bg-success/10 border-success/30" : "bg-warning/10"}`}
+                  >
                     <div className="flex items-start justify-between mb-2">
                       <div>
                         <p className="text-sm font-medium text-foreground">{gap.title}</p>
@@ -1044,12 +1145,7 @@ function GapAnalysisSection({ onProceed, onEditStep, corrections, hasGaps }: Gap
                       {gap.recommendation}
                     </p>
                     {!corrections[gap.step] && (
-                      <Button 
-                        variant="outline" 
-                        size="sm" 
-                        onClick={() => onEditStep(gap.step)}
-                        className="text-xs"
-                      >
+                      <Button variant="outline" size="sm" onClick={() => onEditStep(gap.step)} className="text-xs">
                         <Edit3 className="h-3 w-3 mr-1" />
                         Edit {gap.step === "document-analysis" ? "Document Analysis" : gap.step}
                       </Button>
@@ -1059,7 +1155,7 @@ function GapAnalysisSection({ onProceed, onEditStep, corrections, hasGaps }: Gap
               </div>
             </div>
           )}
-          
+
           {/* Missing Clinical Documents */}
           <div className="mb-6">
             <h4 className="text-sm font-medium text-foreground mb-3 flex items-center gap-2">
@@ -1125,7 +1221,9 @@ function GapAnalysisSection({ onProceed, onEditStep, corrections, hasGaps }: Gap
           </div>
 
           {/* Approval/Deny Prediction */}
-          <Card className={`p-4 mb-6 ${approvalPrediction.prediction === "Likely Approved" ? "bg-success/10 border-success/30" : "bg-destructive/10 border-destructive/30"}`}>
+          <Card
+            className={`p-4 mb-6 ${approvalPrediction.prediction === "Likely Approved" ? "bg-success/10 border-success/30" : "bg-destructive/10 border-destructive/30"}`}
+          >
             <div className="flex items-center gap-3 mb-2">
               {approvalPrediction.prediction === "Likely Approved" ? (
                 <ThumbsUp className="h-5 w-5 text-success" />
@@ -1134,7 +1232,9 @@ function GapAnalysisSection({ onProceed, onEditStep, corrections, hasGaps }: Gap
               )}
               <div className="flex-1">
                 <div className="flex items-center gap-2">
-                  <span className={`text-base font-semibold ${approvalPrediction.prediction === "Likely Approved" ? "text-success" : "text-destructive"}`}>
+                  <span
+                    className={`text-base font-semibold ${approvalPrediction.prediction === "Likely Approved" ? "text-success" : "text-destructive"}`}
+                  >
                     {approvalPrediction.prediction}
                   </span>
                   <Badge variant="outline" className="text-xs">
@@ -1155,12 +1255,14 @@ function GapAnalysisSection({ onProceed, onEditStep, corrections, hasGaps }: Gap
             <p className="text-xs text-muted-foreground mb-3">
               Send an email to the ordering physician requesting the missing clinical documents and gap corrections.
             </p>
-            <Button 
-              variant="outline" 
+            <Button
+              variant="outline"
               className="w-full"
               onClick={() => {
                 const subject = encodeURIComponent("Prior Authorization - Additional Documentation Required");
-                const body = encodeURIComponent(`Dear Dr. Chen,\n\nWe are processing a prior authorization request for patient Sarah Johnson (MRN: PT-78234) for Total Knee Replacement (CPT: 27447).\n\nThe following items are required to complete the authorization:\n\nMISSING DOCUMENTS:\n${missingDocuments.map((d, i) => `${i + 1}. ${d.title} - ${d.description}`).join('\n')}\n\nDOCUMENTATION GAPS:\n${gaps.map((g, i) => `${i + 1}. ${g.title} - ${g.recommendation}`).join('\n')}\n\nPlease provide these items at your earliest convenience to avoid delays in authorization.\n\nThank you for your prompt attention to this matter.`);
+                const body = encodeURIComponent(
+                  `Dear Dr. Chen,\n\nWe are processing a prior authorization request for patient Sarah Johnson (MRN: PT-78234) for Total Knee Replacement (CPT: 27447).\n\nThe following items are required to complete the authorization:\n\nMISSING DOCUMENTS:\n${missingDocuments.map((d, i) => `${i + 1}. ${d.title} - ${d.description}`).join("\n")}\n\nDOCUMENTATION GAPS:\n${gaps.map((g, i) => `${i + 1}. ${g.title} - ${g.recommendation}`).join("\n")}\n\nPlease provide these items at your earliest convenience to avoid delays in authorization.\n\nThank you for your prompt attention to this matter.`,
+                );
                 window.location.href = `mailto:?subject=${subject}&body=${body}`;
               }}
             >
@@ -1168,17 +1270,16 @@ function GapAnalysisSection({ onProceed, onEditStep, corrections, hasGaps }: Gap
               Draft Email with Missing Details
             </Button>
           </Card>
-          
+
           {/* Proceed Section */}
           <Card className="p-4 bg-primary/10 border-primary/30">
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-sm font-medium text-foreground">Ready for Submission</p>
                 <p className="text-xs text-muted-foreground">
-                  {Object.keys(corrections).length > 0 
-                    ? `${Object.keys(corrections).length} correction(s) applied` 
-                    : "Review complete, proceed to submit"
-                  }
+                  {Object.keys(corrections).length > 0
+                    ? `${Object.keys(corrections).length} correction(s) applied`
+                    : "Review complete, proceed to submit"}
                 </p>
               </div>
               <Button onClick={onProceed}>
@@ -1191,7 +1292,9 @@ function GapAnalysisSection({ onProceed, onEditStep, corrections, hasGaps }: Gap
       ) : (
         <Card className="p-6 bg-muted/30 border-border/50 text-center">
           <FileSearch className="h-12 w-12 mx-auto text-muted-foreground mb-3" />
-          <p className="text-sm text-muted-foreground mb-3">Click "Run Check" to perform clinical audit and gap analysis</p>
+          <p className="text-sm text-muted-foreground mb-3">
+            Click "Run Check" to perform clinical audit and gap analysis
+          </p>
         </Card>
       )}
     </Card>
@@ -1205,7 +1308,7 @@ function SubmitToPayerSection() {
     <Card className="p-6 bg-card border-border">
       <AgentHeader name="Agent" status={submitted ? "complete" : "active"} />
       <h3 className="text-lg font-semibold text-foreground mb-4">Submit to Payer</h3>
-      
+
       {!submitted ? (
         <>
           <Card className="p-4 bg-secondary/30 border-border/50 mb-4">
@@ -1217,7 +1320,7 @@ function SubmitToPayerSection() {
               <DataRow label="Expected Response" value="5 business days" />
             </div>
           </Card>
-          
+
           <Card className="p-4 bg-secondary/30 border-border/50 mb-4">
             <h4 className="text-sm font-medium text-foreground mb-3">Included Documents</h4>
             <div className="space-y-2">
@@ -1227,7 +1330,7 @@ function SubmitToPayerSection() {
               <DocumentItem name="Functional Assessment" date="Today" status="attached" />
             </div>
           </Card>
-          
+
           <div className="flex gap-3">
             <Button onClick={() => setSubmitted(true)} className="flex-1">
               <Send className="h-4 w-4 mr-2" />
@@ -1246,7 +1349,7 @@ function SubmitToPayerSection() {
               Prior authorization request has been submitted to Blue Cross Blue Shield via API.
             </p>
           </Card>
-          
+
           <Card className="p-4 bg-secondary/30 border-border/50 mb-4">
             <h4 className="text-sm font-medium text-foreground mb-3">Submission Details</h4>
             <div className="space-y-2 text-sm">
@@ -1256,7 +1359,7 @@ function SubmitToPayerSection() {
               <DataRow label="Expected Decision" value="Jan 22, 2024" />
             </div>
           </Card>
-          
+
           <Card className="p-4 bg-secondary/30 border-border/50">
             <h4 className="text-sm font-medium text-foreground mb-3">Notifications Sent</h4>
             <div className="space-y-2">
@@ -1274,7 +1377,7 @@ function SubmitToPayerSection() {
               </div>
             </div>
           </Card>
-          
+
           <div className="mt-4 p-4 rounded-xl bg-primary/10 border border-primary/30">
             <p className="text-sm text-foreground">
               <Sparkles className="h-4 w-4 inline mr-1 text-primary" />
@@ -1288,9 +1391,19 @@ function SubmitToPayerSection() {
 }
 
 // Helper Components
-function InfoCard({ icon, label, value, editable }: { icon: React.ReactNode; label: string; value: string; editable?: boolean }) {
+function InfoCard({
+  icon,
+  label,
+  value,
+  editable,
+}: {
+  icon: React.ReactNode;
+  label: string;
+  value: string;
+  editable?: boolean;
+}) {
   return (
-    <Card className={`p-3 bg-secondary/30 border-border/50 ${editable ? 'ring-1 ring-primary/30' : ''}`}>
+    <Card className={`p-3 bg-secondary/30 border-border/50 ${editable ? "ring-1 ring-primary/30" : ""}`}>
       <div className="flex items-center gap-2 mb-1">
         <span className="text-muted-foreground">{icon}</span>
         <span className="text-xs text-muted-foreground">{label}</span>
@@ -1322,11 +1435,20 @@ function DecisionNode({ label, result, status }: { label: string; result: string
         <GitBranch className="h-4 w-4 text-primary" />
       )}
       <span className="text-sm text-foreground flex-1">{label}</span>
-      <Badge variant="outline" className={`text-xs ${
-        status === "pass" ? "border-success/30 text-success" :
-        status === "warn" ? "border-warning/30 text-warning" :
-        status === "fail" ? "border-destructive/30 text-destructive" : ""
-      }`}>{result}</Badge>
+      <Badge
+        variant="outline"
+        className={`text-xs ${
+          status === "pass"
+            ? "border-success/30 text-success"
+            : status === "warn"
+              ? "border-warning/30 text-warning"
+              : status === "fail"
+                ? "border-destructive/30 text-destructive"
+                : ""
+        }`}
+      >
+        {result}
+      </Badge>
     </div>
   );
 }
