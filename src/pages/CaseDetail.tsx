@@ -82,7 +82,7 @@ export default function CaseDetail() {
 
           <TabsContent value="pre-auth" className="mt-6">
             {persona === "provider" ? (
-              <PreAuthProviderWorkflow />
+              <PreAuthProviderWorkflow caseData={caseData} />
             ) : (
               <PreAuthPayerWorkflow />
             )}

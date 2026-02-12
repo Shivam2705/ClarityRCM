@@ -159,7 +159,21 @@ const initialSteps: WorkflowStep[] = [
   },
 ];
 
-export function PreAuthProviderWorkflow() {
+interface PreAuthProviderWorkflowProps {
+  caseData: {
+    id: string;
+    patientName: string;
+    patientId: string;
+    dateOfBirth: string;
+    encounterType: string;
+    orderingProvider: string;
+    payerName: string;
+    procedureCode?: string;
+    procedureName?: string;
+  };
+}
+
+export function PreAuthProviderWorkflow({ caseData }: PreAuthProviderWorkflowProps) {
   const { caseId } = useParams();
   const [currentStep, setCurrentStep] = useState("eligibility");
   const [steps, setSteps] = useState<WorkflowStep[]>(initialSteps);
@@ -175,6 +189,9 @@ export function PreAuthProviderWorkflow() {
   const [workflowPhase, setWorkflowPhase] = useState<
     "eligibility" | "document-analysis" | "unlocked" | "complete"
   >("eligibility");
+
+  // Document summary available after analysis phase
+  const documentSummary = `Patient documentation includes comprehensive clinical notes from ${caseData.orderingProvider} documenting progressive knee condition with failed conservative management. Imaging studies confirm significant findings. Physical therapy records show treatment with limited improvement. All documentation supports medical necessity for ${caseData.procedureName || "requested procedure"}.`;
 
   // Determine if this case has gaps based on caseId
   const caseHasGaps = caseId === "CASE-001";
@@ -333,11 +350,15 @@ export function PreAuthProviderWorkflow() {
     );
 
     try {
+      // Build clinical notes from document summary and patient metadata
+      const clinicalNotes = documentSummary;
+      const patientMeta = `Patient: ${caseData.patientName}, DOB: ${caseData.dateOfBirth}, ID: ${caseData.patientId}, Encounter: ${caseData.encounterType}, Provider: ${caseData.orderingProvider}`;
+
       const result = await callPriorAuthAgent({
-        cpt: "29881",
-        payer: "UnitedHealthcare",
+        cpt: caseData.procedureCode || "29881",
+        payer: caseData.payerName,
         state: "Florida",
-        notes: "MRI dated Jan 2026 shows medial meniscus tear. Pain rated 7/10 with locking and catching. 8 weeks PT, 4 weeks NSAIDs with minimal improvement.",
+        notes: `${patientMeta}. Procedure: ${caseData.procedureName || ""}. Clinical Notes: ${clinicalNotes}`,
       });
       setAgentData(result);
 
@@ -708,7 +729,7 @@ function DocumentAnalysisSection({ isEditing, onSave, onCancel, onComplete }: Se
     { name: "Injection Records (3x)", date: "2023-12-15", status: "analyzed" },
   ];
 
-  const documentSummary = `Patient documentation includes comprehensive clinical notes from Dr. Chen dated January 15, 2024, documenting progressive knee osteoarthritis with failed conservative management. Imaging studies (X-ray and MRI) confirm Kellgren-Lawrence Grade IV changes with complete joint space narrowing. Physical therapy records show 12 weeks of treatment with limited improvement. Three corticosteroid injections administered over 6 months provided temporary relief only. All documentation supports medical necessity for Total Knee Replacement.`;
+  const documentSummary = `Patient documentation includes comprehensive clinical notes documenting progressive knee condition with failed conservative management. Imaging studies (X-ray and MRI) confirm significant findings with joint space narrowing. Physical therapy records show 12 weeks of treatment with limited improvement. Three corticosteroid injections administered over 6 months provided temporary relief only. All documentation supports medical necessity for the requested procedure.`;
 
   const handleAnalyze = () => {
     setIsAnalyzing(true);
