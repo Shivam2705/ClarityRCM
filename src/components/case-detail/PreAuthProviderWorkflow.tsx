@@ -35,109 +35,90 @@ import {
   CircleDot,
 } from "lucide-react";
 
-// Mock agent response data
-const priorAuthAgentResponse = {
+// Type for the agent API response
+interface PriorAuthAgentResponse {
   summary: {
-    cpt_code: "29881",
-    procedure_description: "Arthroscopy, knee, surgical; with meniscectomy (medial OR lateral, including any meniscal shaving)",
-    payer: "UnitedHealthcare",
-    overall_recommendation: "SUBMIT",
-  },
+    cpt_code: string;
+    procedure_description: string;
+    payer: string;
+    overall_recommendation: string;
+  };
   pre_certification_analysis: {
-    pa_required: true,
-    authorization_type: "Standard Prior Authorization",
-    estimated_tat_days: "7-15",
-  },
+    pa_required: boolean;
+    authorization_type: string;
+    estimated_tat_days: string;
+  };
   state_policy_analysis: {
-    state: "Florida",
-    applicable_laws: [
-      {
-        law_name: "FL Electronic Prior Authorization Mandate",
-        description: "As of Jan 1, 2017, Florida requires health insurers without an electronic PA process to use a specific 2-page form approved by the Financial Services Commission.",
-        impact: "Mandates use of an electronic portal or a standardized paper form, streamlining the submission process.",
-      },
-      {
-        law_name: "FL Prior Authorization Timeframes (ACA/Medicaid)",
-        description: "For ACA plans, Florida adheres to federal rules requiring a response to standard PA requests within 15 days. For Medicaid, the standard is 14 days.",
-        impact: "Provides a predictable timeframe for receiving a decision on the authorization request.",
-      },
-    ],
-    reviewer_requirement: "Not specified in provided documentation.",
-  },
+    state: string;
+    applicable_laws: { law_name: string; description: string; impact: string }[];
+    reviewer_requirement: string;
+  };
   decision_tree_validation: {
-    policy_id: "UHC Surgery of the Knee / InterQual CP: Procedures",
-    policy_wording: "UnitedHealthcare's commercial policy refers to InterQual criteria for medical necessity. A proxy policy requires imaging confirmation of a meniscal tear, presence of mechanical symptoms, and a trial of conservative therapy.",
-    logic_path: [
-      {
-        step: 1,
-        criteria: "Is there imaging confirmation of a meniscal tear extending to the articular surface?",
-        patient_data_meets: true,
-        evidence: "MRI dated Jan 2026 shows medial meniscus tear.",
-      },
-      {
-        step: 2,
-        criteria: "Does the patient report significant knee pain and at least one mechanical symptom (locking, catching, giving-way)?",
-        patient_data_meets: true,
-        evidence: "Pain rated 7/10 with reported locking and catching sensation.",
-      },
-      {
-        step: 3,
-        criteria: "Has a trial of conservative therapy failed?",
-        patient_data_meets: true,
-        evidence: "8 weeks of physical therapy, 4 weeks of NSAIDs, and activity modification with minimal improvement.",
-      },
-      {
-        step: 4,
-        criteria: "Are there specific clinical reasons for an Outpatient Hospital setting (e.g., bleeding disorder, anticipated overnight stay)?",
-        patient_data_meets: false,
-        evidence: "No documented conditions meeting UHC's site of service criteria for an outpatient hospital.",
-      },
-    ],
-  },
-  gap_comparison_table: [
-    {
-      requirement: "Imaging Confirmation: MRI confirms a meniscal tear.",
-      current_evidence: "MRI dated Jan 2026 shows medial meniscus tear with associated joint effusion.",
-      status: "MET",
-      action_required: null,
-    },
-    {
-      requirement: "Mechanical Symptoms: Patient reports significant pain plus locking, catching, or giving-way.",
-      current_evidence: "Patient reports pain at 7/10, a locking and catching sensation, and difficulty climbing stairs.",
-      status: "MET",
-      action_required: null,
-    },
-    {
-      requirement: "Conservative Treatment Failure: Trial of non-surgical therapy (e.g., PT for 8-12 weeks, NSAIDs for 3+ weeks).",
-      current_evidence: "Physical therapy for 8 weeks and NSAIDs for 4 weeks with minimal improvement.",
-      status: "PARTIALLY_MET",
-      action_required: "Some UHC policies imply a 12-week PT trial. Justify why further PT is not clinically indicated due to persistent mechanical symptoms.",
-    },
-    {
-      requirement: "Absence of Exclusionary Imaging Findings: No moderate/severe arthritis, meniscal extrusion, or significant degenerative changes on MRI.",
-      current_evidence: "Clinical notes do not explicitly rule out exclusionary findings. The MRI report summary only mentions the tear and effusion.",
-      status: "UNCLEAR",
-      action_required: "Review the full radiologist's report for the MRI to confirm the absence of advanced degenerative changes.",
-    },
-    {
-      requirement: "Site of Service Justification: Patient meets criteria for procedure in an Outpatient Hospital setting.",
-      current_evidence: "No clinical documentation supports the need for an outpatient hospital setting over an Ambulatory Surgery Center (ASC).",
-      status: "NOT_MET",
-      action_required: "Provide specific medical justification for the outpatient hospital location or consider moving to an ASC to prevent denial.",
-    },
-  ],
+    policy_id: string;
+    policy_wording: string;
+    logic_path: { step: number; criteria: string; patient_data_meets: boolean; evidence: string }[];
+  };
+  gap_comparison_table: {
+    requirement: string;
+    current_evidence: string;
+    status: string;
+    action_required: string | null;
+  }[];
   final_recommendation: {
-    decision: "SUBMIT",
-    primary_reason: "The patient's clinical presentation strongly aligns with the core medical necessity criteria, including an MRI-confirmed tear and persistent mechanical symptoms that have failed a reasonable course of conservative management.",
-    risk_of_denial: "Medium",
-    next_steps: [
-      "Bolster the clinical narrative to emphasize that the 8-week course of physical therapy was a sufficient trial and further non-operative care is futile given the persistent mechanical symptoms.",
-      "Obtain and submit the full radiologist's MRI report to proactively confirm the absence of exclusionary degenerative conditions.",
-      "Provide a clear medical justification for the Outpatient Hospital site of service, or confirm with the provider if an Ambulatory Surgery Center (ASC) is a clinically appropriate alternative.",
-      "Submit the prior authorization request via UHC's electronic portal with all supporting documentation.",
-    ],
-  },
-};
+    decision: string;
+    primary_reason: string;
+    risk_of_denial: string;
+    next_steps: string[];
+  };
+}
+
+const BASE_URL = "https://rcmhc-agents-1037311574972.us-central1.run.app";
+const APP_NAME = "Prior_Auth_Version2";
+
+async function callPriorAuthAgent(payload: { cpt: string; payer: string; state: string; notes: string }): Promise<PriorAuthAgentResponse> {
+  const userId = "u_web_client";
+  const sessionId = crypto.randomUUID();
+
+  // 1. Initialize Session
+  const sessionUrl = `${BASE_URL}/apps/${APP_NAME}/users/${userId}/sessions/${sessionId}`;
+  await fetch(sessionUrl, { method: 'POST' });
+
+  // 2. Run the Multi-Agent Pipeline
+  const runUrl = `${BASE_URL}/run`;
+  const runPayload = {
+    app_name: APP_NAME,
+    user_id: userId,
+    session_id: sessionId,
+    new_message: {
+      parts: [{ text: `Analyze CPT ${payload.cpt} for ${payload.payer} in ${payload.state}. Clinical Notes: ${payload.notes}` }]
+    }
+  };
+
+  const response = await fetch(runUrl, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(runPayload)
+  });
+
+  if (!response.ok) {
+    throw new Error(`Agent API error: ${response.status}`);
+  }
+
+  const events = await response.json();
+
+  // 3. Find the Final Agent Output
+  const finalEvent = events.reverse().find((e: any) =>
+    e.actions && e.actions.stateDelta && e.actions.stateDelta.final_prior_auth_json
+  );
+
+  if (!finalEvent) {
+    throw new Error("No final_prior_auth_json found in agent response");
+  }
+
+  const result = finalEvent.actions.stateDelta.final_prior_auth_json;
+  // The result may be a string (JSON) or already parsed
+  return typeof result === "string" ? JSON.parse(result) : result;
+}
 
 // Initial steps - only eligibility is active, others locked
 const initialSteps: WorkflowStep[] = [
@@ -182,6 +163,9 @@ export function PreAuthProviderWorkflow() {
   const { caseId } = useParams();
   const [currentStep, setCurrentStep] = useState("eligibility");
   const [steps, setSteps] = useState<WorkflowStep[]>(initialSteps);
+  const [agentData, setAgentData] = useState<PriorAuthAgentResponse | null>(null);
+  const [agentLoading, setAgentLoading] = useState(false);
+  const [agentError, setAgentError] = useState<string | null>(null);
   const [editingStep, setEditingStep] = useState<string | null>(null);
   const [corrections, setCorrections] = useState<Record<string, boolean>>({});
   const [eligibilityStatus, setEligibilityStatus] = useState<"idle" | "processing" | "eligible" | "not-eligible">(
@@ -230,7 +214,7 @@ export function PreAuthProviderWorkflow() {
     }
   }, [hasAutoRun, eligibilityStatus]);
 
-  // Phase 2: Document Analysis auto-run, then unlock all subsequent steps for manual navigation
+  // Phase 2: Document Analysis auto-run, then mark document analysis complete but keep other steps locked
   useEffect(() => {
     if (workflowPhase === "document-analysis") {
       const timer = setTimeout(() => {
@@ -239,20 +223,10 @@ export function PreAuthProviderWorkflow() {
             if (s.id === "document-analysis") {
               return { ...s, status: "completed" as const, documentAnalysisStatus: "analyzed" as const, canEdit: true };
             }
-            // Unlock all steps after document analysis for manual navigation
-            if (s.id === "prior-auth-decision") {
-              return { ...s, status: "active" as const, canEdit: true };
-            }
-            if (s.id === "gap-analysis") {
-              return { ...s, status: "active" as const, canEdit: true };
-            }
-            if (s.id === "submit-to-payer") {
-              return { ...s, status: "active" as const, canEdit: true };
-            }
             return s;
           }),
         );
-        setCurrentStep("prior-auth-decision");
+        // Stay on document-analysis so user can click "Proceed to Readiness Check"
         setWorkflowPhase("unlocked");
       }, 2000);
       return () => clearTimeout(timer);
@@ -344,6 +318,44 @@ export function PreAuthProviderWorkflow() {
     handleStepComplete("gap-analysis", "submit-to-payer");
   }, [handleStepComplete]);
 
+  // Handle "Proceed to Readiness Check" — calls the backend agent API
+  const handleProceedToReadinessCheck = useCallback(async () => {
+    setCurrentStep("prior-auth-decision");
+    setAgentLoading(true);
+    setAgentError(null);
+    setAgentData(null);
+
+    setSteps((prev) =>
+      prev.map((s) => {
+        if (s.id === "prior-auth-decision") return { ...s, status: "active" as const, canEdit: true };
+        return s;
+      }),
+    );
+
+    try {
+      const result = await callPriorAuthAgent({
+        cpt: "29881",
+        payer: "UnitedHealthcare",
+        state: "Florida",
+        notes: "MRI dated Jan 2026 shows medial meniscus tear. Pain rated 7/10 with locking and catching. 8 weeks PT, 4 weeks NSAIDs with minimal improvement.",
+      });
+      setAgentData(result);
+
+      setSteps((prev) =>
+        prev.map((s) => {
+          if (s.id === "prior-auth-decision") return { ...s, status: "completed" as const, canEdit: true };
+          if (s.id === "gap-analysis") return { ...s, status: "active" as const, canEdit: true };
+          if (s.id === "submit-to-payer") return { ...s, status: "active" as const, canEdit: true };
+          return s;
+        }),
+      );
+    } catch (err) {
+      setAgentError(err instanceof Error ? err.message : "Failed to run prior auth agent");
+    } finally {
+      setAgentLoading(false);
+    }
+  }, []);
+
   const renderPanel = () => {
     switch (currentStep) {
       case "eligibility":
@@ -363,7 +375,7 @@ export function PreAuthProviderWorkflow() {
             isEditing={editingStep === "document-analysis"}
             onSave={() => handleSaveCorrection("document-analysis")}
             onCancel={handleCancelEdit}
-            onComplete={() => handleStepComplete("document-analysis", "prior-auth-decision")}
+            onComplete={handleProceedToReadinessCheck}
           />
         );
       case "prior-auth-decision":
@@ -373,6 +385,10 @@ export function PreAuthProviderWorkflow() {
             onSave={() => handleSaveCorrection("prior-auth-decision")}
             onCancel={handleCancelEdit}
             onComplete={() => setCurrentStep("gap-analysis")}
+            agentData={agentData}
+            agentLoading={agentLoading}
+            agentError={agentError}
+            onRetry={handleProceedToReadinessCheck}
           />
         );
       case "gap-analysis":
@@ -382,6 +398,7 @@ export function PreAuthProviderWorkflow() {
             onEditStep={handleEditStep}
             corrections={corrections}
             hasGaps={caseHasGaps}
+            agentData={agentData}
           />
         );
       case "submit-to-payer":
@@ -792,37 +809,68 @@ function DocumentAnalysisSection({ isEditing, onSave, onCancel, onComplete }: Se
 }
 
 // ─── REDESIGNED: Prior Auth Readiness Check ─────────────────────────────────
-function PriorAuthDecisionSection({ isEditing, onSave, onCancel, onComplete }: SectionProps) {
-  const [isRunning, setIsRunning] = useState(false);
-  const [hasResults, setHasResults] = useState(true);
-  const data = priorAuthAgentResponse;
+interface PriorAuthDecisionSectionProps extends SectionProps {
+  agentData: PriorAuthAgentResponse | null;
+  agentLoading: boolean;
+  agentError: string | null;
+  onRetry: () => void;
+}
 
-  const handleRunCheck = () => {
-    setIsRunning(true);
-    setTimeout(() => {
-      setIsRunning(false);
-      setHasResults(true);
-    }, 2000);
-  };
+function PriorAuthDecisionSection({ isEditing, onSave, onCancel, onComplete, agentData, agentLoading, agentError, onRetry }: PriorAuthDecisionSectionProps) {
+  const data = agentData;
+  const hasResults = !!data;
 
-  const metCount = data.decision_tree_validation.logic_path.filter((s) => s.patient_data_meets).length;
-  const totalSteps = data.decision_tree_validation.logic_path.length;
+  const metCount = data ? data.decision_tree_validation.logic_path.filter((s) => s.patient_data_meets).length : 0;
+  const totalSteps = data ? data.decision_tree_validation.logic_path.length : 0;
 
   return (
     <Card className="p-6 bg-card border-border">
       <AgentHeader
         name="Prior Auth Agent"
-        status={hasResults ? "complete" : "idle"}
+        status={agentLoading ? "active" : hasResults ? "complete" : "idle"}
         showRunButton
-        onRun={handleRunCheck}
-        isRunning={isRunning}
+        onRun={onRetry}
+        isRunning={agentLoading}
       />
       <h3 className="text-lg font-semibold text-foreground mb-1">Prior Auth Readiness Check</h3>
-      <p className="text-sm text-muted-foreground mb-6">
-        CPT {data.summary.cpt_code} — {data.summary.procedure_description}
-      </p>
+      {data && (
+        <p className="text-sm text-muted-foreground mb-6">
+          CPT {data.summary.cpt_code} — {data.summary.procedure_description}
+        </p>
+      )}
 
-      {hasResults ? (
+      {agentLoading ? (
+        <Card className="p-8 bg-primary/5 border-primary/20 text-center">
+          <div className="flex flex-col items-center gap-4">
+            <div className="relative">
+              <div className="h-16 w-16 rounded-full bg-primary/10 flex items-center justify-center">
+                <Bot className="h-8 w-8 text-primary" />
+              </div>
+              <div className="absolute -bottom-1 -right-1 h-6 w-6 rounded-full bg-primary flex items-center justify-center">
+                <Loader2 className="h-3 w-3 text-primary-foreground animate-spin" />
+              </div>
+            </div>
+            <div>
+              <p className="text-sm font-medium text-foreground">Prior Auth Agent is Running...</p>
+              <p className="text-xs text-muted-foreground mt-1">Analyzing payer policies, decision tree, and clinical evidence</p>
+            </div>
+            <div className="flex items-center gap-2 text-xs text-muted-foreground">
+              <Loader2 className="h-3 w-3 animate-spin" />
+              <span>This may take 30–60 seconds</span>
+            </div>
+          </div>
+        </Card>
+      ) : agentError ? (
+        <Card className="p-6 bg-destructive/5 border-destructive/30 text-center">
+          <XCircle className="h-12 w-12 mx-auto text-destructive mb-3" />
+          <p className="text-sm font-medium text-destructive mb-2">Agent Error</p>
+          <p className="text-xs text-muted-foreground mb-4">{agentError}</p>
+          <Button variant="outline" size="sm" onClick={onRetry}>
+            <RefreshCw className="h-4 w-4 mr-2" />
+            Retry
+          </Button>
+        </Card>
+      ) : hasResults && data ? (
         <div className="grid gap-5">
           {/* ── Summary Banner ── */}
           <Card className={`p-4 ${data.summary.overall_recommendation === "SUBMIT" ? "bg-success/10 border-success/30" : "bg-warning/10 border-warning/30"}`}>
@@ -1025,15 +1073,16 @@ interface GapAnalysisSectionProps {
   onEditStep: (stepId: string) => void;
   corrections: Record<string, boolean>;
   hasGaps: boolean;
+  agentData: PriorAuthAgentResponse | null;
 }
 
-function GapAnalysisSection({ onProceed, onEditStep, corrections, hasGaps }: GapAnalysisSectionProps) {
+function GapAnalysisSection({ onProceed, onEditStep, corrections, hasGaps, agentData }: GapAnalysisSectionProps) {
   const [isRunning, setIsRunning] = useState(false);
-  const [hasResults, setHasResults] = useState(true);
+  const hasResults = !!agentData;
   const [notes, setNotes] = useState<string>("");
-  const data = priorAuthAgentResponse;
+  const data = agentData;
 
-  const gapItems = data.gap_comparison_table;
+  const gapItems = data?.gap_comparison_table || [];
   const metItems = gapItems.filter((g) => g.status === "MET");
   const issueItems = gapItems.filter((g) => g.status !== "MET");
 
@@ -1041,7 +1090,6 @@ function GapAnalysisSection({ onProceed, onEditStep, corrections, hasGaps }: Gap
     setIsRunning(true);
     setTimeout(() => {
       setIsRunning(false);
-      setHasResults(true);
     }, 2000);
   };
 
@@ -1123,7 +1171,7 @@ function GapAnalysisSection({ onProceed, onEditStep, corrections, hasGaps }: Gap
       />
       <h3 className="text-lg font-semibold text-foreground mb-1">Gap Analysis & Review</h3>
       <p className="text-sm text-muted-foreground mb-6">
-        Comparing clinical evidence against {data.summary.payer} medical necessity requirements for CPT {data.summary.cpt_code}.
+        Comparing clinical evidence against {data?.summary.payer || "payer"} medical necessity requirements for CPT {data?.summary.cpt_code || ""}.
       </p>
 
       {hasResults ? (
@@ -1239,7 +1287,7 @@ function GapAnalysisSection({ onProceed, onEditStep, corrections, hasGaps }: Gap
               onClick={() => {
                 const subject = encodeURIComponent("Prior Authorization - Additional Documentation Required");
                 const body = encodeURIComponent(
-                  `Dear Dr.,\n\nWe are processing a prior authorization request for CPT ${data.summary.cpt_code} (${data.summary.procedure_description}).\n\nThe following items require attention:\n\n${issueItems.map((item, i) => `${i + 1}. [${item.status}] ${item.requirement}\n   Action: ${item.action_required || "N/A"}`).join("\n\n")}\n\nPlease provide the required documentation at your earliest convenience.\n\nThank you.`,
+                  `Dear Dr.,\n\nWe are processing a prior authorization request for CPT ${data?.summary.cpt_code || ""} (${data?.summary.procedure_description || ""}).\n\nThe following items require attention:\n\n${issueItems.map((item, i) => `${i + 1}. [${item.status}] ${item.requirement}\n   Action: ${item.action_required || "N/A"}`).join("\n\n")}\n\nPlease provide the required documentation at your earliest convenience.\n\nThank you.`,
                 );
                 window.location.href = `mailto:?subject=${subject}&body=${body}`;
               }}
