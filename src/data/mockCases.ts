@@ -25,7 +25,7 @@ export const mockCases: Case[] = [
     dateOfBirth: "1965-03-12",
     encounterType: "Inpatient",
     orderingProvider: "Dr. Michael Chen",
-    payerName: "Blue Cross Blue Shield",
+    payerName: "Aetna",
     groupId: "GRP-12345",
     status: "Eligible PA Req",
     priority: "High",
