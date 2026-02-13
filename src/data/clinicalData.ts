@@ -76,5 +76,6 @@ const clinicalDataMap: Record<string, ClinicalProfile> = {
 };
 
 export function getClinicalData(caseId: string): ClinicalProfile {
-  return clinicalDataMap[caseId] || case3;;
+  console.log("Fetching clinical data for caseId:", caseId, clinicalDataMap[caseId]);
+  return clinicalDataMap[caseId] || case2;
 }

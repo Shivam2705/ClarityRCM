@@ -94,7 +94,7 @@ export function ClinicalIntakeHeader({
   const patientInfo = {
     dob: formattedDob,
     age: ageLabel,
-    gender: "Female",
+    gender: clinicalData.gender,
     phone: "(555) 234-5678",
     address: "1234 Oak Street, Springfield, IL 62701",
     mrn: patientId,

@@ -1303,7 +1303,7 @@ function AgentHeader({
   isRunning,
 }: {
   name: string;
-  status: "active" | "complete" | "idle";
+  status: "active" | "complete" | "idle" | "new";
   showRunButton?: boolean;
   onRun?: () => void;
   isRunning?: boolean;
@@ -1316,7 +1316,7 @@ function AgentHeader({
             ? "bg-primary/20 ring-2 ring-primary/30"
             : status === "complete"
               ? "bg-success/20"
-              : "bg-muted"
+              : status === "new" ? "bg-black" : "bg-muted"
         }`}
       >
         <Sparkles
