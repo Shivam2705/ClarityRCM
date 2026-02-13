@@ -39,7 +39,7 @@ export function ClinicalIntakeHeader({
   const patientInfo = {
     dob: dateOfBirth ? new Date(dateOfBirth).toLocaleDateString("en-US", { year: "numeric", month: "long", day: "numeric" }) : "March 15, 1956",
     age: `${calculatedAge} years`,
-    gender: "Female",
+    gender: clinicalData.gender,
     phone: "(555) 234-5678",
     address: "1234 Oak Street, Springfield, IL 62701",
     mrn: patientId,

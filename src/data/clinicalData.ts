@@ -1,4 +1,5 @@
 export interface ClinicalProfile {
+  gender: string;
   primaryDiagnosis: string;
   icdCode: string;
   severity: string;
@@ -11,6 +12,7 @@ export interface ClinicalProfile {
 }
 
 const defaultClinical: ClinicalProfile = {
+  gender: "Female",
   primaryDiagnosis: "Primary Osteoarthritis, Right Knee",
   icdCode: "M17.11",
   severity: "Grade IV (Kellgren-Lawrence)",
@@ -26,10 +28,11 @@ const defaultClinical: ClinicalProfile = {
     { name: "Injection Records (3x)", date: "2023-12-15", status: "analyzed" },
   ],
   summaryTemplate: (patientName, patientAge, procedureName, procedureCode) =>
-    `${patientName}, a ${patientAge} patient, presents with Primary Osteoarthritis, Right Knee (Grade IV - Kellgren-Lawrence) persisting for 18 months. Currently managed with conservative treatment including NSAIDs (Meloxicam) and analgesics. Patient has well-controlled comorbidities including Type 2 Diabetes and Hypertension. Requesting ${procedureName} (CPT: ${procedureCode}). Known allergies to Penicillin and Sulfa drugs noted. Clinical documentation supports medical necessity for the requested procedure.`,
+    `${patientName}, a ${patientAge} female patient, presents with Primary Osteoarthritis, Right Knee (Grade IV - Kellgren-Lawrence) persisting for 18 months. Currently managed with conservative treatment including NSAIDs (Meloxicam) and analgesics. Patient has well-controlled comorbidities including Type 2 Diabetes and Hypertension. Requesting ${procedureName} (CPT: ${procedureCode}). Known allergies to Penicillin and Sulfa drugs noted. Clinical documentation supports medical necessity for the requested procedure.`,
 };
 
 const nephrologyClinical: ClinicalProfile = {
+  gender: "Male",
   primaryDiagnosis: "End-Stage Renal Disease (ESRD)",
   icdCode: "N18.6",
   severity: "Stage 5 CKD (eGFR < 15 mL/min)",
@@ -45,7 +48,7 @@ const nephrologyClinical: ClinicalProfile = {
     { name: "HLA Typing & Crossmatch Results", date: "2024-01-05", status: "analyzed" },
   ],
   summaryTemplate: (patientName, patientAge, procedureName, procedureCode) =>
-    `${patientName}, a ${patientAge} patient, presents with End-Stage Renal Disease (ESRD, Stage 5 CKD, eGFR < 15 mL/min) progressing over 36 months. Currently on hemodialysis three times weekly. Patient has completed pre-transplant evaluation with favorable crossmatch results. Comorbidities include controlled Hypertension, Secondary Hyperparathyroidism, and Anemia of CKD. Requesting ${procedureName} (CPT: ${procedureCode}). Known allergies to Iodine contrast and Cephalosporins noted. Clinical documentation supports medical necessity for renal transplantation.`,
+    `${patientName}, a ${patientAge} male patient, presents with End-Stage Renal Disease (ESRD, Stage 5 CKD, eGFR < 15 mL/min) progressing over 36 months. Currently on hemodialysis three times weekly. Patient has completed pre-transplant evaluation with favorable crossmatch results. Comorbidities include controlled Hypertension, Secondary Hyperparathyroidism, and Anemia of CKD. Requesting ${procedureName} (CPT: ${procedureCode}). Known allergies to Iodine contrast and Cephalosporins noted. Clinical documentation supports medical necessity for renal transplantation.`,
 };
 
 const clinicalDataMap: Record<string, ClinicalProfile> = {
