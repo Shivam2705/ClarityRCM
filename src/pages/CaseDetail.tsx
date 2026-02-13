@@ -10,7 +10,9 @@ import { InlineDocumentViewer } from "@/components/case-detail/panels/InlineDocu
 import { StatusBadge } from "@/components/ui/status-badge";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { ArrowLeft, FileCheck, Code2, FileText } from "lucide-react";
+import { ArrowLeft, FileCheck, Code2, FileText, Receipt, Landmark } from "lucide-react";
+import { ClaimsManagementWorkflow } from "@/components/case-detail/ClaimsManagementWorkflow";
+import { AccountsReceivableWorkflow } from "@/components/case-detail/AccountsReceivableWorkflow";
 import { mockCases } from "@/data/mockCases";
 
 export default function CaseDetail() {
@@ -78,6 +80,14 @@ export default function CaseDetail() {
               <FileText className="h-4 w-4 mr-2" />
               View Documents
             </TabsTrigger>
+            <TabsTrigger value="claims" className="h-10 px-6 data-[state=active]:bg-card">
+              <Receipt className="h-4 w-4 mr-2" />
+              Claims Management
+            </TabsTrigger>
+            <TabsTrigger value="ar" className="h-10 px-6 data-[state=active]:bg-card">
+              <Landmark className="h-4 w-4 mr-2" />
+              Accounts Receivable
+            </TabsTrigger>
           </TabsList>
 
           <TabsContent value="pre-auth" className="mt-6">
@@ -94,6 +104,14 @@ export default function CaseDetail() {
 
           <TabsContent value="documents" className="mt-6">
             <InlineDocumentViewer caseId={caseId || "CASE-001"} />
+          </TabsContent>
+
+          <TabsContent value="claims" className="mt-6">
+            <ClaimsManagementWorkflow />
+          </TabsContent>
+
+          <TabsContent value="ar" className="mt-6">
+            <AccountsReceivableWorkflow />
           </TabsContent>
         </Tabs>
       </main>
