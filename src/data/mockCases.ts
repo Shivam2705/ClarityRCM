@@ -46,8 +46,8 @@ export const mockCases: Case[] = [
     status: "Eligible",
     priority: "Medium",
     lastUpdated: "2024-01-15T09:15:00Z",
-    procedureCode: "70553",
-    procedureName: "MRI Brain with Contrast",
+    procedureCode: "50360",
+    procedureName: "Renal Transplant Allotransplantation",
     hasGaps: false,
   },
   {
