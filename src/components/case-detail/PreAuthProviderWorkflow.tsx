@@ -1,5 +1,6 @@
 import { useState, useCallback, useEffect } from "react";
 import { useNavigate, useParams } from "react-router-dom";
+import { getClinicalData } from "@/data/clinicalData";
 import { WorkflowSteps, WorkflowStep } from "./WorkflowSteps";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
@@ -192,7 +193,8 @@ export function PreAuthProviderWorkflow({ caseData }: PreAuthProviderWorkflowPro
 
   // Document summary - matches the AI Patient Summary format from ClinicalIntakeHeader
   const patientAge = caseData.dateOfBirth ? `${new Date().getFullYear() - new Date(caseData.dateOfBirth).getFullYear()}-year-old` : "";
-  const documentSummary = `${caseData.patientName}, a ${patientAge} patient, presents with Primary Osteoarthritis, Right Knee (Grade IV - Kellgren-Lawrence) persisting for 18 months. Currently managed with conservative treatment including NSAIDs (Meloxicam) and analgesics. Patient has well-controlled comorbidities including Type 2 Diabetes and Hypertension. Requesting ${caseData.procedureName || "requested procedure"} (CPT: ${caseData.procedureCode || "N/A"}). Known allergies to Penicillin and Sulfa drugs noted. Clinical documentation supports medical necessity for the requested procedure.`;
+  const clinicalProfile = getClinicalData(caseId || "CASE-001");
+  const documentSummary = clinicalProfile.summaryTemplate(caseData.patientName, patientAge, caseData.procedureName || "requested procedure", caseData.procedureCode || "N/A");
 
   // Determine if this case has gaps based on caseId
   const caseHasGaps = caseId === "CASE-001";
@@ -732,7 +734,8 @@ function DocumentAnalysisSection({ isEditing, onSave, onCancel, onComplete, case
   ];
 
   const patientAge = caseData.dateOfBirth ? `${new Date().getFullYear() - new Date(caseData.dateOfBirth).getFullYear()}-year-old` : "";
-  const documentSummary = `${caseData.patientName}, a ${patientAge} patient, presents with Primary Osteoarthritis, Right Knee (Grade IV - Kellgren-Lawrence) persisting for 18 months. Currently managed with conservative treatment including NSAIDs (Meloxicam) and analgesics. Patient has well-controlled comorbidities including Type 2 Diabetes and Hypertension. Requesting ${caseData.procedureName || "requested procedure"} (CPT: ${caseData.procedureCode || "N/A"}). Known allergies to Penicillin and Sulfa drugs noted. Clinical documentation supports medical necessity for the requested procedure.`;
+  const clinicalProfile2 = getClinicalData(caseId || "CASE-001");
+  const documentSummary = clinicalProfile2.summaryTemplate(caseData.patientName, patientAge, caseData.procedureName || "requested procedure", caseData.procedureCode || "N/A");
 
   const handleAnalyze = () => {
     setIsAnalyzing(true);

@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { User, Stethoscope, FileText, Phone, CreditCard, Activity, Pill, AlertCircle, Sparkles, FileUp, Eye, Loader2, RefreshCw } from "lucide-react";
 import { useNavigate, useParams } from "react-router-dom";
+import { getClinicalData } from "@/data/clinicalData";
 interface ClinicalIntakeHeaderProps {
   patientName: string;
   patientId: string;
@@ -31,6 +32,7 @@ export function ClinicalIntakeHeader({
   } = useParams();
   const [isGeneratingSummary, setIsGeneratingSummary] = useState(false);
   const [summaryGenerated, setSummaryGenerated] = useState(hasSummary);
+  const clinicalData = getClinicalData(caseId || "CASE-001");
   const patientInfo = {
     dob: "March 15, 1956",
     age: "68 years",
@@ -45,13 +47,13 @@ export function ClinicalIntakeHeader({
       planType: "PPO"
     },
     clinical: {
-      primaryDiagnosis: "Primary Osteoarthritis, Right Knee",
-      icdCode: "M17.11",
-      severity: "Grade IV (Kellgren-Lawrence)",
-      duration: "18 months",
-      allergies: ["Penicillin", "Sulfa drugs"],
-      medications: ["Meloxicam 15mg", "Acetaminophen 500mg", "Lisinopril 10mg", "Metformin 500mg"],
-      comorbidities: ["Type 2 Diabetes (controlled)", "Hypertension (controlled)", "Hyperlipidemia"]
+      primaryDiagnosis: clinicalData.primaryDiagnosis,
+      icdCode: clinicalData.icdCode,
+      severity: clinicalData.severity,
+      duration: clinicalData.duration,
+      allergies: clinicalData.allergies,
+      medications: clinicalData.medications,
+      comorbidities: clinicalData.comorbidities,
     }
   };
 
@@ -75,7 +77,8 @@ export function ClinicalIntakeHeader({
     field: "Prior Auth Required",
     value: "Yes"
   }];
-  const aiSummary = `${patientName}, a ${patientInfo.age.replace(' years', '-year-old')} ${patientInfo.gender.toLowerCase()} patient, presents with ${patientInfo.clinical.primaryDiagnosis} (${patientInfo.clinical.severity}) persisting for ${patientInfo.clinical.duration}. Currently managed with conservative treatment including NSAIDs (Meloxicam) and analgesics. Patient has well-controlled comorbidities including Type 2 Diabetes and Hypertension. Requesting ${procedureName} (CPT: ${procedureCode}). Known allergies to Penicillin and Sulfa drugs noted. Clinical documentation supports medical necessity for the requested procedure.`;
+  const patientAge = patientInfo.age.replace(' years', '-year-old');
+  const aiSummary = clinicalData.summaryTemplate(patientName, patientAge, procedureName || "requested procedure", procedureCode || "N/A");
   const handleGenerateSummary = () => {
     if (!hasDocuments) {
       navigate(`/case/${caseId}/documents`);
