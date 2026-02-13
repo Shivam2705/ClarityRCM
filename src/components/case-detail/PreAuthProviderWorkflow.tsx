@@ -1412,7 +1412,7 @@ function EligibilitySection({
                 <InfoCard
                   icon={<Shield className="h-4 w-4" />}
                   label="Payer"
-                  value="Blue Cross Blue Shield"
+                  value="United Healthcare"
                   editable={isEditing}
                 />
                 <InfoCard icon={<Shield className="h-4 w-4" />} label="Plan Type" value="PPO" editable={isEditing} />
@@ -1433,7 +1433,7 @@ function EligibilitySection({
                 <h4 className="text-sm font-medium text-foreground mb-2">Coverage Details</h4>
                 <div className="space-y-2 text-sm">
                   <DataRow label="Surgical Coverage" value="80% after deductible" />
-                  <DataRow label="Prior Auth Required" value="Yes - Orthopedic Surgery" highlight />
+                  <DataRow label="Prior Auth Required" value="Yes" highlight />
                   <DataRow label="Network Status" value="In-Network Provider" />
                 </div>
               </Card>
