@@ -22,7 +22,7 @@ export const mockCases: Case[] = [
     id: "CASE-001",
     patientName: "Sarah Johnson",
     patientId: "PT-78234",
-    dateOfBirth: "1965-03-12",
+    dateOfBirth: "1958-03-12",
     encounterType: "Inpatient",
     orderingProvider: "Dr. Michael Chen",
     payerName: "Aetna",
