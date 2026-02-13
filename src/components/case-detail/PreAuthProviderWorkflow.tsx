@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { AuditLogsDialog } from "@/components/ui/audit-logs-dialog";
+import { getCaseById, Case } from "@/data/mockCases";
 import {
   FileText,
   Shield,
@@ -35,12 +36,13 @@ import {
   Target,
   CircleDot,
 } from "lucide-react";
+import { get } from "node:http";
 
 // Type for the agent API response
 interface PriorAuthAgentResponse {
   summary: {
     cpt_code: string;
-    procedure_description: string;
+    description: string;
     payer: string;
     overall_recommendation: string;
   };
@@ -57,7 +59,7 @@ interface PriorAuthAgentResponse {
   decision_tree_validation: {
     policy_id: string;
     policy_wording: string;
-    logic_path: { step: number; criteria: string; patient_data_meets: boolean; evidence: string }[];
+    logic_path: { step: number; criteria: string; patient_evidence: string; satisfied: boolean }[];
   };
   gap_comparison_table: {
     requirement: string;
@@ -106,7 +108,750 @@ async function callPriorAuthAgent(payload: { cpt: string; payer: string; state: 
   }
 
   const events = await response.json();
-
+//   const events = [
+//     {
+//         "modelVersion": "gemini-2.5-flash",
+//         "content": {
+//             "parts": [
+//                 {
+//                     "text": "Aetna requires precertification for CPT 27447, Arthroplasty, knee, condyle and plateau; medial AND lateral compartments with or without patella resurfacing (total knee arthroplasty), especially for elective inpatient admissions. The clinical notes provided for Sarah Johnson, detailing progressively worsening right knee pain consistent with advanced osteoarthritis, persistent severe pain, significant functional limitation, failure of extensive conservative management, and radiographic evidence of end-stage degenerative joint disease, align with Aetna's medical necessity criteria for total knee arthroplasty. Aetna considers a member to have advanced joint disease demonstrated by pain and functional disability that interferes with activities of daily living due to osteoarthritis, among other conditions, as criteria for initial approval. When reviewing precertification requests, Aetna considers the member's clinical circumstances and Milliman Care Guidelines (MCG).\n\nFlorida state laws impact the prior authorization process with specific requirements for health plans operating in the state. Health plans licensed under Chapter 641 must provide treatment authorization 24 hours a day, seven days a week, and establish written procedures for authorization requests. For urgent requests, prior authorization decisions should be made within 24 hours. For non-urgent requests, decisions are expected within 5 business days for plans licensed under Ch. 627, 641, and Medicaid. However, other sources indicate general prior authorization laws in Florida require decisions within 72 hours for urgent electronic requests and 7 days for non-urgent electronic requests, with longer timeframes for non-electronic submissions.\n\nBeginning in 2025, CMS guidelines for Florida mandate that all prior authorization requests be submitted electronically. Florida law also requires insurers to make prior authorization policies, including clinical criteria, easily understandable and accessible online. Adverse decisions must include the reason for denial and information on how to appeal. Prior authorizations are generally presumed valid for at least a year and cannot be revoked or restricted if care is provided within 45 business days of approval.\n\nAs of November 2024, Florida is not among the states that have passed \"Gold Carding\" legislation, which would exempt providers with high prior authorization approval rates from needing prior authorization for certain services. While some payers, such as UnitedHealthcare, have implemented their own Gold Card programs, there is no indication from the provided search results that Aetna in Florida currently has a specific Gold Card program that would apply to this CPT code. Therefore, precertification for CPT 27447 for Sarah Johnson will need to follow the standard Aetna precertification process, adhering to Florida's statutory timelines and electronic submission requirements."
+//                 }
+//             ],
+//             "role": "model"
+//         },
+//         "groundingMetadata": {
+//             "groundingChunks": [
+//                 {
+//                     "web": {
+//                         "domain": "aetna.com",
+//                         "title": "aetna.com",
+//                         "uri": "https://vertexaisearch.cloud.google.com/grounding-api-redirect/AUZIYQGWOSm0Q3SiDAB7atSx6C6upTAkTF-m3OCZ7hl0kEMlQbER6pb6pfGP8hP-f-ruSUOUOIf_n3cuFpo6R4_mOBI3eGBdpVTpYVORnXWK5O02xH_Uvo8kPpVQaZk1gsxIGUz0VooC5xnThwvwYtfppKsv-qpi"
+//                     }
+//                 },
+//                 {
+//                     "web": {
+//                         "domain": "aetna.com",
+//                         "title": "aetna.com",
+//                         "uri": "https://vertexaisearch.cloud.google.com/grounding-api-redirect/AUZIYQFiF_JHCBq4vpmPY3FPjnp4txwizzZg3Vu1ffR-wmQTMt57yejVbcgsi8Cehu3aMepRTJdqisOn9vUqiDtYycCkAnq304geTsoQhyA7gjsWyOJ8jWjTTqlYIj7KMH4yVsblCo6YPl7Yx185vGo_zpRFR0PfFd-cFgjjGUCEqK-PPZ6JD-hil3zHeshtfR6OjZoLKpzf15Ki_MceMlmfHSE="
+//                     }
+//                 },
+//                 {
+//                     "web": {
+//                         "domain": "mercyoptions.net",
+//                         "title": "mercyoptions.net",
+//                         "uri": "https://vertexaisearch.cloud.google.com/grounding-api-redirect/AUZIYQED2tD37KwjBwMNrh6VrG19UxDcqMaz41Af-pm9gq7EmWuZvfl7Hc8-CMlTGqYDHMVi6UpCztm1KaE9SUuJPJ2cUwlULenw6DlWq39LlGERR1Cb_W7omy3CAB6zW1PnIl5SxVxmD6033g9vt8Y5xFtZQDHGO-MjnzgKWVUNdEaagDbQnGTa4K91zFWkl5ebmeeA32wxVywM-Q=="
+//                     }
+//                 },
+//                 {
+//                     "web": {
+//                         "domain": "fha.org",
+//                         "title": "fha.org",
+//                         "uri": "https://vertexaisearch.cloud.google.com/grounding-api-redirect/AUZIYQEbBaWbIloQJ05aAPP8sHr16M68qx9IHisy5U8lYX2PQ_TdNGxLGiHSX30DT6qlg--Rp4mfw_bfqLhkzxhx4oHdPuZeZJT5zzXaIjBbP81135di74FZFRaIXnGt6jr8rpgCrG-GhDwq0sHv7HA5BZzq5KOqRE0t57UuxgsamYmv-yIewIdDdWeP0GSCMHanq5NqQxKv_ZFoU4iW6RMXvw0WVyTw6N-u-N2wuOTBYIj-FgXr_jpsUMGmDVRqbSrq_5OMymtucx0hhg=="
+//                     }
+//                 },
+//                 {
+//                     "web": {
+//                         "domain": "sunknowledge.com",
+//                         "title": "sunknowledge.com",
+//                         "uri": "https://vertexaisearch.cloud.google.com/grounding-api-redirect/AUZIYQGveO-tqBMRBRJhqsEZrzGdPqnfv2ghNVGZ3hDpxHngcf_JzpYE4ZtLaTfTZHdmUWtsQ74oijHzzxuEvApzHo_jEc_cX7pvyjATxvBTP6b4QTyIYIfDhM7Eb1iB5ktRBug0U5n-K-tZzx82KcoyJ9ACy9PYVg8kZn91NQmO0auUx-kH0r1VsMHBpVs6RvjDEr-fC4prdPkVfztGj-5l_AW2UUPcInnkew=="
+//                     }
+//                 },
+//                 {
+//                     "web": {
+//                         "domain": "triagecancer.org",
+//                         "title": "triagecancer.org",
+//                         "uri": "https://vertexaisearch.cloud.google.com/grounding-api-redirect/AUZIYQGKYVcHcMLT8tiW99n1YoxQ1yLjYIZkE3SU6kMAa94bifWdzMqinUlKy3VhPKGsmdx6qWn3Id436ycv_liGcWbG_ydhm7yrkOFBp2h97mXwgu3YqhisJERUulcZaAbVMti8H8DcvzsayqfJm4hfNNE_Tf4ZQwqUh2WiqZ0_eSk_PlgNxA=="
+//                     }
+//                 },
+//                 {
+//                     "web": {
+//                         "domain": "phslrx.com",
+//                         "title": "phslrx.com",
+//                         "uri": "https://vertexaisearch.cloud.google.com/grounding-api-redirect/AUZIYQGyihFCzA3X0Zwy_-h_4um7953ArD84UrGsTUD9F8cBwV-8bB7Z-_Ig1owYjM54ruPwDM4DEKJYz_A72nbUsHzaufP2z5hf0are51S7TJyRroyYO4K6sJjVSkwnNzFBHXIZkXDteNF1DmXfmMzti1HOCFsI9rJUM5vfFX9CtGJ8POaItmzdvjnydh2g8Q=="
+//                     }
+//                 },
+//                 {
+//                     "web": {
+//                         "domain": "flmedical.org",
+//                         "title": "flmedical.org",
+//                         "uri": "https://vertexaisearch.cloud.google.com/grounding-api-redirect/AUZIYQGQekF1300QxC3EbTtOZrPSl3gkZwttRBTQUyyBSW-J--CXFnG4Hi3VpkEi8CF61YQLaBW3HhbLnYY-HnNeap2zWBEf_KFhJTFnCL8R8zDPklkX9C8qnD9BWAVrnIozlptAobQ82jnw8idPnQPFsJvKOWHQfpMaxZbbm2s9kKuCIrFZnr8feD91uTlFeGxk4wooZenrBnZF"
+//                     }
+//                 },
+//                 {
+//                     "web": {
+//                         "domain": "floridasocietyofnephrology.com",
+//                         "title": "floridasocietyofnephrology.com",
+//                         "uri": "https://vertexaisearch.cloud.google.com/grounding-api-redirect/AUZIYQGLlKwr2AzHvocvvH3RSegoAyZB8TZZIWAij7gxpv7xbluM7nsm_blBY6SmRQm3PVoAgLb5gN47kSj0k7UxzTZ0U8D1O6e9_hSoEvsCfsuE2vM_TXAkxQtDrw-rT7JNN9QW-lErLXRMasbKPrT0LbNKvxStMWPW-QUFpbxXvfq1B1UkXphtad0LhDuR_5akSllT7wYEfxbk74I_nnV3ZZPUbQKfQ7pSzmVdI4J1uZhKoyi5WwRgkA=="
+//                     }
+//                 }
+//             ],
+//             "groundingSupports": [
+//                 {
+//                     "groundingChunkIndices": [
+//                         0,
+//                         1,
+//                         2
+//                     ],
+//                     "segment": {
+//                         "endIndex": 228,
+//                         "text": "Aetna requires precertification for CPT 27447, Arthroplasty, knee, condyle and plateau; medial AND lateral compartments with or without patella resurfacing (total knee arthroplasty), especially for elective inpatient admissions."
+//                     }
+//                 },
+//                 {
+//                     "groundingChunkIndices": [
+//                         0
+//                     ],
+//                     "segment": {
+//                         "endIndex": 613,
+//                         "startIndex": 229,
+//                         "text": "The clinical notes provided for Sarah Johnson, detailing progressively worsening right knee pain consistent with advanced osteoarthritis, persistent severe pain, significant functional limitation, failure of extensive conservative management, and radiographic evidence of end-stage degenerative joint disease, align with Aetna's medical necessity criteria for total knee arthroplasty."
+//                     }
+//                 },
+//                 {
+//                     "groundingChunkIndices": [
+//                         0
+//                     ],
+//                     "segment": {
+//                         "endIndex": 845,
+//                         "startIndex": 614,
+//                         "text": "Aetna considers a member to have advanced joint disease demonstrated by pain and functional disability that interferes with activities of daily living due to osteoarthritis, among other conditions, as criteria for initial approval."
+//                     }
+//                 },
+//                 {
+//                     "groundingChunkIndices": [
+//                         2
+//                     ],
+//                     "segment": {
+//                         "endIndex": 975,
+//                         "startIndex": 846,
+//                         "text": "When reviewing precertification requests, Aetna considers the member's clinical circumstances and Milliman Care Guidelines (MCG)."
+//                     }
+//                 },
+//                 {
+//                     "groundingChunkIndices": [
+//                         3
+//                     ],
+//                     "segment": {
+//                         "endIndex": 1275,
+//                         "startIndex": 1103,
+//                         "text": "Health plans licensed under Chapter 641 must provide treatment authorization 24 hours a day, seven days a week, and establish written procedures for authorization requests."
+//                     }
+//                 },
+//                 {
+//                     "groundingChunkIndices": [
+//                         3,
+//                         4
+//                     ],
+//                     "segment": {
+//                         "endIndex": 1358,
+//                         "startIndex": 1276,
+//                         "text": "For urgent requests, prior authorization decisions should be made within 24 hours."
+//                     }
+//                 },
+//                 {
+//                     "groundingChunkIndices": [
+//                         3
+//                     ],
+//                     "segment": {
+//                         "endIndex": 1482,
+//                         "startIndex": 1459,
+//                         "text": "627, 641, and Medicaid."
+//                     }
+//                 },
+//                 {
+//                     "groundingChunkIndices": [
+//                         5
+//                     ],
+//                     "segment": {
+//                         "endIndex": 1725,
+//                         "startIndex": 1483,
+//                         "text": "However, other sources indicate general prior authorization laws in Florida require decisions within 72 hours for urgent electronic requests and 7 days for non-urgent electronic requests, with longer timeframes for non-electronic submissions."
+//                     }
+//                 },
+//                 {
+//                     "groundingChunkIndices": [
+//                         4
+//                     ],
+//                     "segment": {
+//                         "endIndex": 1847,
+//                         "startIndex": 1727,
+//                         "text": "Beginning in 2025, CMS guidelines for Florida mandate that all prior authorization requests be submitted electronically."
+//                     }
+//                 },
+//                 {
+//                     "groundingChunkIndices": [
+//                         5
+//                     ],
+//                     "segment": {
+//                         "endIndex": 1994,
+//                         "startIndex": 1848,
+//                         "text": "Florida law also requires insurers to make prior authorization policies, including clinical criteria, easily understandable and accessible online."
+//                     }
+//                 },
+//                 {
+//                     "groundingChunkIndices": [
+//                         5
+//                     ],
+//                     "segment": {
+//                         "endIndex": 2081,
+//                         "startIndex": 1995,
+//                         "text": "Adverse decisions must include the reason for denial and information on how to appeal."
+//                     }
+//                 },
+//                 {
+//                     "groundingChunkIndices": [
+//                         5
+//                     ],
+//                     "segment": {
+//                         "endIndex": 2244,
+//                         "startIndex": 2082,
+//                         "text": "Prior authorizations are generally presumed valid for at least a year and cannot be revoked or restricted if care is provided within 45 business days of approval."
+//                     }
+//                 },
+//                 {
+//                     "groundingChunkIndices": [
+//                         6
+//                     ],
+//                     "segment": {
+//                         "endIndex": 2472,
+//                         "startIndex": 2246,
+//                         "text": "As of November 2024, Florida is not among the states that have passed \"Gold Carding\" legislation, which would exempt providers with high prior authorization approval rates from needing prior authorization for certain services."
+//                     }
+//                 },
+//                 {
+//                     "groundingChunkIndices": [
+//                         7,
+//                         8,
+//                         6
+//                     ],
+//                     "segment": {
+//                         "endIndex": 2720,
+//                         "startIndex": 2473,
+//                         "text": "While some payers, such as UnitedHealthcare, have implemented their own Gold Card programs, there is no indication from the provided search results that Aetna in Florida currently has a specific Gold Card program that would apply to this CPT code."
+//                     }
+//                 }
+//             ],
+//             "searchEntryPoint": {
+//                 "renderedContent": "<style>\n.container {\n  align-items: center;\n  border-radius: 8px;\n  display: flex;\n  font-family: Google Sans, Roboto, sans-serif;\n  font-size: 14px;\n  line-height: 20px;\n  padding: 8px 12px;\n}\n.chip {\n  display: inline-block;\n  border: solid 1px;\n  border-radius: 16px;\n  min-width: 14px;\n  padding: 5px 16px;\n  text-align: center;\n  user-select: none;\n  margin: 0 8px;\n  -webkit-tap-highlight-color: transparent;\n}\n.carousel {\n  overflow: auto;\n  scrollbar-width: none;\n  white-space: nowrap;\n  margin-right: -12px;\n}\n.headline {\n  display: flex;\n  margin-right: 4px;\n}\n.gradient-container {\n  position: relative;\n}\n.gradient {\n  position: absolute;\n  transform: translate(3px, -9px);\n  height: 36px;\n  width: 9px;\n}\n@media (prefers-color-scheme: light) {\n  .container {\n    background-color: #fafafa;\n    box-shadow: 0 0 0 1px #0000000f;\n  }\n  .headline-label {\n    color: #1f1f1f;\n  }\n  .chip {\n    background-color: #ffffff;\n    border-color: #d2d2d2;\n    color: #5e5e5e;\n    text-decoration: none;\n  }\n  .chip:hover {\n    background-color: #f2f2f2;\n  }\n  .chip:focus {\n    background-color: #f2f2f2;\n  }\n  .chip:active {\n    background-color: #d8d8d8;\n    border-color: #b6b6b6;\n  }\n  .logo-dark {\n    display: none;\n  }\n  .gradient {\n    background: linear-gradient(90deg, #fafafa 15%, #fafafa00 100%);\n  }\n}\n@media (prefers-color-scheme: dark) {\n  .container {\n    background-color: #1f1f1f;\n    box-shadow: 0 0 0 1px #ffffff26;\n  }\n  .headline-label {\n    color: #fff;\n  }\n  .chip {\n    background-color: #2c2c2c;\n    border-color: #3c4043;\n    color: #fff;\n    text-decoration: none;\n  }\n  .chip:hover {\n    background-color: #353536;\n  }\n  .chip:focus {\n    background-color: #353536;\n  }\n  .chip:active {\n    background-color: #464849;\n    border-color: #53575b;\n  }\n  .logo-light {\n    display: none;\n  }\n  .gradient {\n    background: linear-gradient(90deg, #1f1f1f 15%, #1f1f1f00 100%);\n  }\n}\n</style>\n<div class=\"container\">\n  <div class=\"headline\">\n    <svg class=\"logo-light\" width=\"18\" height=\"18\" viewBox=\"9 9 35 35\" fill=\"none\" xmlns=\"http://www.w3.org/2000/svg\">\n      <path fill-rule=\"evenodd\" clip-rule=\"evenodd\" d=\"M42.8622 27.0064C42.8622 25.7839 42.7525 24.6084 42.5487 23.4799H26.3109V30.1568H35.5897C35.1821 32.3041 33.9596 34.1222 32.1258 35.3448V39.6864H37.7213C40.9814 36.677 42.8622 32.2571 42.8622 27.0064V27.0064Z\" fill=\"#4285F4\"/>\n      <path fill-rule=\"evenodd\" clip-rule=\"evenodd\" d=\"M26.3109 43.8555C30.9659 43.8555 34.8687 42.3195 37.7213 39.6863L32.1258 35.3447C30.5898 36.3792 28.6306 37.0061 26.3109 37.0061C21.8282 37.0061 18.0195 33.9811 16.6559 29.906H10.9194V34.3573C13.7563 39.9841 19.5712 43.8555 26.3109 43.8555V43.8555Z\" fill=\"#34A853\"/>\n      <path fill-rule=\"evenodd\" clip-rule=\"evenodd\" d=\"M16.6559 29.8904C16.3111 28.8559 16.1074 27.7588 16.1074 26.6146C16.1074 25.4704 16.3111 24.3733 16.6559 23.3388V18.8875H10.9194C9.74388 21.2072 9.06992 23.8247 9.06992 26.6146C9.06992 29.4045 9.74388 32.022 10.9194 34.3417L15.3864 30.8621L16.6559 29.8904V29.8904Z\" fill=\"#FBBC05\"/>\n      <path fill-rule=\"evenodd\" clip-rule=\"evenodd\" d=\"M26.3109 16.2386C28.85 16.2386 31.107 17.1164 32.9095 18.8091L37.8466 13.8719C34.853 11.082 30.9659 9.3736 26.3109 9.3736C19.5712 9.3736 13.7563 13.245 10.9194 18.8875L16.6559 23.3388C18.0195 19.2636 21.8282 16.2386 26.3109 16.2386V16.2386Z\" fill=\"#EA4335\"/>\n    </svg>\n    <svg class=\"logo-dark\" width=\"18\" height=\"18\" viewBox=\"0 0 48 48\" xmlns=\"http://www.w3.org/2000/svg\">\n      <circle cx=\"24\" cy=\"23\" fill=\"#FFF\" r=\"22\"/>\n      <path d=\"M33.76 34.26c2.75-2.56 4.49-6.37 4.49-11.26 0-.89-.08-1.84-.29-3H24.01v5.99h8.03c-.4 2.02-1.5 3.56-3.07 4.56v.75l3.91 2.97h.88z\" fill=\"#4285F4\"/>\n      <path d=\"M15.58 25.77A8.845 8.845 0 0 0 24 31.86c1.92 0 3.62-.46 4.97-1.31l4.79 3.71C31.14 36.7 27.65 38 24 38c-5.93 0-11.01-3.4-13.45-8.36l.17-1.01 4.06-2.85h.8z\" fill=\"#34A853\"/>\n      <path d=\"M15.59 20.21a8.864 8.864 0 0 0 0 5.58l-5.03 3.86c-.98-2-1.53-4.25-1.53-6.64 0-2.39.55-4.64 1.53-6.64l1-.22 3.81 2.98.22 1.08z\" fill=\"#FBBC05\"/>\n      <path d=\"M24 14.14c2.11 0 4.02.75 5.52 1.98l4.36-4.36C31.22 9.43 27.81 8 24 8c-5.93 0-11.01 3.4-13.45 8.36l5.03 3.85A8.86 8.86 0 0 1 24 14.14z\" fill=\"#EA4335\"/>\n    </svg>\n    <div class=\"gradient-container\"><div class=\"gradient\"></div></div>\n  </div>\n  <div class=\"carousel\">\n    <a class=\"chip\" href=\"https://vertexaisearch.cloud.google.com/grounding-api-redirect/AUZIYQF___vfibJeGf4kyh2ipSE2XBKW2uQSFGqor15CrkD_tRBXPoaxAX55VJuMdEJ5SgVqlhTkWRscWvGl3PXUNawYv41vhx4rNNGDvTejUjRK_QL1aoloX4mJ7JM8I6enNqHnlXKIBtLDHpoxrCNegmLkUtL0-FXk1WtvTGKXcAdtrolozqC4r59o_5I6BV58Map8jm1NNRherrlyqz_TSVwlyJgaedclGKtgJI2B2A==\">Florida prior authorization laws insurance</a>\n    <a class=\"chip\" href=\"https://vertexaisearch.cloud.google.com/grounding-api-redirect/AUZIYQFxPnV9NJjF4sldnvbJ1Mx5Ct9OCCrDnRwtEXAYy7dR6cvPrOUu5_ujCRgP6xWY_QDwRPF_EFd4PF8yERAqs-PDhrrkvl0E-tImMOzpDIy22iHTGztKQYIoGmIFq48pH97lgiKJM9_fX6SpNCf7wCiRH6hWvhkTz6Dok_UaoWwyvRs-2ujvflF_sb1DUgJxv5fFE0ApIcoHvzzgdRBI1aw7d0a7oh8Fk1rsDYXsilbMntoxqDUmNQ==\">Aetna 2026 precertification list CPT 27447 Florida</a>\n    <a class=\"chip\" href=\"https://vertexaisearch.cloud.google.com/grounding-api-redirect/AUZIYQGcTYhtInViZyH-x0gzL0-oO7HtkPgmz2uSykIYIVWdZvJy3d405MA6WJYxiMSzFa6dra17wE-zI5DwVLeCW9acjSLLtWE9vxqC-6oZrCa2KDEc9AZu6kpult14W7BJlm0h-47TdVD2Cyh_tZqZ2AfWLP1A4LfSZEYzoJrovkIG3IYWNU5rFi5fCOaKOlHir4oRZn1_njHGkP5IRdyjiUjcJFKbGjWfqQwzEg==\">Aetna clinical policy CPT 27447 Florida</a>\n    <a class=\"chip\" href=\"https://vertexaisearch.cloud.google.com/grounding-api-redirect/AUZIYQEwOldQPMP1IPK0md3kUE3vi-b6kPUwVsRUvD5bCo3yySrRyQpsx-laxcSXO-LuSKVWE-IVrF6tQVsmKkoJcWu5IdLFY4QppaoBkgqlur17_Pd359YfrnNOMy54Dj0oK0Nd92Y_7JQncnd0KPghywDHsRhAs5BWjOQPzq9q6egDrt321jMynMiOFADaj_CO-NO8SXdteUrGTkFp1elz_4HfQygbOkExgJROKV0UqjqITQ==\">Florida statute prior authorization timelines</a>\n    <a class=\"chip\" href=\"https://vertexaisearch.cloud.google.com/grounding-api-redirect/AUZIYQFOTbgyB8DHL6T8ANggQqBXEdLnmFR4EiT1qzN3T4vYjLLPOIUi5TXdGCHJKmBENMYI8lkSlnzkDdltSPzaqUr3GaiNtyvgROU5eDsdIyJSvzEgHb8xKuyVE_EKEX-ILEA-Fyo6XZxw14G6GT1Ts-VlwvRT_Mv1oqck8Vd-RYXZS4HpX9DepQvcGU5c6HHQA4GMi-Cl2Lvn9kd97RAEQrJldZ21ed5BKU6cDxQeITbO\">Florida gold carding law prior authorization</a>\n  </div>\n</div>\n"
+//             },
+//             "webSearchQueries": [
+//                 "Aetna 2026 precertification list CPT 27447 Florida",
+//                 "Aetna clinical policy CPT 27447 Florida",
+//                 "Florida prior authorization laws insurance",
+//                 "Florida gold carding law prior authorization",
+//                 "Florida statute prior authorization timelines"
+//             ]
+//         },
+//         "finishReason": "STOP",
+//         "usageMetadata": {
+//             "candidatesTokenCount": 543,
+//             "candidatesTokensDetails": [
+//                 {
+//                     "modality": "TEXT",
+//                     "tokenCount": 543
+//                 }
+//             ],
+//             "promptTokenCount": 318,
+//             "promptTokensDetails": [
+//                 {
+//                     "modality": "TEXT",
+//                     "tokenCount": 318
+//                 }
+//             ],
+//             "thoughtsTokenCount": 1314,
+//             "toolUsePromptTokenCount": 212,
+//             "toolUsePromptTokensDetails": [
+//                 {
+//                     "modality": "TEXT",
+//                     "tokenCount": 212
+//                 }
+//             ],
+//             "totalTokenCount": 2387,
+//             "trafficType": "ON_DEMAND"
+//         },
+//         "invocationId": "e-a926fa2f-77e7-46a7-b08c-1e036b51db6e",
+//         "author": "ComplianceScout",
+//         "actions": {
+//             "stateDelta": {},
+//             "artifactDelta": {},
+//             "requestedAuthConfigs": {},
+//             "requestedToolConfirmations": {}
+//         },
+//         "id": "25c6eade-a06c-4336-a938-cde929bc970b",
+//         "timestamp": 1770990844.0833
+//     },
+//     {
+//         "modelVersion": "gemini-2.5-flash",
+//         "content": {
+//             "parts": [
+//                 {
+//                     "text": "Aetna's Clinical Policy Bulletin (CPB) 0660 for Knee Arthroplasty outlines the medical necessity criteria for CPT 27447, Total Knee Arthroplasty (TKA). This policy generally applies to all Aetna plans, including those in Florida.\n\n**Medical Necessity Wording:**\n\nA Food and Drug Administration (FDA) approved total knee arthroplasty (TKA) prosthesis is considered medically necessary for adult members when specific criteria are met.\n\n**Step-by-Step Criteria for Approval (Total Knee Arthroplasty - CPT 27447):**\n\nFor a primary Total Knee Arthroplasty (CPT 27447) to be considered medically necessary, the adult member must meet the following criteria:\n\n1.  **Advanced Joint Disease:** The member must have advanced joint disease demonstrated by one of the following:\n    *   Pain and functional disability that interferes with activities of daily living (ADLs) due to osteoarthritis (degenerative joint disease).\n    *   Pain and functional disability that interferes with ADLs due to post-traumatic arthritis.\n    *   Pain and functional disability that interferes with ADLs due to inflammatory arthritis (e.g., rheumatoid arthritis).\n    *   Failure of a previous osteotomy with pain interfering with ADLs.\n    *   Distal femur or proximal tibia malunion by imaging with pain interfering with ADLs.\n    *   Distal femur or proximal tibia fracture or nonunion.\n    *   Malignancy of the distal femur, proximal tibia, knee joint, or adjacent soft tissues by imaging.\n    *   Failure of previous unicompartmental knee replacement with pain interfering with ADLs.\n\n2.  **Radiographic Evidence:** The member must have radiographic evidence of one of the following:\n    *   Moderate/severe osteoarthritis of the knee joint (i.e., Kellgren-Lawrence Grade 3 or 4).\n    *   Avascular necrosis (osteonecrosis) of the tibial or femoral condyle.\n    *   Rheumatoid arthritis (joint space narrowing).\n\n3.  **Failure of Conservative Therapy:** There must be an inadequate response to conservative measures. While not explicitly detailed as a duration for TKA in the provided snippets, Aetna policies generally require failure of conservative management for knee arthroplasty procedures. For example, for knee arthroscopy, failure of conservative therapy (including rest, activity modification, physical therapy, NSAIDs, analgesics, or corticosteroid injections) for at least three months is often specified. The provided clinical notes indicate Sarah Johnson's failure of extensive conservative management over more than two years, including NSAIDs, physical therapy, bracing, activity modification, and corticosteroid injections, which aligns with this requirement.\n\n**Absolute Contraindications (if any of these are present, TKA is generally not considered medically necessary):**\n\n*   Active infection of the joint or active systemic bacteremia that has not been totally eradicated.\n*   Active skin infection (exception recurrent cutaneous staph infections) or open wound within the planned surgical site of the knee.\n*   Corticosteroid injection into the joint within 12 weeks of the planned arthroplasty.\n*   Vascular insufficiency, significant muscular atrophy of the leg, or neuromuscular disease severe enough to compromise implant stability or post-operative recovery or quadriplegia.\n*   Osseous abnormalities that cannot be optimally managed and would increase the likelihood of a poor surgical outcome (e.g., inadequate bone stock to support the implant).\n*   Allergy to components of the implant (e.g., cobalt, chromium, or alumina).\n\nAetna requires precertification for elective inpatient admissions, including total knee arthroplasty (CPT 27447). Providers are encouraged to review CPB 0660 and use the precertification information request form to submit necessary documentation, including current history and physical, description of proposed treatment, and supporting medical records documenting clinical findings, conservative management with outcome, and current plan of care."
+//                 }
+//             ],
+//             "role": "model"
+//         },
+//         "groundingMetadata": {
+//             "groundingChunks": [
+//                 {
+//                     "web": {
+//                         "domain": "aetna.com",
+//                         "title": "aetna.com",
+//                         "uri": "https://vertexaisearch.cloud.google.com/grounding-api-redirect/AUZIYQHqDoTrEqs5Jh9a9q3NJ1PhOEUctTAvvMbCIOPLAu4Ki7bqP37lVzzoiKEi99emnAynkgG5t2z656M3D1xeK6Ix0HBDn7mAW1MYToG4qybQtYj9_MksZ9dSQAuUNQLenHd5WD7p4juHfl24vWivKHgir0YUUG7pZZIKIdXoHNPwbAP2d7QfNpYsBtTCPUqAJIiyhuI8WQDYf3rwojyBKa1lUGOnMz1kLrmQCaFzxqCksf_jyw=="
+//                     }
+//                 },
+//                 {
+//                     "web": {
+//                         "domain": "aetna.com",
+//                         "title": "aetna.com",
+//                         "uri": "https://vertexaisearch.cloud.google.com/grounding-api-redirect/AUZIYQHLwUFlUHTLjtN7lYw4fFf9QnUNFq967apXzP1XTis62e5CCmr6r5_2LxQouK_BoKeU_mofw02WYwqan_ZJhl5ML3m6TR3FwuS0mDYUmR-IE-OhGWuVzFJbKLqu9Yyl56CJGlz4AReHH-CAPUOAGH9n0Ew="
+//                     }
+//                 },
+//                 {
+//                     "web": {
+//                         "domain": "aetna.com",
+//                         "title": "aetna.com",
+//                         "uri": "https://vertexaisearch.cloud.google.com/grounding-api-redirect/AUZIYQFOSOKLvBH7j2LJ457QPmzpO9ZLMh2_cb-YV6-jPD2xVo9xLeycY9s_YzbwXOAE73s7b6Y9CAgJiT9OZjIJPzQYHAFPaiZaihHVFhsTtg6cTW65e8aShBpjo8UUaDCmul6AH7RX5VHfgyzBtamcYiuZ6Qs="
+//                     }
+//                 },
+//                 {
+//                     "web": {
+//                         "domain": "covenanthealthcare.com",
+//                         "title": "covenanthealthcare.com",
+//                         "uri": "https://vertexaisearch.cloud.google.com/grounding-api-redirect/AUZIYQH4HpDXNOJrQH3u9CIWUBWtQMnmsIP2h8dpnw7PQbjbC-fJPQCjkFU4fos7hSE17q3ky-Y5fROpH64LN4YUaBMFHRDk0giFHH7Ik5_hO-6-2WjpUVSylUA1kAou2m2SHMYt_A5Ok9vUhFwXQKubkuUJx-9XGOFeSWAuPKwrSPFDTGl0lrCKU2725et07oIs7dh5_zXTKgzEndLP3Hg_u38LiN6Jq4Ui"
+//                     }
+//                 },
+//                 {
+//                     "web": {
+//                         "domain": "aetna.com",
+//                         "title": "aetna.com",
+//                         "uri": "https://vertexaisearch.cloud.google.com/grounding-api-redirect/AUZIYQH8Rp_C6e7WU8M2k8iBSbo0BC7ROSLY8GercLdryXDODOqgQlR2ODlDbwqrCOOWKfZFci111hb-UMucQrHVNEpJAlfwDJS4L3PSMb1BPMaavdxuBPyCODhIMhOjo8CwAIbxrVh4Anw60bmY-weQUqaCmJPMRTSxi4tIZhbE5hi9-RxtZ4NDvuc8JO3d3DjrRQp1qqV80XMH0NyM-q0J_9hoQCzfDGBHxe9_4Khg3tv6Idt8cw=="
+//                     }
+//                 }
+//             ],
+//             "groundingSupports": [
+//                 {
+//                     "groundingChunkIndices": [
+//                         0
+//                     ],
+//                     "segment": {
+//                         "endIndex": 228,
+//                         "startIndex": 152,
+//                         "text": "This policy generally applies to all Aetna plans, including those in Florida"
+//                     }
+//                 },
+//                 {
+//                     "groundingChunkIndices": [
+//                         1
+//                     ],
+//                     "segment": {
+//                         "endIndex": 432,
+//                         "startIndex": 263,
+//                         "text": "A Food and Drug Administration (FDA) approved total knee arthroplasty (TKA) prosthesis is considered medically necessary for adult members when specific criteria are met"
+//                     }
+//                 },
+//                 {
+//                     "groundingChunkIndices": [
+//                         1
+//                     ],
+//                     "segment": {
+//                         "endIndex": 766,
+//                         "startIndex": 658,
+//                         "text": "**Advanced Joint Disease:** The member must have advanced joint disease demonstrated by one of the following"
+//                     }
+//                 },
+//                 {
+//                     "groundingChunkIndices": [
+//                         1
+//                     ],
+//                     "segment": {
+//                         "endIndex": 913,
+//                         "startIndex": 766,
+//                         "text": ":\n    *   Pain and functional disability that interferes with activities of daily living (ADLs) due to osteoarthritis (degenerative joint disease)."
+//                     }
+//                 },
+//                 {
+//                     "groundingChunkIndices": [
+//                         1
+//                     ],
+//                     "segment": {
+//                         "endIndex": 1209,
+//                         "startIndex": 1141,
+//                         "text": "*   Failure of a previous osteotomy with pain interfering with ADLs."
+//                     }
+//                 },
+//                 {
+//                     "groundingChunkIndices": [
+//                         1
+//                     ],
+//                     "segment": {
+//                         "endIndex": 1301,
+//                         "startIndex": 1214,
+//                         "text": "*   Distal femur or proximal tibia malunion by imaging with pain interfering with ADLs."
+//                     }
+//                 },
+//                 {
+//                     "groundingChunkIndices": [
+//                         1
+//                     ],
+//                     "segment": {
+//                         "endIndex": 1362,
+//                         "startIndex": 1306,
+//                         "text": "*   Distal femur or proximal tibia fracture or nonunion."
+//                     }
+//                 },
+//                 {
+//                     "groundingChunkIndices": [
+//                         1
+//                     ],
+//                     "segment": {
+//                         "endIndex": 1467,
+//                         "startIndex": 1367,
+//                         "text": "*   Malignancy of the distal femur, proximal tibia, knee joint, or adjacent soft tissues by imaging."
+//                     }
+//                 },
+//                 {
+//                     "groundingChunkIndices": [
+//                         1
+//                     ],
+//                     "segment": {
+//                         "endIndex": 1562,
+//                         "startIndex": 1472,
+//                         "text": "*   Failure of previous unicompartmental knee replacement with pain interfering with ADLs."
+//                     }
+//                 },
+//                 {
+//                     "groundingChunkIndices": [
+//                         1
+//                     ],
+//                     "segment": {
+//                         "endIndex": 1661,
+//                         "startIndex": 1568,
+//                         "text": "**Radiographic Evidence:** The member must have radiographic evidence of one of the following"
+//                     }
+//                 },
+//                 {
+//                     "groundingChunkIndices": [
+//                         1
+//                     ],
+//                     "segment": {
+//                         "endIndex": 1759,
+//                         "startIndex": 1661,
+//                         "text": ":\n    *   Moderate/severe osteoarthritis of the knee joint (i.e., Kellgren-Lawrence Grade 3 or 4)."
+//                     }
+//                 },
+//                 {
+//                     "groundingChunkIndices": [
+//                         1
+//                     ],
+//                     "segment": {
+//                         "endIndex": 1836,
+//                         "startIndex": 1764,
+//                         "text": "*   Avascular necrosis (osteonecrosis) of the tibial or femoral condyle."
+//                     }
+//                 },
+//                 {
+//                     "groundingChunkIndices": [
+//                         1
+//                     ],
+//                     "segment": {
+//                         "endIndex": 1890,
+//                         "startIndex": 1841,
+//                         "text": "*   Rheumatoid arthritis (joint space narrowing)."
+//                     }
+//                 },
+//                 {
+//                     "groundingChunkIndices": [
+//                         2
+//                     ],
+//                     "segment": {
+//                         "endIndex": 2395,
+//                         "startIndex": 2176,
+//                         "text": "For example, for knee arthroscopy, failure of conservative therapy (including rest, activity modification, physical therapy, NSAIDs, analgesics, or corticosteroid injections) for at least three months is often specified"
+//                     }
+//                 },
+//                 {
+//                     "groundingChunkIndices": [
+//                         1,
+//                         0
+//                     ],
+//                     "segment": {
+//                         "endIndex": 2768,
+//                         "startIndex": 2657,
+//                         "text": "**Absolute Contraindications (if any of these are present, TKA is generally not considered medically necessary)"
+//                     }
+//                 },
+//                 {
+//                     "groundingChunkIndices": [
+//                         1,
+//                         0
+//                     ],
+//                     "segment": {
+//                         "endIndex": 2874,
+//                         "startIndex": 2773,
+//                         "text": "*   Active infection of the joint or active systemic bacteremia that has not been totally eradicated."
+//                     }
+//                 },
+//                 {
+//                     "groundingChunkIndices": [
+//                         1,
+//                         0
+//                     ],
+//                     "segment": {
+//                         "endIndex": 3009,
+//                         "startIndex": 2875,
+//                         "text": "*   Active skin infection (exception recurrent cutaneous staph infections) or open wound within the planned surgical site of the knee."
+//                     }
+//                 },
+//                 {
+//                     "groundingChunkIndices": [
+//                         1
+//                     ],
+//                     "segment": {
+//                         "endIndex": 3098,
+//                         "startIndex": 3010,
+//                         "text": "*   Corticosteroid injection into the joint within 12 weeks of the planned arthroplasty."
+//                     }
+//                 },
+//                 {
+//                     "groundingChunkIndices": [
+//                         1,
+//                         0
+//                     ],
+//                     "segment": {
+//                         "endIndex": 3282,
+//                         "startIndex": 3099,
+//                         "text": "*   Vascular insufficiency, significant muscular atrophy of the leg, or neuromuscular disease severe enough to compromise implant stability or post-operative recovery or quadriplegia."
+//                     }
+//                 },
+//                 {
+//                     "groundingChunkIndices": [
+//                         0
+//                     ],
+//                     "segment": {
+//                         "endIndex": 3456,
+//                         "startIndex": 3283,
+//                         "text": "*   Osseous abnormalities that cannot be optimally managed and would increase the likelihood of a poor surgical outcome (e.g., inadequate bone stock to support the implant)."
+//                     }
+//                 },
+//                 {
+//                     "groundingChunkIndices": [
+//                         0
+//                     ],
+//                     "segment": {
+//                         "endIndex": 3535,
+//                         "startIndex": 3457,
+//                         "text": "*   Allergy to components of the implant (e.g., cobalt, chromium, or alumina)."
+//                     }
+//                 },
+//                 {
+//                     "groundingChunkIndices": [
+//                         0,
+//                         3
+//                     ],
+//                     "segment": {
+//                         "endIndex": 3649,
+//                         "startIndex": 3537,
+//                         "text": "Aetna requires precertification for elective inpatient admissions, including total knee arthroplasty (CPT 27447)"
+//                     }
+//                 },
+//                 {
+//                     "groundingChunkIndices": [
+//                         0,
+//                         4
+//                     ],
+//                     "segment": {
+//                         "endIndex": 3983,
+//                         "startIndex": 3651,
+//                         "text": "Providers are encouraged to review CPB 0660 and use the precertification information request form to submit necessary documentation, including current history and physical, description of proposed treatment, and supporting medical records documenting clinical findings, conservative management with outcome, and current plan of care"
+//                     }
+//                 }
+//             ],
+//             "searchEntryPoint": {
+//                 "renderedContent": "<style>\n.container {\n  align-items: center;\n  border-radius: 8px;\n  display: flex;\n  font-family: Google Sans, Roboto, sans-serif;\n  font-size: 14px;\n  line-height: 20px;\n  padding: 8px 12px;\n}\n.chip {\n  display: inline-block;\n  border: solid 1px;\n  border-radius: 16px;\n  min-width: 14px;\n  padding: 5px 16px;\n  text-align: center;\n  user-select: none;\n  margin: 0 8px;\n  -webkit-tap-highlight-color: transparent;\n}\n.carousel {\n  overflow: auto;\n  scrollbar-width: none;\n  white-space: nowrap;\n  margin-right: -12px;\n}\n.headline {\n  display: flex;\n  margin-right: 4px;\n}\n.gradient-container {\n  position: relative;\n}\n.gradient {\n  position: absolute;\n  transform: translate(3px, -9px);\n  height: 36px;\n  width: 9px;\n}\n@media (prefers-color-scheme: light) {\n  .container {\n    background-color: #fafafa;\n    box-shadow: 0 0 0 1px #0000000f;\n  }\n  .headline-label {\n    color: #1f1f1f;\n  }\n  .chip {\n    background-color: #ffffff;\n    border-color: #d2d2d2;\n    color: #5e5e5e;\n    text-decoration: none;\n  }\n  .chip:hover {\n    background-color: #f2f2f2;\n  }\n  .chip:focus {\n    background-color: #f2f2f2;\n  }\n  .chip:active {\n    background-color: #d8d8d8;\n    border-color: #b6b6b6;\n  }\n  .logo-dark {\n    display: none;\n  }\n  .gradient {\n    background: linear-gradient(90deg, #fafafa 15%, #fafafa00 100%);\n  }\n}\n@media (prefers-color-scheme: dark) {\n  .container {\n    background-color: #1f1f1f;\n    box-shadow: 0 0 0 1px #ffffff26;\n  }\n  .headline-label {\n    color: #fff;\n  }\n  .chip {\n    background-color: #2c2c2c;\n    border-color: #3c4043;\n    color: #fff;\n    text-decoration: none;\n  }\n  .chip:hover {\n    background-color: #353536;\n  }\n  .chip:focus {\n    background-color: #353536;\n  }\n  .chip:active {\n    background-color: #464849;\n    border-color: #53575b;\n  }\n  .logo-light {\n    display: none;\n  }\n  .gradient {\n    background: linear-gradient(90deg, #1f1f1f 15%, #1f1f1f00 100%);\n  }\n}\n</style>\n<div class=\"container\">\n  <div class=\"headline\">\n    <svg class=\"logo-light\" width=\"18\" height=\"18\" viewBox=\"9 9 35 35\" fill=\"none\" xmlns=\"http://www.w3.org/2000/svg\">\n      <path fill-rule=\"evenodd\" clip-rule=\"evenodd\" d=\"M42.8622 27.0064C42.8622 25.7839 42.7525 24.6084 42.5487 23.4799H26.3109V30.1568H35.5897C35.1821 32.3041 33.9596 34.1222 32.1258 35.3448V39.6864H37.7213C40.9814 36.677 42.8622 32.2571 42.8622 27.0064V27.0064Z\" fill=\"#4285F4\"/>\n      <path fill-rule=\"evenodd\" clip-rule=\"evenodd\" d=\"M26.3109 43.8555C30.9659 43.8555 34.8687 42.3195 37.7213 39.6863L32.1258 35.3447C30.5898 36.3792 28.6306 37.0061 26.3109 37.0061C21.8282 37.0061 18.0195 33.9811 16.6559 29.906H10.9194V34.3573C13.7563 39.9841 19.5712 43.8555 26.3109 43.8555V43.8555Z\" fill=\"#34A853\"/>\n      <path fill-rule=\"evenodd\" clip-rule=\"evenodd\" d=\"M16.6559 29.8904C16.3111 28.8559 16.1074 27.7588 16.1074 26.6146C16.1074 25.4704 16.3111 24.3733 16.6559 23.3388V18.8875H10.9194C9.74388 21.2072 9.06992 23.8247 9.06992 26.6146C9.06992 29.4045 9.74388 32.022 10.9194 34.3417L15.3864 30.8621L16.6559 29.8904V29.8904Z\" fill=\"#FBBC05\"/>\n      <path fill-rule=\"evenodd\" clip-rule=\"evenodd\" d=\"M26.3109 16.2386C28.85 16.2386 31.107 17.1164 32.9095 18.8091L37.8466 13.8719C34.853 11.082 30.9659 9.3736 26.3109 9.3736C19.5712 9.3736 13.7563 13.245 10.9194 18.8875L16.6559 23.3388C18.0195 19.2636 21.8282 16.2386 26.3109 16.2386V16.2386Z\" fill=\"#EA4335\"/>\n    </svg>\n    <svg class=\"logo-dark\" width=\"18\" height=\"18\" viewBox=\"0 0 48 48\" xmlns=\"http://www.w3.org/2000/svg\">\n      <circle cx=\"24\" cy=\"23\" fill=\"#FFF\" r=\"22\"/>\n      <path d=\"M33.76 34.26c2.75-2.56 4.49-6.37 4.49-11.26 0-.89-.08-1.84-.29-3H24.01v5.99h8.03c-.4 2.02-1.5 3.56-3.07 4.56v.75l3.91 2.97h.88z\" fill=\"#4285F4\"/>\n      <path d=\"M15.58 25.77A8.845 8.845 0 0 0 24 31.86c1.92 0 3.62-.46 4.97-1.31l4.79 3.71C31.14 36.7 27.65 38 24 38c-5.93 0-11.01-3.4-13.45-8.36l.17-1.01 4.06-2.85h.8z\" fill=\"#34A853\"/>\n      <path d=\"M15.59 20.21a8.864 8.864 0 0 0 0 5.58l-5.03 3.86c-.98-2-1.53-4.25-1.53-6.64 0-2.39.55-4.64 1.53-6.64l1-.22 3.81 2.98.22 1.08z\" fill=\"#FBBC05\"/>\n      <path d=\"M24 14.14c2.11 0 4.02.75 5.52 1.98l4.36-4.36C31.22 9.43 27.81 8 24 8c-5.93 0-11.01 3.4-13.45 8.36l5.03 3.85A8.86 8.86 0 0 1 24 14.14z\" fill=\"#EA4335\"/>\n    </svg>\n    <div class=\"gradient-container\"><div class=\"gradient\"></div></div>\n  </div>\n  <div class=\"carousel\">\n    <a class=\"chip\" href=\"https://vertexaisearch.cloud.google.com/grounding-api-redirect/AUZIYQGzx5_cMDXNkPI5b9_e8Af1QsHoF4vYKdC0_WLqLsRdKEjIdOrNaD9CGIi2jyyMSRsOyquOrOIdw7IBqjtsRBS8EDbB_sbS57aUgJskqw_VUyIVyHghWjHz0GmFjXRlnsJZJEGkDAdonz7R-NrBnjuMy_FdeT3242lHZvemu2xJf7vNIKZ552_aWi4L5iI28_s=\">Aetna CPB 0241</a>\n    <a class=\"chip\" href=\"https://vertexaisearch.cloud.google.com/grounding-api-redirect/AUZIYQHHKNc-Rapvm3iiYccsTaszpTQeQWwWMiBE1y9fao8CtV9fVtvt8bG84DoFkS7KRIYKVVT6_1tR9blovObuuVHxt1nX_VEA3K3byR-_LKLS69RerI8J1VuCdTybbI9JmCiixnSbEasYBRvKtM1Ib5RPLBrfVmQEYK3RuvprJQzN8jYnlwxv2cxtDnNiZbUGxjMx4qN0C_rbxUdCDqKbXNVvYVvHo9sIH1smvub4CAH8b4-sySdYTsBAxjc2o9GfGrcFGi0=\">Aetna medical necessity criteria total knee arthroplasty Florida</a>\n    <a class=\"chip\" href=\"https://vertexaisearch.cloud.google.com/grounding-api-redirect/AUZIYQGqETAL0sJyqvI-aFmM3gE3Z-rdFuN9ENtvYX1CYOBJRqf2ZxkEa4WjYAby75p7jP8fE9UelJi94s61ndzz1yyFIZWNAGuFRnhEgYCKezIMrSV8kpvpFIdng6ww6Nb5bkURFZoeIzdkZfFmaLtFM4P25oh1SSUzffDPygyUjsmKGQz-0DKZXx1zrtGR6neZJB6Qolg70syfK2H2KfnyRDTzo9aKhm2R3XxF6Q4pTzZpbQ7Gbvia8irU-l0=\">Aetna clinical policy total knee arthroplasty CPT 27447</a>\n    <a class=\"chip\" href=\"https://vertexaisearch.cloud.google.com/grounding-api-redirect/AUZIYQEkhUgnara-nJwJuux1lHN1k--HkBgn5NqRIIrQAHXl2GlQHH26Ok_7tKj3OhWI52V2jg9E1Pct8RtD2pvL7PKMQ7c0LcEiJLiVOxNAUgyIx9bKnbOcRg649txfSxD4qO-d-49YVWO818U9H6mFPegr_IbYysps1qTojSZyKxdJuMD_Omr28eHv3yCH9v_CijE4Wy4TRZQW-Nw0YTW-E3OBzlUv-oUb3LAT\">Aetna clinical policy knee arthroplasty</a>\n  </div>\n</div>\n"
+//             },
+//             "webSearchQueries": [
+//                 "Aetna clinical policy total knee arthroplasty CPT 27447",
+//                 "Aetna medical necessity criteria total knee arthroplasty Florida",
+//                 "Aetna clinical policy knee arthroplasty",
+//                 "Aetna CPB 0241"
+//             ]
+//         },
+//         "finishReason": "STOP",
+//         "usageMetadata": {
+//             "candidatesTokenCount": 846,
+//             "candidatesTokensDetails": [
+//                 {
+//                     "modality": "TEXT",
+//                     "tokenCount": 846
+//                 }
+//             ],
+//             "promptTokenCount": 873,
+//             "promptTokensDetails": [
+//                 {
+//                     "modality": "TEXT",
+//                     "tokenCount": 873
+//                 }
+//             ],
+//             "thoughtsTokenCount": 628,
+//             "toolUsePromptTokenCount": 178,
+//             "toolUsePromptTokensDetails": [
+//                 {
+//                     "modality": "TEXT",
+//                     "tokenCount": 178
+//                 }
+//             ],
+//             "totalTokenCount": 2525,
+//             "trafficType": "ON_DEMAND"
+//         },
+//         "invocationId": "e-a926fa2f-77e7-46a7-b08c-1e036b51db6e",
+//         "author": "PolicyScout",
+//         "actions": {
+//             "stateDelta": {},
+//             "artifactDelta": {},
+//             "requestedAuthConfigs": {},
+//             "requestedToolConfirmations": {}
+//         },
+//         "id": "660a6ed7-6b58-4b22-abf0-42d426cfcc20",
+//         "timestamp": 1770990858.004921
+//     },
+//     {
+//         "modelVersion": "gemini-2.5-pro",
+//         "content": {
+//             "parts": [
+//                 {
+//                     "text": "{\n  \"summary\": {\n    \"cpt_code\": \"27447\",\n    \"description\": \"Arthroplasty, knee, condyle and plateau; medial AND lateral compartments with or without patella resurfacing (total knee arthroplasty)\",\n    \"payer\": \"Aetna\",\n    \"overall_recommendation\": \"Hold - Missing Documentation\"\n  },\n  \"pre_certification_analysis\": {\n    \"pa_required\": \"Yes\",\n    \"authorization_type\": \"Precertification for Elective Inpatient Admission\",\n    \"estimated_tat_days\": \"7\"\n  },\n  \"state_policy_analysis\": {\n    \"state\": \"Florida\",\n    \"applicable_laws\": [\n      {\n        \"law_id\": \"Florida Statutes Chapter 641\",\n        \"description\": \"Requires health plans to provide treatment authorization 24/7 and establish written procedures for authorization requests.\"\n      },\n      {\n        \"law_id\": \"Florida Statutes Chapter 627\",\n        \"description\": \"Specifies a 5-business day turnaround time for non-urgent prior authorization decisions.\"\n      },\n      {\n        \"law_id\": \"CMS Guidelines for Florida (2025)\",\n        \"description\": \"Mandates electronic submission for all prior authorization requests starting in 2025.\"\n      }\n    ],\n    \"reviewer_requirement\": \"Not specified in provided documentation.\"\n  },\n  \"decision_tree_validation\": {\n    \"policy_id\": \"Aetna CPB 0660\",\n    \"policy_wording\": \"A Food and Drug Administration (FDA) approved total knee arthroplasty (TKA) prosthesis is considered medically necessary for adult members when specific criteria are met.\",\n    \"logic_path\": [\n      {\n        \"step\": 1,\n        \"criteria\": \"Advanced joint disease demonstrated by pain and functional disability from osteoarthritis.\",\n        \"patient_evidence\": \"Patient has progressively worsening right knee pain over more than two years, rated up to 9/10, with significant functional limitation affecting ambulation and activities of daily living.\",\n        \"satisfied\": true\n      },\n      {\n        \"step\": 2,\n        \"criteria\": \"Radiographic evidence of moderate/severe osteoarthritis (Kellgren-Lawrence Grade 3 or 4).\",\n        \"patient_evidence\": \"Radiographs show severe medial compartment joint space narrowing, consistent with end-stage degenerative joint disease (Kellgren-Lawrence Grade IV).\",\n        \"satisfied\": true\n      },\n      {\n        \"step\": 3,\n        \"criteria\": \"Inadequate response to conservative measures.\",\n        \"patient_evidence\": \"Patient has failed extensive conservative management including NSAIDs, physical therapy, bracing, activity modification, and corticosteroid injections over more than two years.\",\n        \"satisfied\": true\n      },\n      {\n        \"step\": 4,\n        \"criteria\": \"Absence of absolute contraindications, specifically no corticosteroid injection into the joint within 12 weeks of the planned arthroplasty.\",\n        \"patient_evidence\": \"Clinical notes confirm corticosteroid injections were administered, but the date of the last injection is not documented.\",\n        \"satisfied\": false\n      }\n    ]\n  },\n  \"gap_comparison_table\": [\n    {\n      \"requirement\": \"Advanced joint disease (pain and functional disability from osteoarthritis)\",\n      \"current_evidence\": \"Progressively worsening pain up to 9/10 over two years with significant functional limitation in ADLs.\",\n      \"status\": \"met\",\n      \"action_required\": null\n    },\n    {\n      \"requirement\": \"Radiographic evidence of severe osteoarthritis (Kellgren-Lawrence Grade 3 or 4)\",\n      \"current_evidence\": \"Radiographs show Kellgren-Lawrence Grade IV changes.\",\n      \"status\": \"met\",\n      \"action_required\": null\n    },\n    {\n      \"requirement\": \"Failure of conservative therapy\",\n      \"current_evidence\": \"Documented failure of extensive conservative management including NSAIDs, physical therapy, bracing, and injections.\",\n      \"status\": \"met\",\n      \"action_required\": null\n    },\n    {\n      \"requirement\": \"Absence of contraindication: No corticosteroid injection within 12 weeks of surgery.\",\n      \"current_evidence\": \"Notes confirm corticosteroid injections were part of failed conservative therapy, but the date of the last injection is not documented.\",\n      \"status\": \"gap\",\n      \"action_required\": \"Obtain and document the date of the last corticosteroid injection to confirm it was not administered within 12 weeks of the surgery date.\"\n    }\n  ],\n  \"final_recommendation\": {\n    \"decision\": \"DO_NOT_SUBMIT\",\n    \"primary_reason\": \"Missing documentation for the date of the last corticosteroid injection. Aetna policy (CPB 0660) lists a steroid injection within 12 weeks of surgery as an absolute contraindication. The current notes do not provide the date of the last injection, creating a high risk of denial.\",\n    \"risk_of_denial\": \"High\",\n    \"next_steps\": [\n      \"Hold submission of the claim.\",\n      \"Review patient's detailed medication and procedure history to find the date of the last corticosteroid injection.\",\n      \"Provide an addendum to the clinical notes specifying the date of the last injection, ensuring it was administered more than 12 weeks prior to the total knee arthroplasty.\"\n    ]\n  }\n}"
+//                 }
+//             ],
+//             "role": "model"
+//         },
+//         "finishReason": "STOP",
+//         "usageMetadata": {
+//             "candidatesTokenCount": 1225,
+//             "candidatesTokensDetails": [
+//                 {
+//                     "modality": "TEXT",
+//                     "tokenCount": 1225
+//                 }
+//             ],
+//             "promptTokenCount": 2256,
+//             "promptTokensDetails": [
+//                 {
+//                     "modality": "TEXT",
+//                     "tokenCount": 2256
+//                 }
+//             ],
+//             "thoughtsTokenCount": 1790,
+//             "totalTokenCount": 5271,
+//             "trafficType": "ON_DEMAND"
+//         },
+//         "avgLogprobs": -0.3263682338169643,
+//         "invocationId": "e-a926fa2f-77e7-46a7-b08c-1e036b51db6e",
+//         "author": "IntakeArchitect",
+//         "actions": {
+//             "stateDelta": {
+//                 "final_prior_auth_json": {
+//                     "summary": {
+//                         "cpt_code": "27447",
+//                         "description": "Arthroplasty, knee, condyle and plateau; medial AND lateral compartments with or without patella resurfacing (total knee arthroplasty)",
+//                         "payer": "Aetna",
+//                         "overall_recommendation": "Hold - Missing Documentation"
+//                     },
+//                     "pre_certification_analysis": {
+//                         "pa_required": "Yes",
+//                         "authorization_type": "Precertification for Elective Inpatient Admission",
+//                         "estimated_tat_days": "7"
+//                     },
+//                     "state_policy_analysis": {
+//                         "state": "Florida",
+//                         "applicable_laws": [
+//                             {
+//                                 "law_id": "Florida Statutes Chapter 641",
+//                                 "description": "Requires health plans to provide treatment authorization 24/7 and establish written procedures for authorization requests."
+//                             },
+//                             {
+//                                 "law_id": "Florida Statutes Chapter 627",
+//                                 "description": "Specifies a 5-business day turnaround time for non-urgent prior authorization decisions."
+//                             },
+//                             {
+//                                 "law_id": "CMS Guidelines for Florida (2025)",
+//                                 "description": "Mandates electronic submission for all prior authorization requests starting in 2025."
+//                             }
+//                         ],
+//                         "reviewer_requirement": "Not specified in provided documentation."
+//                     },
+//                     "decision_tree_validation": {
+//                         "policy_id": "Aetna CPB 0660",
+//                         "policy_wording": "A Food and Drug Administration (FDA) approved total knee arthroplasty (TKA) prosthesis is considered medically necessary for adult members when specific criteria are met.",
+//                         "logic_path": [
+//                             {
+//                                 "step": 1,
+//                                 "criteria": "Advanced joint disease demonstrated by pain and functional disability from osteoarthritis.",
+//                                 "patient_evidence": "Patient has progressively worsening right knee pain over more than two years, rated up to 9/10, with significant functional limitation affecting ambulation and activities of daily living.",
+//                                 "satisfied": true
+//                             },
+//                             {
+//                                 "step": 2,
+//                                 "criteria": "Radiographic evidence of moderate/severe osteoarthritis (Kellgren-Lawrence Grade 3 or 4).",
+//                                 "patient_evidence": "Radiographs show severe medial compartment joint space narrowing, consistent with end-stage degenerative joint disease (Kellgren-Lawrence Grade IV).",
+//                                 "satisfied": true
+//                             },
+//                             {
+//                                 "step": 3,
+//                                 "criteria": "Inadequate response to conservative measures.",
+//                                 "patient_evidence": "Patient has failed extensive conservative management including NSAIDs, physical therapy, bracing, activity modification, and corticosteroid injections over more than two years.",
+//                                 "satisfied": true
+//                             },
+//                             {
+//                                 "step": 4,
+//                                 "criteria": "Absence of absolute contraindications, specifically no corticosteroid injection into the joint within 12 weeks of the planned arthroplasty.",
+//                                 "patient_evidence": "Clinical notes confirm corticosteroid injections were administered, but the date of the last injection is not documented.",
+//                                 "satisfied": false
+//                             }
+//                         ]
+//                     },
+//                     "gap_comparison_table": [
+//                         {
+//                             "requirement": "Advanced joint disease (pain and functional disability from osteoarthritis)",
+//                             "current_evidence": "Progressively worsening pain up to 9/10 over two years with significant functional limitation in ADLs.",
+//                             "status": "met"
+//                         },
+//                         {
+//                             "requirement": "Radiographic evidence of severe osteoarthritis (Kellgren-Lawrence Grade 3 or 4)",
+//                             "current_evidence": "Radiographs show Kellgren-Lawrence Grade IV changes.",
+//                             "status": "met"
+//                         },
+//                         {
+//                             "requirement": "Failure of conservative therapy",
+//                             "current_evidence": "Documented failure of extensive conservative management including NSAIDs, physical therapy, bracing, and injections.",
+//                             "status": "met"
+//                         },
+//                         {
+//                             "requirement": "Absence of contraindication: No corticosteroid injection within 12 weeks of surgery.",
+//                             "current_evidence": "Notes confirm corticosteroid injections were part of failed conservative therapy, but the date of the last injection is not documented.",
+//                             "status": "gap",
+//                             "action_required": "Obtain and document the date of the last corticosteroid injection to confirm it was not administered within 12 weeks of the surgery date."
+//                         }
+//                     ],
+//                     "final_recommendation": {
+//                         "decision": "DO_NOT_SUBMIT",
+//                         "primary_reason": "Missing documentation for the date of the last corticosteroid injection. Aetna policy (CPB 0660) lists a steroid injection within 12 weeks of surgery as an absolute contraindication. The current notes do not provide the date of the last injection, creating a high risk of denial.",
+//                         "risk_of_denial": "High",
+//                         "next_steps": [
+//                             "Hold submission of the claim.",
+//                             "Review patient's detailed medication and procedure history to find the date of the last corticosteroid injection.",
+//                             "Provide an addendum to the clinical notes specifying the date of the last injection, ensuring it was administered more than 12 weeks prior to the total knee arthroplasty."
+//                         ]
+//                     }
+//                 }
+//             },
+//             "artifactDelta": {},
+//             "requestedAuthConfigs": {},
+//             "requestedToolConfirmations": {}
+//         },
+//         "id": "7ebd955d-e172-4724-a9a8-dfdba3fa2b65",
+//         "timestamp": 1770990868.986844
+//     }
+// ]
   // 3. Find the Final Agent Output
   const finalEvent = events.reverse().find((e: any) =>
     e.actions && e.actions.stateDelta && e.actions.stateDelta.final_prior_auth_json
@@ -116,7 +861,7 @@ async function callPriorAuthAgent(payload: { cpt: string; payer: string; state: 
     throw new Error("No final_prior_auth_json found in agent response");
   }
 
-  const result = finalEvent.actions.stateDelta.final_prior_auth_json;
+  const result:any = finalEvent.actions.stateDelta.final_prior_auth_json;
   // The result may be a string (JSON) or already parsed
   return typeof result === "string" ? JSON.parse(result) : result;
 }
@@ -144,13 +889,13 @@ const initialSteps: WorkflowStep[] = [
     status: "pending",
     canEdit: false,
   },
-  {
-    id: "gap-analysis",
-    title: "Gap Analysis & Review",
-    description: "Clinical audit & gaps",
-    status: "pending",
-    canEdit: false,
-  },
+  // {
+  //   id: "gap-analysis",
+  //   title: "Gap Analysis & Review",
+  //   description: "Clinical audit & gaps",
+  //   status: "pending",
+  //   canEdit: false,
+  // },
   {
     id: "submit-to-payer",
     title: "Submit to Payer",
@@ -171,6 +916,7 @@ interface PreAuthProviderWorkflowProps {
     payerName: string;
     procedureCode?: string;
     procedureName?: string;
+    hasGaps?: boolean;
   };
 }
 
@@ -178,7 +924,7 @@ export function PreAuthProviderWorkflow({ caseData }: PreAuthProviderWorkflowPro
   const { caseId } = useParams();
   const [currentStep, setCurrentStep] = useState("eligibility");
   const [steps, setSteps] = useState<WorkflowStep[]>(initialSteps);
-  const [agentData, setAgentData] = useState<PriorAuthAgentResponse | null>(null);
+  const [agentData, setAgentData] = useState<PriorAuthAgentResponse | null>();
   const [agentLoading, setAgentLoading] = useState(false);
   const [agentError, setAgentError] = useState<string | null>(null);
   const [editingStep, setEditingStep] = useState<string | null>(null);
@@ -191,13 +937,17 @@ export function PreAuthProviderWorkflow({ caseData }: PreAuthProviderWorkflowPro
     "eligibility" | "document-analysis" | "unlocked" | "complete"
   >("eligibility");
 
-  // Document summary - matches the AI Patient Summary format from ClinicalIntakeHeader
-  const patientAge = caseData.dateOfBirth ? `${new Date().getFullYear() - new Date(caseData.dateOfBirth).getFullYear()}-year-old` : "";
-  const clinicalProfile = getClinicalData(caseId || "CASE-001");
-  const documentSummary = clinicalProfile.summaryTemplate(caseData.patientName, patientAge, caseData.procedureName || "requested procedure", caseData.procedureCode || "N/A");
+  // Fetch case data from mockCases based on caseId
+  const matchedCase: Case | undefined = caseId ? getCaseById(caseId) : undefined;
+  // Use fetched case data, fallback to caseData prop if not found
+  const activeCase = matchedCase || caseData;
 
+  // Document summary available after analysis phase
+  const documentSummary = getCaseById(caseId)?.documentSummary || "";
+  
+  // const documentSummary = `Patient documentation includes comprehensive clinical notes from ${activeCase.orderingProvider} documenting progressive knee condition with failed conservative management. Imaging studies confirm significant findings. Physical therapy records show treatment with limited improvement. All documentation supports medical necessity for ${activeCase.procedureName || "requested procedure"}.`;
   // Determine if this case has gaps based on caseId
-  const caseHasGaps = caseId === "CASE-001";
+  const caseHasGaps = caseId === "CASE-001" || activeCase.hasGaps;
 
   // Auto-run only eligibility and document analysis, then unlock manual navigation
   useEffect(() => {
@@ -355,13 +1105,14 @@ export function PreAuthProviderWorkflow({ caseData }: PreAuthProviderWorkflowPro
     try {
       // Build clinical notes from document summary and patient metadata
       const clinicalNotes = documentSummary;
-      const patientMeta = `Patient: ${caseData.patientName}, DOB: ${caseData.dateOfBirth}, ID: ${caseData.patientId}, Encounter: ${caseData.encounterType}, Provider: ${caseData.orderingProvider}`;
+      const patientMeta = `Patient: ${activeCase.patientName}, DOB: ${activeCase.dateOfBirth}, ID: ${activeCase.patientId}, Encounter: ${activeCase.encounterType}, Provider: ${activeCase.orderingProvider}`;
 
       const result = await callPriorAuthAgent({
-        cpt: caseData.procedureCode || "29881",
-        payer: caseData.payerName,
+        cpt: activeCase.procedureCode || "29881",
+        payer: activeCase.payerName,
         state: "Florida",
-        notes: `${patientMeta}. Procedure: ${caseData.procedureName || ""}. Clinical Notes: ${clinicalNotes}`,
+        notes: documentSummary,
+        // notes: `${patientMeta}. Procedure: ${activeCase.procedureName || ""}. Clinical Notes: ${documentSummary}`,
       });
       setAgentData(result);
 
@@ -409,7 +1160,7 @@ export function PreAuthProviderWorkflow({ caseData }: PreAuthProviderWorkflowPro
             isEditing={editingStep === "prior-auth-decision"}
             onSave={() => handleSaveCorrection("prior-auth-decision")}
             onCancel={handleCancelEdit}
-            onComplete={() => setCurrentStep("gap-analysis")}
+            onComplete={() => setCurrentStep("submit-to-payer")}
             agentData={agentData}
             agentLoading={agentLoading}
             agentError={agentError}
@@ -733,10 +1484,8 @@ function DocumentAnalysisSection({ isEditing, onSave, onCancel, onComplete, case
     { name: "Injection Records (3x)", date: "2023-12-15", status: "analyzed" },
   ];
 
-  const patientAge = caseData.dateOfBirth ? `${new Date().getFullYear() - new Date(caseData.dateOfBirth).getFullYear()}-year-old` : "";
-  const clinicalProfile2 = getClinicalData(caseId || "CASE-001");
-  const documentSummary = clinicalProfile2.summaryTemplate(caseData.patientName, patientAge, caseData.procedureName || "requested procedure", caseData.procedureCode || "N/A");
-
+  // const documentSummary = `Patient documentation includes comprehensive clinical notes documenting progressive knee condition with failed conservative management. Imaging studies (X-ray and MRI) confirm significant findings with joint space narrowing. Physical therapy records show 12 weeks of treatment with limited improvement. Three corticosteroid injections administered over 6 months provided temporary relief only. All documentation supports medical necessity for the requested procedure.`;
+const documentSummary = getCaseById(caseId)?.documentSummary || "";
   const handleAnalyze = () => {
     setIsAnalyzing(true);
     setTimeout(() => {
@@ -847,7 +1596,7 @@ function PriorAuthDecisionSection({ isEditing, onSave, onCancel, onComplete, age
   const data = agentData;
   const hasResults = !!data;
 
-  const metCount = data ? data.decision_tree_validation.logic_path.filter((s) => s.patient_data_meets).length : 0;
+  const metCount = data ? data.decision_tree_validation.logic_path.filter((s) => s.patient_evidence).length : 0;
   const totalSteps = data ? data.decision_tree_validation.logic_path.length : 0;
 
   return (
@@ -862,7 +1611,7 @@ function PriorAuthDecisionSection({ isEditing, onSave, onCancel, onComplete, age
       <h3 className="text-lg font-semibold text-foreground mb-1">Prior Auth Readiness Check</h3>
       {data && (
         <p className="text-sm text-muted-foreground mb-6">
-          CPT {data.summary.cpt_code} — {data.summary.procedure_description}
+          CPT {data.summary.cpt_code} — {data.summary.description}
         </p>
       )}
 
@@ -956,10 +1705,10 @@ function PriorAuthDecisionSection({ isEditing, onSave, onCancel, onComplete, age
                     <div>
                       <p className="text-sm font-medium text-foreground">{law.law_name}</p>
                       <p className="text-xs text-muted-foreground mt-1">{law.description}</p>
-                      <p className="text-xs text-primary mt-1.5">
+                      {/* <p className="text-xs text-primary mt-1.5">
                         <Sparkles className="h-3 w-3 inline mr-1" />
                         Impact: {law.impact}
-                      </p>
+                      </p> */}
                     </div>
                   </div>
                 </div>
@@ -988,11 +1737,11 @@ function PriorAuthDecisionSection({ isEditing, onSave, onCancel, onComplete, age
               "{data.decision_tree_validation.policy_wording}"
             </p>
             <div className="space-y-2 ml-8">
-              {data.decision_tree_validation.logic_path.map((step) => (
+              {data.decision_tree_validation.logic_path.map((step:any,index) => (
                 <div key={step.step} className="p-3 rounded-lg bg-background/50 border border-border/50">
                   <div className="flex items-start gap-3">
                     <div className="mt-0.5">
-                      {step.patient_data_meets ? (
+                      {step.patient_evidence ? (
                         <CheckCircle2 className="h-4 w-4 text-success" />
                       ) : (
                         <XCircle className="h-4 w-4 text-destructive" />
@@ -1001,18 +1750,68 @@ function PriorAuthDecisionSection({ isEditing, onSave, onCancel, onComplete, age
                     <div className="flex-1">
                       <div className="flex items-center gap-2">
                         <span className="text-xs font-semibold text-muted-foreground">Step {step.step}</span>
-                        <Badge
+                        {/* <Badge
                           variant="outline"
-                          className={`text-xs ${step.patient_data_meets ? "border-success/30 text-success" : "border-destructive/30 text-destructive"}`}
+                          className={`text-xs ${data?.gap_comparison_table[index]?.status === "met" ? "border-success/30 text-success" : "border-destructive/30 text-destructive"}`}
                         >
-                          {step.patient_data_meets ? "Criteria Met" : "Not Met"}
-                        </Badge>
+                          {data?.gap_comparison_table[index]?.status.charAt(0).toUpperCase() + data?.gap_comparison_table[index]?.status.slice(1)}
+                        </Badge> */}
                       </div>
                       <p className="text-sm text-foreground mt-1">{step.criteria}</p>
                       <p className="text-xs text-muted-foreground mt-1">
                         <CircleDot className="h-3 w-3 inline mr-1" />
-                        {step.evidence}
+                        {step.evidence} {step?.patient_evidence || step?.patient_data}
                       </p>
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </Card>
+
+          {/* ── Gap Comparison Table ── */}
+          <Card className="p-4 bg-secondary/30 border-border/50">
+            <div className="flex items-center gap-2 mb-2">
+              <div className="h-6 w-6 rounded-full bg-primary/20 flex items-center justify-center">
+                <ClipboardList className="h-3 w-3 text-primary" />
+              </div>
+              <h4 className="text-sm font-medium text-foreground">Gap Comparison Table</h4>
+              <Badge variant="outline" className="ml-auto text-xs">
+                {data.gap_comparison_table.length} items
+              </Badge>
+            </div>
+            <div className="space-y-2 ml-8">
+              {data.gap_comparison_table.map((item, idx) => (
+                <div key={`${item.requirement}-${idx}`} className="p-3 rounded-lg bg-background/50 border border-border/50">
+                  <div className="flex items-start gap-3">
+                    <div className="mt-0.5">
+                      {item.status === "met" ? (
+                        <ThumbsUp className="h-4 w-4 text-success" />
+                      ) : (
+                        <ThumbsDown className="h-4 w-4 text-destructive" />
+                      )}
+                    </div>
+                    <div className="flex-1">
+                      <div className="flex items-center gap-2">
+                        <span className="text-xs font-semibold text-muted-foreground">Requirement</span>
+                        <Badge
+                          variant="outline"
+                          className={`text-xs ${item.status === "met" ? "border-success/30 text-success" : "border-destructive/30 text-destructive"}`}
+                        >
+                          {item.status.charAt(0).toUpperCase() + item.status.slice(1)}
+                        </Badge>
+                      </div>
+                      <p className="text-sm text-foreground mt-1">{item.requirement}</p>
+                      <p className="text-xs text-muted-foreground mt-1">
+                        <CircleDot className="h-3 w-3 inline mr-1" />
+                        {item.current_evidence}
+                      </p>
+                      {item.action_required && (
+                        <p className="text-xs text-warning mt-2">
+                          <AlertTriangle className="h-3 w-3 inline mr-1" />
+                          {item.action_required}
+                        </p>
+                      )}
                     </div>
                   </div>
                 </div>
@@ -1084,7 +1883,7 @@ function PriorAuthDecisionSection({ isEditing, onSave, onCancel, onComplete, age
         onComplete && (
           <div className="flex justify-end mt-6 pt-4 border-t border-border">
             <Button onClick={onComplete}>
-              Proceed to Gap Analysis
+              Proceed to Submit to payer
               <ArrowRight className="h-4 w-4 ml-2" />
             </Button>
           </div>
@@ -1314,7 +2113,7 @@ function GapAnalysisSection({ onProceed, onEditStep, corrections, hasGaps, agent
               onClick={() => {
                 const subject = encodeURIComponent("Prior Authorization - Additional Documentation Required");
                 const body = encodeURIComponent(
-                  `Dear Dr.,\n\nWe are processing a prior authorization request for CPT ${data?.summary.cpt_code || ""} (${data?.summary.procedure_description || ""}).\n\nThe following items require attention:\n\n${issueItems.map((item, i) => `${i + 1}. [${item.status}] ${item.requirement}\n   Action: ${item.action_required || "N/A"}`).join("\n\n")}\n\nPlease provide the required documentation at your earliest convenience.\n\nThank you.`,
+                  `Dear Dr.,\n\nWe are processing a prior authorization request for CPT ${data?.summary.cpt_code || ""} (${data?.summary.description || ""}).\n\nThe following items require attention:\n\n${issueItems.map((item, i) => `${i + 1}. [${item.status}] ${item.requirement}\n   Action: ${item.action_required || "N/A"}`).join("\n\n")}\n\nPlease provide the required documentation at your earliest convenience.\n\nThank you.`,
                 );
                 window.location.href = `mailto:?subject=${subject}&body=${body}`;
               }}

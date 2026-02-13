@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
@@ -27,6 +27,7 @@ import {
   ClipboardList
 } from "lucide-react";
 import { toast } from "sonner";
+import { format } from "date-fns";
 
 const payerOptions = [
   "Blue Cross Blue Shield",
@@ -77,6 +78,7 @@ export default function NewCase() {
   const [icdInput, setIcdInput] = useState("");
   const [selectedDocType, setSelectedDocType] = useState("");
   const [uploadedDocuments, setUploadedDocuments] = useState<UploadedDocument[]>([]);
+  const maxDob = useMemo(() => format(new Date(), "yyyy-MM-dd"), []);
 
   const handleInputChange = (field: string, value: string) => {
     setFormData(prev => ({ ...prev, [field]: value }));
@@ -128,20 +130,55 @@ export default function NewCase() {
     return (bytes / (1024 * 1024)).toFixed(1) + " MB";
   };
 
+  // Helper to save new case to localStorage
+  function saveNewCaseToLocalStorage(newCase: any) {
+    try {
+      const local = localStorage.getItem("userCases");
+      const cases = local ? JSON.parse(local) : [];
+      cases.push(newCase);
+      localStorage.setItem("userCases", JSON.stringify(cases));
+    } catch {}
+  }
+
+  // Required fields check
+  const requiredFieldsFilled =
+    formData.memberId && formData.memberName && formData.dob && formData.payerName;
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    
-    // Validation
-    if (!formData.memberId || !formData.memberName || !formData.dob || !formData.payerName) {
+    if (!requiredFieldsFilled) {
       toast.error("Please fill in all required fields");
       return;
     }
-
+    const parsedDob = new Date(formData.dob);
+    if (Number.isNaN(parsedDob.getTime())) {
+      toast.error("Please enter a valid date of birth");
+      return;
+    }
+    if (parsedDob.getTime() > Date.now()) {
+      toast.error("Date of birth cannot be in the future");
+      return;
+    }
     setIsSubmitting(true);
-    
-    // Simulate API call
-    await new Promise(resolve => setTimeout(resolve, 1500));
-    
+    // Build new case object
+    const newCase = {
+      id: `CASE-${Date.now()}`,
+      patientId: formData.memberId,
+      patientName: formData.memberName,
+      dateOfBirth: formData.dob,
+      payerName: formData.payerName,
+      groupId: formData.groupNumber || undefined,
+      status: "New",
+      priority: "Medium",
+      lastUpdated: new Date().toISOString(),
+      procedureCode: formData.cptCode || undefined,
+      procedureName: formData.description || undefined,
+      hasGaps: false,
+      documentSummary: undefined,
+      encounterType: "Outpatient",
+    };
+    saveNewCaseToLocalStorage(newCase);
+    await new Promise(resolve => setTimeout(resolve, 1000));
     toast.success("Case created successfully!");
     navigate("/dashboard");
   };
@@ -217,6 +254,7 @@ export default function NewCase() {
                   id="dob"
                   type="date"
                   value={formData.dob}
+                  max={maxDob}
                   onChange={(e) => handleInputChange("dob", e.target.value)}
                   required
                 />
@@ -440,7 +478,7 @@ export default function NewCase() {
             >
               Cancel
             </Button>
-            <Button type="submit" disabled={isSubmitting}>
+            <Button type="submit" disabled={isSubmitting || !requiredFieldsFilled}>
               {isSubmitting ? "Creating Case..." : "Create Case"}
             </Button>
           </div>

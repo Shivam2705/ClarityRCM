@@ -1,4 +1,4 @@
-import { useState } from "react";
+import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { DashboardHeader } from "@/components/dashboard/DashboardHeader";
 import { PersonaToggle, Persona } from "@/components/dashboard/PersonaToggle";
@@ -15,7 +15,36 @@ export default function Dashboard() {
   const [searchQuery, setSearchQuery] = useState("");
   const navigate = useNavigate();
 
-  const filteredCases = mockCases.filter(
+  // Load cases from localStorage
+  function getLocalCases(): Case[] {
+    try {
+      const local = localStorage.getItem("userCases");
+      if (!local) return [];
+      return JSON.parse(local);
+    } catch {
+      return [];
+    }
+  }
+
+  // Use state for local cases
+  const [localCases, setLocalCases] = useState<Case[]>(getLocalCases());
+
+  // Refresh local cases on mount and when page regains focus
+  React.useEffect(() => {
+    function refreshCases() {
+      setLocalCases(getLocalCases());
+    }
+    window.addEventListener("visibilitychange", refreshCases);
+    refreshCases();
+    return () => {
+      window.removeEventListener("visibilitychange", refreshCases);
+    };
+  }, []);
+
+  // Combine mockCases and localStorage cases
+  const allCases: Case[] = [...mockCases, ...localCases];
+
+  const filteredCases = allCases.filter(
     (c) =>
       c.patientName.toLowerCase().includes(searchQuery.toLowerCase()) ||
       c.patientId.toLowerCase().includes(searchQuery.toLowerCase()) ||
@@ -23,14 +52,14 @@ export default function Dashboard() {
   );
 
   const statusCounts = {
-    all: mockCases.length,
-    new: mockCases.filter((c) => c.status === "New").length,
-    eligible: mockCases.filter((c) => c.status === "Eligible").length,
-    eligiblePaReq: mockCases.filter((c) => c.status === "Eligible PA Req").length,
-    notEligible: mockCases.filter((c) => c.status === "Not Eligible").length,
-    paReview: mockCases.filter((c) => c.status === "PA Review").length,
-    paSubmitted: mockCases.filter((c) => c.status === "PA Submitted").length,
-    paDenied: mockCases.filter((c) => c.status === "PA Denied").length,
+    all: allCases.length,
+    new: allCases.filter((c) => c.status === "New").length,
+    eligible: allCases.filter((c) => c.status === "Eligible").length,
+    eligiblePaReq: allCases.filter((c) => c.status === "Eligible PA Req").length,
+    notEligible: allCases.filter((c) => c.status === "Not Eligible").length,
+    paReview: allCases.filter((c) => c.status === "PA Review").length,
+    paSubmitted: allCases.filter((c) => c.status === "PA Submitted").length,
+    paDenied: allCases.filter((c) => c.status === "PA Denied").length,
   };
 
   const handleCaseClick = (caseData: Case) => {

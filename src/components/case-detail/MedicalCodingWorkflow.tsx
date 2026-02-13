@@ -1,4 +1,6 @@
 import { useState } from "react";
+import { useParams } from "react-router-dom";
+import { callMedicalCodingApi } from "@/services/medicalCodingApi";
 import { StatusBadge } from "@/components/ui/status-badge";
 import { ConfidenceIndicator } from "@/components/ui/confidence-indicator";
 import { AgentStatus } from "@/components/ui/agent-status";
@@ -50,7 +52,8 @@ const complianceChecks = [
   { check: "Medical Necessity", status: "warning", detail: "WOMAC score documentation recommended" },
 ];
 
-export function MedicalCodingWorkflow() {
+export function MedicalCodingWorkflow({ aiSummary }: { aiSummary: string }) {
+    const { caseId } = useParams();
   const [expandedGroups, setExpandedGroups] = useState<string[]>(["27447", "99223"]);
   const [editingCode, setEditingCode] = useState<string | null>(null);
   const [editValues, setEditValues] = useState<{ code: string; description: string }>({ code: "", description: "" });
@@ -69,6 +72,25 @@ export function MedicalCodingWorkflow() {
     setEditValues({ code: "", description: "" });
   };
 
+  // State for run/rerun button
+  const [hasRun, setHasRun] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const [apiResult, setApiResult] = useState<any>(null);
+
+
+  const handleRun = async () => {
+    setLoading(true);
+    setApiResult(null);
+    try {
+      const result = await callMedicalCodingApi(aiSummary);
+      setApiResult(result);
+    } catch (err) {
+      setApiResult({ error: err?.message || "Unknown error" });
+    }
+    setHasRun(true);
+    setLoading(false);
+  };
+
   return (
     <div className="grid gap-6 lg:grid-cols-12">
       {/* Left Column */}
@@ -80,121 +102,111 @@ export function MedicalCodingWorkflow() {
 
       {/* Middle Column - Coding Suggestions */}
       <div className="lg:col-span-5 space-y-6">
-        <div className="flex items-center justify-between">
+        <div className="flex items-center justify-between gap-2">
           <h3 className="text-lg font-semibold text-foreground">Coding Suggestions</h3>
-          <AgentStatus name="Coding Agent" state="completed" />
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={handleRun}
+            disabled={loading}
+            className="ml-2"
+          >
+            {loading ? (
+              <span className="flex items-center"><Loader2 className="h-4 w-4 animate-spin mr-1" />{hasRun ? "Rerunning..." : "Running..."}</span>
+            ) : (
+              hasRun ? "Rerun" : "Run"
+            )}
+          </Button>
         </div>
+        {hasRun && (
+          <div className="mt-4 p-3 rounded bg-muted border">
+            <h5 className="font-medium mb-2">API Response:</h5>
+          </div>
+        )}
 
         <div className="space-y-5">
-          {mockCPTGroups.map((group) => {
-            const isExpanded = expandedGroups.includes(group.cpt.code);
-            return (
-              <div key={group.cpt.code} className="rounded-xl border bg-card overflow-hidden">
-                {/* CPT Header */}
-                <button
-                  onClick={() => toggleGroup(group.cpt.code)}
-                  className="w-full flex items-start gap-3 p-4 text-left hover:bg-muted/30 transition-colors"
-                >
-                  <div className="mt-0.5">
-                    {isExpanded ? <ChevronDown className="h-4 w-4 text-muted-foreground" /> : <ChevronRight className="h-4 w-4 text-muted-foreground" />}
-                  </div>
-                  <div className="flex-1 min-w-0">
-                    <div className="flex items-center gap-2 mb-1">
-                      <span className="px-2 py-0.5 rounded text-xs font-medium bg-success/10 text-success">CPT</span>
-                      {editingCode === group.cpt.code ? (
-                        <div className="flex items-center gap-2 flex-1" onClick={e => e.stopPropagation()}>
-                          <Input value={editValues.code} onChange={e => setEditValues(prev => ({ ...prev, code: e.target.value }))} className="h-7 w-24 font-mono text-sm" />
-                          <Input value={editValues.description} onChange={e => setEditValues(prev => ({ ...prev, description: e.target.value }))} className="h-7 flex-1 text-sm" />
-                          <Button variant="ghost" size="sm" onClick={cancelEdit} className="h-7 w-7 p-0"><X className="h-3 w-3" /></Button>
-                          <Button variant="default" size="sm" onClick={cancelEdit} className="h-7 w-7 p-0"><Save className="h-3 w-3" /></Button>
-                        </div>
-                      ) : (
-                        <>
-                          <span className="font-mono font-semibold text-foreground">{group.cpt.code}</span>
-                          <span className="text-sm text-muted-foreground">— {group.cpt.description}</span>
-                        </>
-                      )}
-                    </div>
-                    <div className="flex items-center gap-3 mt-1">
-                      <ConfidenceIndicator value={group.cpt.confidence} size="sm" />
-                      <span className="text-xs text-muted-foreground">
-                        <Link2 className="h-3 w-3 inline mr-1" />{group.icdCodes.length} linked ICD-10 codes
-                      </span>
-                    </div>
-                  </div>
-                  {editingCode !== group.cpt.code && (
-                    <Button variant="ghost" size="sm" className="shrink-0" onClick={(e) => { e.stopPropagation(); startEdit(group.cpt.code, group.cpt.description); }}>
-                      <Edit3 className="h-3.5 w-3.5" />
-                    </Button>
-                  )}
-                </button>
-
-                {/* AI Reasoning for CPT */}
-                {isExpanded && (
-                  <div className="px-4 pb-3">
-                    <div className="ml-7 p-3 rounded-lg bg-primary/5 border border-primary/10">
-                      <div className="flex items-center gap-1.5 mb-1.5">
-                        <Brain className="h-3.5 w-3.5 text-primary" />
-                        <span className="text-xs font-medium text-primary">AI Reasoning</span>
+          {hasRun && apiResult && Array.isArray(apiResult) && apiResult.length > 0
+            ? apiResult.map((item, idx) => {
+                const isExpanded = expandedGroups.includes(item.cpt_code);
+                return (
+                  <div key={item.cpt_code} className="rounded-xl border bg-card overflow-hidden">
+                    {/* CPT Header */}
+                    <button
+                      onClick={() => toggleGroup(item.cpt_code)}
+                      className="w-full flex items-start gap-3 p-4 text-left hover:bg-muted/30 transition-colors"
+                    >
+                      <div className="mt-0.5">
+                        {isExpanded ? <ChevronDown className="h-4 w-4 text-muted-foreground" /> : <ChevronRight className="h-4 w-4 text-muted-foreground" />}
                       </div>
-                      <p className="text-xs text-muted-foreground leading-relaxed">{group.cpt.reasoning}</p>
-                    </div>
-                  </div>
-                )}
-
-                {/* Linked ICD-10 Codes */}
-                {isExpanded && (
-                  <div className="border-t">
-                    <div className="px-4 py-2 bg-muted/30">
-                      <span className="text-xs font-medium text-muted-foreground uppercase tracking-wider">Linked ICD-10 Codes</span>
-                    </div>
-                    <div className="divide-y">
-                      {group.icdCodes.map((icd) => (
-                        <div key={icd.code} className="px-4 py-3 hover:bg-muted/20 transition-colors">
-                          <div className="ml-7">
-                            <div className="flex items-center justify-between mb-1">
-                              <div className="flex items-center gap-2">
-                                <span className="px-2 py-0.5 rounded text-xs font-medium bg-info/10 text-info">ICD-10</span>
-                                {editingCode === icd.code ? (
-                                  <div className="flex items-center gap-2" onClick={e => e.stopPropagation()}>
-                                    <Input value={editValues.code} onChange={e => setEditValues(prev => ({ ...prev, code: e.target.value }))} className="h-7 w-24 font-mono text-sm" />
-                                    <Input value={editValues.description} onChange={e => setEditValues(prev => ({ ...prev, description: e.target.value }))} className="h-7 w-48 text-sm" />
-                                    <Button variant="ghost" size="sm" onClick={cancelEdit} className="h-7 w-7 p-0"><X className="h-3 w-3" /></Button>
-                                    <Button variant="default" size="sm" onClick={cancelEdit} className="h-7 w-7 p-0"><Save className="h-3 w-3" /></Button>
-                                  </div>
-                                ) : (
-                                  <>
-                                    <span className="font-mono font-semibold text-sm text-foreground">{icd.code}</span>
-                                    <span className="text-sm text-muted-foreground">— {icd.description}</span>
-                                  </>
-                                )}
-                              </div>
-                              <div className="flex items-center gap-2">
-                                <ConfidenceIndicator value={icd.confidence} size="sm" />
-                                {editingCode !== icd.code && (
-                                  <Button variant="ghost" size="sm" className="h-7 w-7 p-0" onClick={() => startEdit(icd.code, icd.description)}>
-                                    <Edit3 className="h-3 w-3" />
-                                  </Button>
-                                )}
-                              </div>
-                            </div>
-                            {/* AI Reasoning for ICD */}
-                            <div className="mt-2 p-2.5 rounded-md bg-muted/50 border">
-                              <div className="flex items-center gap-1.5 mb-1">
-                                <Brain className="h-3 w-3 text-muted-foreground" />
-                                <span className="text-[10px] font-medium text-muted-foreground uppercase tracking-wider">Reasoning</span>
-                              </div>
-                              <p className="text-xs text-muted-foreground leading-relaxed">{icd.reasoning}</p>
-                            </div>
-                          </div>
+                      <div className="flex-1 min-w-0">
+                        <div className="flex items-center gap-2 mb-1">
+                          <span className="px-2 py-0.5 rounded text-xs font-medium bg-success/10 text-success">CPT</span>
+                          <span className="font-mono font-semibold text-foreground">{item.cpt_code}</span>
                         </div>
-                      ))}
-                    </div>
+                        <div className="flex flex-col items-start mt-1 ml-7">
+                          <span className="text-[10px] font-medium text-muted-foreground uppercase tracking-wider mb-0.5">Score</span>
+                          <ConfidenceIndicator value={item.cpt_score * 100} size="sm" />
+                        </div>
+                      </div>
+                    </button>
+
+                    {/* AI Reasoning for CPT */}
+                    {isExpanded && (
+                      <div className="px-4 pb-3">
+                        <div className="ml-7 p-3 rounded-lg bg-primary/5 border border-primary/10">
+                          <div className="flex items-center gap-1.5 mb-1.5">
+                            <Brain className="h-3.5 w-3.5 text-primary" />
+                            <span className="text-xs font-medium text-primary">AI Reasoning</span>
+                          </div>
+                          <p className="text-xs text-muted-foreground leading-relaxed">{item.justification}</p>
+                        </div>
+                      </div>
+                    )}
+
+                    {/* Linked ICD-10 Codes */}
+                    {isExpanded && (
+                      <div className="border-t">
+                        <div className="px-4 py-2 bg-muted/30">
+                          <span className="text-xs font-medium text-muted-foreground uppercase tracking-wider">Linked ICD-10 Codes</span>
+                        </div>
+                        <div className="divide-y">
+                          {item.icd_link.map((icd, icdIdx) => (
+                            <div key={icdIdx} className="px-4 py-3 hover:bg-muted/20 transition-colors">
+                              <div className="ml-7">
+                                <div className="flex items-center justify-between mb-1">
+                                  <div className="flex items-center gap-2">
+                                    <span className="px-2 py-0.5 rounded text-xs font-medium bg-info/10 text-info">ICD-10</span>
+                                    <span className="font-mono font-semibold text-sm text-foreground">{icd.icd10_code.code}</span>
+                                  </div>
+                                  <div className="flex flex-col items-start mt-1 ml-7">
+                                    <span className="text-[10px] font-medium text-muted-foreground uppercase tracking-wider mb-0.5">Score</span>
+                                    <ConfidenceIndicator value={icd.icd10_code.score * 100} size="sm" />
+                                  </div>
+                                </div>
+                                <div className="mt-2 p-2.5 rounded-md bg-muted/50 border">
+                                  <div className="flex items-center gap-1.5 mb-1">
+                                    <Brain className="h-3 w-3 text-muted-foreground" />
+                                    <span className="text-[10px] font-medium text-muted-foreground uppercase tracking-wider">Description</span>
+                                  </div>
+                                  <p className="text-xs text-muted-foreground leading-relaxed">{icd.icd10_code.description}</p>
+                                </div>
+                              </div>
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+                    )}
                   </div>
-                )}
-              </div>
-            );
-          })}
+                );
+              })
+            : mockCPTGroups.map((group) => {
+                const isExpanded = expandedGroups.includes(group.cpt.code);
+                return (
+                  <div key={group.cpt.code} className="rounded-xl border bg-card overflow-hidden">
+                    {/* ...existing code... */}
+                  </div>
+                );
+              })}
         </div>
 
         {/* Human Override Panel */}

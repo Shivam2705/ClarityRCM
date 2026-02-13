@@ -10,11 +10,11 @@ export function Footer() {
             <div className="flex h-8 w-8 items-center justify-center rounded-lg gradient-primary">
               <Brain className="h-4 w-4 text-primary-foreground" />
             </div>
-            <span className="text-lg font-bold text-foreground">AgentRCM</span>
+            <span className="text-lg font-bold text-foreground">Revflow</span>
           </Link>
 
           <p className="text-sm text-muted-foreground">
-            © {new Date().getFullYear()} AgentRCM. Intelligent Revenue Cycle Management.
+            © {new Date().getFullYear()} Revflow. Intelligent Revenue Cycle Management.
           </p>
 
           <div className="flex items-center gap-6">

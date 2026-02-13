@@ -13,7 +13,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { ArrowLeft, FileCheck, Code2, FileText, Receipt, Landmark } from "lucide-react";
 import { ClaimsManagementWorkflow } from "@/components/case-detail/ClaimsManagementWorkflow";
 import { AccountsReceivableWorkflow } from "@/components/case-detail/AccountsReceivableWorkflow";
-import { mockCases } from "@/data/mockCases";
+import { mockCases, Case } from "@/data/mockCases";
 
 export default function CaseDetail() {
   const { caseId } = useParams();
@@ -24,7 +24,17 @@ export default function CaseDetail() {
   const [persona, setPersona] = useState<Persona>(initialPersona);
   const [activeTab, setActiveTab] = useState("pre-auth");
 
-  const caseData = mockCases.find((c) => c.id === caseId) || mockCases[0];
+  function getAllCases(): Case[] {
+    try {
+      const userCases = JSON.parse(localStorage.getItem("userCases") || "[]");
+      return [...mockCases, ...userCases];
+    } catch {
+      return [...mockCases];
+    }
+  }
+
+  const allCases = getAllCases();
+  const caseData = allCases.find((c) => c.id === caseId) || allCases[0];
 
   const statusVariant: Record<string, "new" | "eligible" | "eligible-pa-req" | "not-eligible" | "pa-review" | "pa-submitted" | "pa-denied"> = {
     "New": "new",
@@ -64,6 +74,7 @@ export default function CaseDetail() {
           procedureCode={caseData.procedureCode}
           payerName={caseData.payerName}
           orderingProvider={caseData.orderingProvider}
+          aiSummary={caseData.aiSummary}
         />
 
         {/* Tabs */}
@@ -100,7 +111,7 @@ export default function CaseDetail() {
           </TabsContent>
 
           <TabsContent value="coding" className="mt-6">
-            <MedicalCodingWorkflow />
+            <MedicalCodingWorkflow aiSummary={caseData.aiSummary} />
           </TabsContent>
 
           <TabsContent value="documents" className="mt-6">

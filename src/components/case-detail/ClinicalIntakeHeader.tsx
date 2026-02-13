@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -6,6 +6,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { User, Stethoscope, FileText, Phone, CreditCard, Activity, Pill, AlertCircle, Sparkles, FileUp, Eye, Loader2, RefreshCw } from "lucide-react";
 import { useNavigate, useParams } from "react-router-dom";
 import { getClinicalData } from "@/data/clinicalData";
+import { format } from "date-fns";
 interface ClinicalIntakeHeaderProps {
   patientName: string;
   patientId: string;
@@ -16,6 +17,7 @@ interface ClinicalIntakeHeaderProps {
   orderingProvider: string;
   hasDocuments?: boolean;
   hasSummary?: boolean;
+  aiSummary?: string;
 }
 export function ClinicalIntakeHeader({
   patientName,
@@ -26,7 +28,8 @@ export function ClinicalIntakeHeader({
   payerName,
   orderingProvider,
   hasDocuments = true,
-  hasSummary = true
+  hasSummary = true,
+  aiSummary
 }: ClinicalIntakeHeaderProps) {
   const navigate = useNavigate();
   const {
@@ -35,11 +38,63 @@ export function ClinicalIntakeHeader({
   const [isGeneratingSummary, setIsGeneratingSummary] = useState(false);
   const [summaryGenerated, setSummaryGenerated] = useState(hasSummary);
   const clinicalData = getClinicalData(caseId || "CASE-001");
-  const calculatedAge = dateOfBirth ? Math.floor((Date.now() - new Date(dateOfBirth).getTime()) / (365.25 * 24 * 60 * 60 * 1000)) : 68;
+  const { formattedDob, ageLabel, ageDescriptor } = useMemo(() => {
+    if (!dateOfBirth) {
+      return {
+        formattedDob: "N/A",
+        ageLabel: "N/A",
+        ageDescriptor: ""
+      };
+    }
+    const parsedDob = new Date(dateOfBirth);
+    if (Number.isNaN(parsedDob.getTime())) {
+      return {
+        formattedDob: "N/A",
+        ageLabel: "N/A",
+        ageDescriptor: ""
+      };
+    }
+    const today = new Date();
+    if (parsedDob.getTime() > today.getTime()) {
+      return {
+        formattedDob: format(parsedDob, "MMMM d, yyyy"),
+        ageLabel: "0 years",
+        ageDescriptor: "0-year-old"
+      };
+    }
+    let years = today.getFullYear() - parsedDob.getFullYear();
+    const hadBirthdayThisYear =
+      today.getMonth() > parsedDob.getMonth() ||
+      (today.getMonth() === parsedDob.getMonth() && today.getDate() >= parsedDob.getDate());
+    if (!hadBirthdayThisYear) {
+      years -= 1;
+    }
+    const safeYears = Math.max(0, years);
+    if (safeYears === 0) {
+      let months = (today.getFullYear() - parsedDob.getFullYear()) * 12 + (today.getMonth() - parsedDob.getMonth());
+      if (today.getDate() < parsedDob.getDate()) {
+        months -= 1;
+      }
+      const safeMonths = Math.max(0, months);
+      const monthLabel = `${safeMonths} month${safeMonths === 1 ? "" : "s"}`;
+      const descriptor = safeMonths === 0 ? "newborn" : `${safeMonths}-month-old`;
+      return {
+        formattedDob: format(parsedDob, "MMMM d, yyyy"),
+        ageLabel: monthLabel,
+        ageDescriptor: descriptor
+      };
+    }
+    const descriptor = `${safeYears}-year-old`;
+    return {
+      formattedDob: format(parsedDob, "MMMM d, yyyy"),
+      ageLabel: `${safeYears} year${safeYears === 1 ? "" : "s"}`,
+      ageDescriptor: descriptor
+    };
+  }, [dateOfBirth]);
   const patientInfo = {
-    dob: dateOfBirth ? new Date(dateOfBirth).toLocaleDateString("en-US", { year: "numeric", month: "long", day: "numeric" }) : "March 15, 1956",
-    age: `${calculatedAge} years`,
-    gender: clinicalData.gender,
+    dob: formattedDob,
+    age: ageLabel,
+    gender: "Female",
     phone: "(555) 234-5678",
     address: "1234 Oak Street, Springfield, IL 62701",
     mrn: patientId,
@@ -80,8 +135,8 @@ export function ClinicalIntakeHeader({
     field: "Prior Auth Required",
     value: "Yes"
   }];
-  const patientAge = patientInfo.age.replace(' years', '-year-old');
-  const aiSummary = clinicalData.summaryTemplate(patientName, patientAge, procedureName || "requested procedure", procedureCode || "N/A");
+  // Use aiSummary from props if available, otherwise fallback to template
+  const summaryToShow = aiSummary || clinicalData.summaryTemplate(patientName, ageDescriptor, procedureName || "requested procedure", procedureCode || "N/A");
   const handleGenerateSummary = () => {
     if (!hasDocuments) {
       navigate(`/case/${caseId}/documents`);
@@ -215,7 +270,7 @@ export function ClinicalIntakeHeader({
                   Regenerate Summary
                 </Button>
               </div>
-              <p className="text-sm text-foreground/90 leading-relaxed">{aiSummary}</p>
+              <p className="text-sm text-foreground/90 leading-relaxed">{summaryToShow}</p>
             </div>
           </div>
         </div> : <div className="p-3 rounded-lg bg-muted/50 border border-border">

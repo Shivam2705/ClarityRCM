@@ -10,7 +10,7 @@ export function LandingNav() {
           <div className="flex h-9 w-9 items-center justify-center rounded-lg gradient-primary">
             <Brain className="h-5 w-5 text-primary-foreground" />
           </div>
-          <span className="text-xl font-bold text-foreground">AgentRCM</span>
+          <span className="text-xl font-bold text-foreground">Revflow</span>
         </Link>
 
         <nav className="hidden items-center gap-8 md:flex">
