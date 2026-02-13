@@ -131,10 +131,12 @@ export function ClinicalIntakeHeader({
   }, {
     field: "Network Status",
     value: "In-Network"
-  }, {
-    field: "Prior Auth Required",
-    value: "Yes"
-  }];
+  },
+  //  {
+  //   field: "Prior Auth Required",
+  //   value: "Yes"
+  // }
+];
   // Use aiSummary from props if available, otherwise fallback to template
   const summaryToShow = aiSummary || clinicalData.summaryTemplate(patientName, ageDescriptor, procedureName || "requested procedure", procedureCode || "N/A");
   const handleGenerateSummary = () => {
@@ -196,7 +198,7 @@ export function ClinicalIntakeHeader({
             <span className="text-[10px] font-medium text-muted-foreground uppercase">Provider</span>
           </div>
           <p className="text-xs font-medium text-foreground truncate">{orderingProvider}</p>
-          <p className="text-[10px] text-muted-foreground truncate">Springfield Orthopedic</p>
+          <p className="text-[10px] text-muted-foreground truncate">Springfield</p>
         </div>
 
         {/* Procedure */}
