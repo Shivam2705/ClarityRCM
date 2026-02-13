@@ -9,6 +9,7 @@ import { getClinicalData } from "@/data/clinicalData";
 interface ClinicalIntakeHeaderProps {
   patientName: string;
   patientId: string;
+  dateOfBirth: string;
   procedureName?: string;
   procedureCode?: string;
   payerName: string;
@@ -19,6 +20,7 @@ interface ClinicalIntakeHeaderProps {
 export function ClinicalIntakeHeader({
   patientName,
   patientId,
+  dateOfBirth,
   procedureName,
   procedureCode,
   payerName,
@@ -33,9 +35,10 @@ export function ClinicalIntakeHeader({
   const [isGeneratingSummary, setIsGeneratingSummary] = useState(false);
   const [summaryGenerated, setSummaryGenerated] = useState(hasSummary);
   const clinicalData = getClinicalData(caseId || "CASE-001");
+  const calculatedAge = dateOfBirth ? Math.floor((Date.now() - new Date(dateOfBirth).getTime()) / (365.25 * 24 * 60 * 60 * 1000)) : 68;
   const patientInfo = {
-    dob: "March 15, 1956",
-    age: "68 years",
+    dob: dateOfBirth ? new Date(dateOfBirth).toLocaleDateString("en-US", { year: "numeric", month: "long", day: "numeric" }) : "March 15, 1956",
+    age: `${calculatedAge} years`,
     gender: "Female",
     phone: "(555) 234-5678",
     address: "1234 Oak Street, Springfield, IL 62701",
