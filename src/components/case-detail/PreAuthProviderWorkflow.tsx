@@ -190,8 +190,9 @@ export function PreAuthProviderWorkflow({ caseData }: PreAuthProviderWorkflowPro
     "eligibility" | "document-analysis" | "unlocked" | "complete"
   >("eligibility");
 
-  // Document summary available after analysis phase
-  const documentSummary = `Patient documentation includes comprehensive clinical notes from ${caseData.orderingProvider} documenting progressive knee condition with failed conservative management. Imaging studies confirm significant findings. Physical therapy records show treatment with limited improvement. All documentation supports medical necessity for ${caseData.procedureName || "requested procedure"}.`;
+  // Document summary - matches the AI Patient Summary format from ClinicalIntakeHeader
+  const patientAge = caseData.dateOfBirth ? `${new Date().getFullYear() - new Date(caseData.dateOfBirth).getFullYear()}-year-old` : "";
+  const documentSummary = `${caseData.patientName}, a ${patientAge} patient, presents with Primary Osteoarthritis, Right Knee (Grade IV - Kellgren-Lawrence) persisting for 18 months. Currently managed with conservative treatment including NSAIDs (Meloxicam) and analgesics. Patient has well-controlled comorbidities including Type 2 Diabetes and Hypertension. Requesting ${caseData.procedureName || "requested procedure"} (CPT: ${caseData.procedureCode || "N/A"}). Known allergies to Penicillin and Sulfa drugs noted. Clinical documentation supports medical necessity for the requested procedure.`;
 
   // Determine if this case has gaps based on caseId
   const caseHasGaps = caseId === "CASE-001";
@@ -397,6 +398,7 @@ export function PreAuthProviderWorkflow({ caseData }: PreAuthProviderWorkflowPro
             onSave={() => handleSaveCorrection("document-analysis")}
             onCancel={handleCancelEdit}
             onComplete={handleProceedToReadinessCheck}
+            caseData={caseData}
           />
         );
       case "prior-auth-decision":
@@ -715,7 +717,7 @@ function EligibilitySection({
   );
 }
 
-function DocumentAnalysisSection({ isEditing, onSave, onCancel, onComplete }: SectionProps) {
+function DocumentAnalysisSection({ isEditing, onSave, onCancel, onComplete, caseData }: SectionProps & { caseData: PreAuthProviderWorkflowProps['caseData'] }) {
   const navigate = useNavigate();
   const { caseId } = useParams();
   const [isAnalyzing, setIsAnalyzing] = useState(false);
@@ -729,7 +731,8 @@ function DocumentAnalysisSection({ isEditing, onSave, onCancel, onComplete }: Se
     { name: "Injection Records (3x)", date: "2023-12-15", status: "analyzed" },
   ];
 
-  const documentSummary = `Patient documentation includes comprehensive clinical notes documenting progressive knee condition with failed conservative management. Imaging studies (X-ray and MRI) confirm significant findings with joint space narrowing. Physical therapy records show 12 weeks of treatment with limited improvement. Three corticosteroid injections administered over 6 months provided temporary relief only. All documentation supports medical necessity for the requested procedure.`;
+  const patientAge = caseData.dateOfBirth ? `${new Date().getFullYear() - new Date(caseData.dateOfBirth).getFullYear()}-year-old` : "";
+  const documentSummary = `${caseData.patientName}, a ${patientAge} patient, presents with Primary Osteoarthritis, Right Knee (Grade IV - Kellgren-Lawrence) persisting for 18 months. Currently managed with conservative treatment including NSAIDs (Meloxicam) and analgesics. Patient has well-controlled comorbidities including Type 2 Diabetes and Hypertension. Requesting ${caseData.procedureName || "requested procedure"} (CPT: ${caseData.procedureCode || "N/A"}). Known allergies to Penicillin and Sulfa drugs noted. Clinical documentation supports medical necessity for the requested procedure.`;
 
   const handleAnalyze = () => {
     setIsAnalyzing(true);
