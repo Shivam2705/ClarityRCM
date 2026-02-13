@@ -29,7 +29,7 @@ export function EligibilityPanel() {
         <div className="grid gap-4 md:grid-cols-2">
           <div>
             <p className="text-xs text-muted-foreground">Payer Name</p>
-            <p className="text-sm font-medium text-foreground">Blue Cross Blue Shield</p>
+            <p className="text-sm font-medium text-foreground">Aetna</p>
           </div>
           <div>
             <p className="text-xs text-muted-foreground">Plan Type</p>
