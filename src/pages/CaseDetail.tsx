@@ -59,6 +59,7 @@ export default function CaseDetail() {
         <ClinicalIntakeHeader 
           patientName={caseData.patientName}
           patientId={caseData.patientId}
+          dateOfBirth={caseData.dateOfBirth}
           procedureName={caseData.procedureName}
           procedureCode={caseData.procedureCode}
           payerName={caseData.payerName}
