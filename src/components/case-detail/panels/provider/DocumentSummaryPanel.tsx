@@ -13,7 +13,7 @@ export function DocumentSummaryPanel() {
       <div>
         <h3 className="text-lg font-semibold text-foreground">Document Retrieval & Summarization</h3>
         <p className="text-sm text-muted-foreground mt-1">
-          Medical documents retrieved and AI-summarized for pre-authorization submission
+          Medical documents retrieved and AI-summarized for prior authorization submission
         </p>
       </div>
 

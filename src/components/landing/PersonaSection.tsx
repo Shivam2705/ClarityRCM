@@ -6,7 +6,7 @@ const personas = [
   {
     icon: Stethoscope,
     title: "For Providers",
-    description: "Streamline pre-authorization submissions, reduce denials, and accelerate reimbursement with AI-powered clinical documentation.",
+    description: "Streamline prior authorization submissions, reduce denials, and accelerate reimbursement with AI-powered clinical documentation.",
     features: [
       "Automated prior auth determination",
       "Clinical evidence summarization",

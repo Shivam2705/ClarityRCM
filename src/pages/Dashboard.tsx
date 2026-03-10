@@ -107,7 +107,7 @@ export default function Dashboard() {
             <h1 className="text-3xl font-bold text-foreground">Case Dashboard</h1>
             <p className="text-muted-foreground mt-1">
               {persona === "provider"
-                ? "Manage pre-authorization requests and coding workflows"
+                ? "Manage prior authorization requests and coding workflows"
                 : "Review and process authorization requests"}
             </p>
           </div>

@@ -1158,7 +1158,7 @@ export function PreAuthProviderWorkflow({ caseData, selectedCodes = [], approved
               </div>
               <div>
                 <h4 className="text-sm font-semibold text-foreground">Provider Journey</h4>
-                <p className="text-xs text-muted-foreground">Pre-Authorization Workflow</p>
+                <p className="text-xs text-muted-foreground">Prior Authorization Workflow</p>
               </div>
             </div>
             <WorkflowSteps

@@ -112,7 +112,7 @@ export default function Login() {
             Intelligent Revenue Cycle Management
           </h2>
           <p className="text-lg text-muted-foreground">
-            Leverage agentic AI to automate pre-authorization and medical coding workflows
+            Leverage agentic AI to automate prior authorization and medical coding workflows
             with explainable decisions and human oversight.
           </p>
         </div>

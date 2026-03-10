@@ -83,7 +83,7 @@ export default function CaseDetail() {
             </TabsTrigger>
             <TabsTrigger value="pre-auth" className="h-10 px-6 data-[state=active]:bg-card">
               <FileCheck className="h-4 w-4 mr-2" />
-              Pre-Authorization
+              Prior Authorization
             </TabsTrigger>
             <TabsTrigger value="claims" className="h-10 px-6 data-[state=active]:bg-card">
               <Receipt className="h-4 w-4 mr-2" />
