@@ -948,59 +948,7 @@ export function PreAuthProviderWorkflow({ caseData }: PreAuthProviderWorkflowPro
   // Determine if this case has gaps based on caseId
   const caseHasGaps = caseId === "CASE-001" || activeCase.hasGaps;
 
-  // Auto-run only eligibility and document analysis, then unlock manual navigation
-  useEffect(() => {
-    if (!hasAutoRun && eligibilityStatus === "idle") {
-      setHasAutoRun(true);
-      setEligibilityStatus("processing");
-
-      // Phase 1: Eligibility (2 seconds)
-      setTimeout(() => {
-        const isEligible = true;
-        const status = isEligible ? "eligible" : "not-eligible";
-        setEligibilityStatus(status);
-        setSteps((prev) =>
-          prev.map((s) => {
-            if (s.id === "eligibility") {
-              return { ...s, status: "completed" as const, eligibilityStatus: status };
-            }
-            if (isEligible && s.id === "document-analysis") {
-              return {
-                ...s,
-                status: "active" as const,
-                documentAnalysisStatus: "in-progress" as const,
-                canEdit: false,
-              };
-            }
-            return s;
-          }),
-        );
-        if (isEligible) {
-          setCurrentStep("document-analysis");
-          setWorkflowPhase("document-analysis");
-        }
-      }, 2000);
-    }
-  }, [hasAutoRun, eligibilityStatus]);
-
-  // Phase 2: Document Analysis auto-run, then mark document analysis complete but keep other steps locked
-  useEffect(() => {
-    if (workflowPhase === "document-analysis") {
-      const timer = setTimeout(() => {
-        setSteps((prev) =>
-          prev.map((s) => {
-            if (s.id === "document-analysis") {
-              return { ...s, status: "completed" as const, documentAnalysisStatus: "analyzed" as const, canEdit: true };
-            }
-            return s;
-          }),
-        );
-        // Stay on document-analysis so user can click "Proceed to Readiness Check"
-        setWorkflowPhase("unlocked");
-      }, 2000);
-      return () => clearTimeout(timer);
-    }
-  }, [workflowPhase]);
+  // No auto-run — user triggers each step manually
 
   // Check if user can access a step based on eligibility and step status
   const canAccessStep = useCallback(
