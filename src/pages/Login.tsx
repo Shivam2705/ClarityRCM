@@ -108,7 +108,7 @@ export default function Login() {
           <div className="mb-8 mx-auto flex h-20 w-20 items-center justify-center rounded-2xl gradient-primary shadow-lg">
             <Brain className="h-10 w-10 text-primary-foreground" />
           </div>
-          <h2 className="text-3xl font-bold text-foreground mb-4">
+          <h2 className="text-3xl font-bold text-white mb-4">
             Intelligent Revenue Cycle Management
           </h2>
           <p className="text-lg text-muted-foreground">
