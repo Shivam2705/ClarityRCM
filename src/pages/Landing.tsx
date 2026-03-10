@@ -26,60 +26,70 @@
 //   );
 // }
 
-import { useNavigate } from 'react-router-dom';
-import { mockCases } from '@/data/mockCases';
-import { CaseCard } from '@/components/dashboard/CaseCard';
-import { Card } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
-import { Activity, Brain, Zap, Network, TrendingUp, Clock, ArrowRight, CheckCircle2, XCircle, Users } from 'lucide-react';
-import { RCMValueChain } from '@/components/landing/RCMValueChain';
+import { useNavigate } from "react-router-dom";
+import { mockCases } from "@/data/mockCases";
+import { CaseCard } from "@/components/dashboard/CaseCard";
+import { Card } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
+import {
+  Activity,
+  Brain,
+  Zap,
+  Network,
+  TrendingUp,
+  Clock,
+  ArrowRight,
+  CheckCircle2,
+  XCircle,
+  Users,
+} from "lucide-react";
+import { RCMValueChain } from "@/components/landing/RCMValueChain";
 
 const Landing = () => {
   const navigate = useNavigate();
-
 
   return (
     <div className="landing-theme min-h-screen bg-background">
       {/* Hero Section */}
       <div className="relative border-b border-border/50 bg-gradient-to-br from-card via-background to-card overflow-hidden">
         <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top_right,_var(--tw-gradient-stops))] from-primary/10 via-transparent to-accent/10"></div>
-        
+
         <div className="relative max-w-7xl mx-auto px-6 py-20">
           <div className="max-w-4xl mx-auto text-center">
             <Badge className="mb-6 bg-gradient-to-r from-primary/20 to-accent/20 text-foreground border-primary/30 backdrop-blur-sm">
               <Activity className="h-3 w-3 mr-1.5" />
               Enterprise-Grade AI for Healthcare Operations
             </Badge>
-            
+
             <h1 className="text-7xl font-bold text-foreground mb-6 tracking-tight">
-              Prior Authorization
+              EXL RevFlow.AI
               <br />
               <span className="bg-gradient-to-r from-primary via-accent to-secondary bg-clip-text text-transparent">
-                Powered by Agentic AI
+                End-to-End Revenue Cycle Platform
               </span>
             </h1>
-            
+
             <p className="text-xl text-muted-foreground leading-relaxed mb-12 max-w-3xl mx-auto">
-              Transform your Revenue Cycle Management with intelligent multi-agent orchestration. 
-              Leveraging hybrid retrieval, advanced reasoning, and real-time decision-making to streamline 
-              prior authorizations from days to minutes.
+              Transform your Revenue Cycle Management with intelligent multi-agent orchestration. Leveraging hybrid
+              retrieval, advanced reasoning, and real-time decision-making to streamline prior authorizations from days
+              to minutes.
             </p>
 
             <div className="flex gap-4 justify-center mb-16">
-              <Button 
-                size="lg" 
-                onClick={() => navigate('/login')}
+              <Button
+                size="lg"
+                onClick={() => navigate("/login")}
                 className="bg-gradient-to-r from-primary to-accent hover:opacity-90 text-white font-semibold px-8"
               >
                 Access Dashboard
                 <ArrowRight className="ml-2 h-5 w-5" />
               </Button>
-              <Button 
-                size="lg" 
+              <Button
+                size="lg"
                 variant="outline"
                 className="text-white border-white/40 hover:text-black hover:bg-white"
-                onClick={() => window.open('https://docs.lovable.dev', '_blank')}
+                onClick={() => window.open("https://docs.lovable.dev", "_blank")}
               >
                 Learn More
               </Button>
@@ -94,7 +104,7 @@ const Landing = () => {
                 <div className="text-sm text-muted-foreground">Faster Processing</div>
                 <div className="text-xs text-muted-foreground/70 mt-1">Than manual authorization submissions</div>
               </Card>
-              
+
               <Card className="p-6 bg-gradient-to-br from-card to-card/50 border-border/50">
                 <div className="text-4xl font-bold bg-gradient-to-r from-success to-agent-analyzer bg-clip-text text-transparent mb-2">
                   98%
@@ -102,7 +112,7 @@ const Landing = () => {
                 <div className="text-sm text-muted-foreground">First-Pass Resolution</div>
                 <div className="text-xs text-muted-foreground/70 mt-1">Reduce rework and resubmissions</div>
               </Card>
-              
+
               <Card className="p-6 bg-gradient-to-br from-card to-card/50 border-border/50">
                 <div className="text-4xl font-bold bg-gradient-to-r from-secondary to-primary bg-clip-text text-transparent mb-2">
                   80%
@@ -110,7 +120,7 @@ const Landing = () => {
                 <div className="text-sm text-muted-foreground">Task Reduction</div>
                 <div className="text-xs text-muted-foreground/70 mt-1">Automate repetitive manual work</div>
               </Card>
-              
+
               <Card className="p-6 bg-gradient-to-br from-card to-card/50 border-border/50">
                 <div className="text-4xl font-bold bg-gradient-to-r from-accent to-secondary bg-clip-text text-transparent mb-2">
                   $2M+
@@ -133,9 +143,7 @@ const Landing = () => {
       {/* Challenges Section */}
       <div className="max-w-7xl mx-auto px-6 py-16">
         <div className="text-center mb-12">
-          <h2 className="text-3xl font-bold text-foreground mb-4">
-            Transforming Prior Authorization Challenges
-          </h2>
+          <h2 className="text-3xl font-bold text-foreground mb-4">Transforming Prior Authorization Challenges</h2>
           <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
             Traditional manual processes create significant operational and financial barriers
           </p>
@@ -150,10 +158,12 @@ const Landing = () => {
               <div>
                 <h4 className="font-semibold mb-2">Extended Processing Times</h4>
                 <p className="text-sm text-muted-foreground mb-2">
-                  Manual authorization requests take 3-7 days on average, with RCM teams spending 
-                  hours navigating complex payer portals and waiting on hold.
+                  Manual authorization requests take 3-7 days on average, with RCM teams spending hours navigating
+                  complex payer portals and waiting on hold.
                 </p>
-                <div className="text-xs text-destructive font-medium">Impact: Delayed patient care and lost revenue opportunities</div>
+                <div className="text-xs text-destructive font-medium">
+                  Impact: Delayed patient care and lost revenue opportunities
+                </div>
               </div>
             </div>
           </Card>
@@ -166,10 +176,12 @@ const Landing = () => {
               <div>
                 <h4 className="font-semibold mb-2">High Denial & Rejection Rates</h4>
                 <p className="text-sm text-muted-foreground mb-2">
-                  30-40% of initial authorization requests are denied due to incomplete documentation, 
-                  missing clinical justification, or policy mismatches.
+                  30-40% of initial authorization requests are denied due to incomplete documentation, missing clinical
+                  justification, or policy mismatches.
                 </p>
-                <div className="text-xs text-destructive font-medium">Impact: $2.5M+ in annual write-offs per 100-bed facility</div>
+                <div className="text-xs text-destructive font-medium">
+                  Impact: $2.5M+ in annual write-offs per 100-bed facility
+                </div>
               </div>
             </div>
           </Card>
@@ -182,10 +194,12 @@ const Landing = () => {
               <div>
                 <h4 className="font-semibold mb-2">Complex Payer Policy Variations</h4>
                 <p className="text-sm text-muted-foreground mb-2">
-                  Each payer maintains different authorization requirements, frequently updated guidelines, 
-                  and varied clinical criteria across 500+ policy documents.
+                  Each payer maintains different authorization requirements, frequently updated guidelines, and varied
+                  clinical criteria across 500+ policy documents.
                 </p>
-                <div className="text-xs text-destructive font-medium">Impact: 60% staff time spent on policy research vs. patient care</div>
+                <div className="text-xs text-destructive font-medium">
+                  Impact: 60% staff time spent on policy research vs. patient care
+                </div>
               </div>
             </div>
           </Card>
@@ -198,10 +212,12 @@ const Landing = () => {
               <div>
                 <h4 className="font-semibold mb-2">Resource-Intensive Manual Review</h4>
                 <p className="text-sm text-muted-foreground mb-2">
-                  Clinical staff spend 15-20 hours per week on authorization tasks, including document 
-                  gathering, form completion, and peer-to-peer reviews.
+                  Clinical staff spend 15-20 hours per week on authorization tasks, including document gathering, form
+                  completion, and peer-to-peer reviews.
                 </p>
-                <div className="text-xs text-destructive font-medium">Impact: $250K+ annual cost in staff time per authorization specialist</div>
+                <div className="text-xs text-destructive font-medium">
+                  Impact: $250K+ annual cost in staff time per authorization specialist
+                </div>
               </div>
             </div>
           </Card>
@@ -214,10 +230,12 @@ const Landing = () => {
               <div>
                 <h4 className="font-semibold mb-2">Patient Satisfaction Impact</h4>
                 <p className="text-sm text-muted-foreground mb-2">
-                  Authorization delays lead to postponed procedures, medication interruptions, 
-                  and frustrated patients who often blame the provider organization.
+                  Authorization delays lead to postponed procedures, medication interruptions, and frustrated patients
+                  who often blame the provider organization.
                 </p>
-                <div className="text-xs text-destructive font-medium">Impact: 25% decrease in patient satisfaction scores</div>
+                <div className="text-xs text-destructive font-medium">
+                  Impact: 25% decrease in patient satisfaction scores
+                </div>
               </div>
             </div>
           </Card>
@@ -230,10 +248,12 @@ const Landing = () => {
               <div>
                 <h4 className="font-semibold mb-2">Compliance & Audit Risk</h4>
                 <p className="text-sm text-muted-foreground mb-2">
-                  Manual processes lack comprehensive audit trails, documentation standards, 
-                  and consistent decision-making frameworks required for regulatory compliance.
+                  Manual processes lack comprehensive audit trails, documentation standards, and consistent
+                  decision-making frameworks required for regulatory compliance.
                 </p>
-                <div className="text-xs text-destructive font-medium">Impact: Increased audit liability and potential penalties</div>
+                <div className="text-xs text-destructive font-medium">
+                  Impact: Increased audit liability and potential penalties
+                </div>
               </div>
             </div>
           </Card>
@@ -243,12 +263,9 @@ const Landing = () => {
       {/* Solution Architecture Section */}
       <div className="max-w-7xl mx-auto px-6 py-16">
         <div className="text-center mb-12">
-          <h2 className="text-3xl font-bold text-foreground mb-4">
-            Intelligent Multi-Agent Orchestration
-          </h2>
+          <h2 className="text-3xl font-bold text-foreground mb-4">Intelligent Multi-Agent Orchestration</h2>
           <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
-            Our agentic AI platform delivers enterprise-grade automation across your entire 
-            prior authorization workflow
+            Our agentic AI platform delivers enterprise-grade automation across your entire prior authorization workflow
           </p>
         </div>
 
@@ -397,16 +414,13 @@ const Landing = () => {
       {/* Footer CTA */}
       <div className="border-t border-border/50 bg-gradient-to-br from-card via-background to-card">
         <div className="max-w-7xl mx-auto px-6 py-16 text-center">
-          <h2 className="text-3xl font-bold text-foreground mb-4">
-            Ready to Transform Your RCM Process?
-          </h2>
+          <h2 className="text-3xl font-bold text-foreground mb-4">Ready to Transform Your RCM Process?</h2>
           <p className="text-lg text-muted-foreground mb-8 max-w-2xl mx-auto">
-            Join leading healthcare organizations leveraging agentic AI for faster, 
-            more accurate prior authorizations
+            Join leading healthcare organizations leveraging agentic AI for faster, more accurate prior authorizations
           </p>
-          <Button 
+          <Button
             size="lg"
-            onClick={() => navigate('/login')}
+            onClick={() => navigate("/login")}
             className="bg-gradient-to-r from-primary to-accent hover:opacity-90 text-white font-semibold px-8"
           >
             Get Started
