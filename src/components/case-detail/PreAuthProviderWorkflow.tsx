@@ -1554,9 +1554,11 @@ interface PriorAuthDecisionSectionProps extends SectionProps {
   agentLoading: boolean;
   agentError: string | null;
   onRetry: () => void;
+  activeCase: { patientName: string; orderingProvider: string };
 }
 
-function PriorAuthDecisionSection({ isEditing, onSave, onCancel, onComplete, agentData, agentLoading, agentError, onRetry }: PriorAuthDecisionSectionProps) {
+function PriorAuthDecisionSection({ isEditing, onSave, onCancel, onComplete, agentData, agentLoading, agentError, onRetry, activeCase }: PriorAuthDecisionSectionProps) {
+  const [showEnquireDialog, setShowEnquireDialog] = useState(false);
   const data = agentData;
   const hasResults = !!data;
 
