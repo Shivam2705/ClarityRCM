@@ -102,16 +102,16 @@ export default function CaseDetail() {
             </TabsTrigger>
           </TabsList>
 
+          <TabsContent value="coding" className="mt-6">
+            <MedicalCodingWorkflow aiSummary={caseData.aiSummary} caseId={caseData.id} />
+          </TabsContent>
+
           <TabsContent value="pre-auth" className="mt-6">
             {persona === "provider" ? (
               <PreAuthProviderWorkflow caseData={caseData} />
             ) : (
               <PreAuthPayerWorkflow />
             )}
-          </TabsContent>
-
-          <TabsContent value="coding" className="mt-6">
-            <MedicalCodingWorkflow aiSummary={caseData.aiSummary} />
           </TabsContent>
 
           <TabsContent value="documents" className="mt-6">
