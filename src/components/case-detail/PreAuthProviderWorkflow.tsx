@@ -1,5 +1,6 @@
 import { useState, useCallback, useEffect } from "react";
 import { useNavigate, useParams } from "react-router-dom";
+import { toast } from "sonner";
 import { getClinicalData } from "@/data/clinicalData";
 import { WorkflowSteps, WorkflowStep } from "./WorkflowSteps";
 import { Button } from "@/components/ui/button";
