@@ -34,7 +34,7 @@ const case1: ClinicalProfile = {
 const case2: ClinicalProfile = {
   gender: "Male",
   primaryDiagnosis: "Lumbar Spondylolisthesis with Spinal Stenosis",
-  icdCode: "M43.16",
+  icdCode: "",
   severity: "Grade I spondylolisthesis with radiculopathy",
   duration: "14 months",
   allergies: ["Iodine contrast", "Shellfish"],
