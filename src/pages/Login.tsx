@@ -103,8 +103,8 @@ export default function Login() {
       {/* Right side - Decorative */}
       <div className="hidden lg:flex flex-1 gradient-hero items-center justify-center p-8">
         <div className="max-w-lg text-center">
-          <div className="mb-8 mx-auto flex h-20 w-20 items-center justify-center rounded-2xl gradient-primary shadow-lg">
-            <Brain className="h-10 w-10 text-primary-foreground" />
+          <div className="mb-8 mx-auto flex items-center justify-center">
+            <img alt="EXL logo" className="h-16" src="/lovable-uploads/839f6e7a-47b4-4683-b09f-b439c68af2fe.png" />
           </div>
           <h2 className="text-3xl font-bold text-white mb-4">
             Intelligent Revenue Cycle Management

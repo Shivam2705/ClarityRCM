@@ -60,13 +60,13 @@ const Landing = () => {
         <div className="relative max-w-7xl mx-auto px-6 py-20">
           <div className="max-w-4xl mx-auto text-center">
             <h1 className="text-foreground mb-6 tracking-tight">
-              <img
-                className="flex flex-col items-center mb-6"
-                alt="exl logo"
-                className="h-8"
-                src="/lovable-uploads/839f6e7a-47b4-4683-b09f-b439c68af2fe.png"
-              />
-
+              <div className="flex justify-center mb-4">
+                <img
+                  alt="EXL logo"
+                  className="h-12"
+                  src="/lovable-uploads/839f6e7a-47b4-4683-b09f-b439c68af2fe.png"
+                />
+              </div>
               <span className="block text-8xl lg:text-9xl font-extrabold">RevFlow.AI</span>
               <span className="block text-3xl lg:text-4xl font-medium mt-3 bg-gradient-to-r from-primary via-accent to-secondary bg-clip-text text-transparent">
                 End-to-End Revenue Cycle Platform
