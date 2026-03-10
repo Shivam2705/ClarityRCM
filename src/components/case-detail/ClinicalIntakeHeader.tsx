@@ -38,7 +38,8 @@ export function ClinicalIntakeHeader({
   orderingProvider,
   hasDocuments = true,
   hasSummary = true,
-  aiSummary
+  aiSummary,
+  approvedCodes = []
 }: ClinicalIntakeHeaderProps) {
   const navigate = useNavigate();
   const {
