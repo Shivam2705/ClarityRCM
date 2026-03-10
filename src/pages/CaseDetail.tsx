@@ -91,6 +91,7 @@ export default function CaseDetail() {
               caseId={caseData.id}
               selectedCodes={selectedCodes}
               onSelectedCodesChange={setSelectedCodes}
+              onApprove={handleApproveCodes}
             />
           </TabsContent>
 
