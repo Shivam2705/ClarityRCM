@@ -42,8 +42,8 @@ import {
   ArrowRight,
   CheckCircle2,
   XCircle,
-  Users,
-} from "lucide-react";
+  Users } from
+"lucide-react";
 import { RCMValueChain } from "@/components/landing/RCMValueChain";
 import EssentialTools from "@/components/landing/EssentialTools";
 import poweredByGoogle from "@/assets/powered-by-google.png";
@@ -62,9 +62,9 @@ const Landing = () => {
             <h1 className="text-foreground mb-6 tracking-tight">
               <img
                 alt="Powered by Google"
-                className="h-8"
-                src="/lovable-uploads/be5eee7e-00d3-458e-8fdc-b61d5f552e8f.png"
-              />
+                className="h-8" src="/lovable-uploads/839f6e7a-47b4-4683-b09f-b439c68af2fe.png" />
+
+              
               <span className="block text-8xl lg:text-9xl font-extrabold">RevFlow.AI</span>
               <span className="block text-3xl lg:text-4xl font-medium mt-3 bg-gradient-to-r from-primary via-accent to-secondary bg-clip-text text-transparent">
                 End-to-End Revenue Cycle Platform
@@ -75,8 +75,8 @@ const Landing = () => {
               <img
                 alt="Powered by Google"
                 className="h-8"
-                src="/lovable-uploads/be5eee7e-00d3-458e-8fdc-b61d5f552e8f.png"
-              />
+                src="/lovable-uploads/be5eee7e-00d3-458e-8fdc-b61d5f552e8f.png" />
+              
             </div>
             <p className="text-xl text-muted-foreground leading-relaxed mb-12 max-w-3xl mx-auto">
               Transform your Revenue Cycle Management with intelligent multi-agent orchestration. Leveraging hybrid
@@ -88,8 +88,8 @@ const Landing = () => {
               <Button
                 size="lg"
                 onClick={() => navigate("/login")}
-                className="bg-gradient-to-r from-primary to-accent hover:opacity-90 text-white font-semibold px-8"
-              >
+                className="bg-gradient-to-r from-primary to-accent hover:opacity-90 text-white font-semibold px-8">
+                
                 Access Dashboard
                 <ArrowRight className="ml-2 h-5 w-5" />
               </Button>
@@ -298,15 +298,15 @@ const Landing = () => {
           <Button
             size="lg"
             onClick={() => navigate("/login")}
-            className="bg-gradient-to-r from-primary to-accent hover:opacity-90 text-white font-semibold px-8"
-          >
+            className="bg-gradient-to-r from-primary to-accent hover:opacity-90 text-white font-semibold px-8">
+            
             Get Started
             <ArrowRight className="ml-2 h-5 w-5" />
           </Button>
         </div>
       </div>
-    </div>
-  );
+    </div>);
+
 };
 
 export default Landing;
