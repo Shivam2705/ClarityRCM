@@ -287,7 +287,11 @@ const Landing = () => {
         </Card>
       </div>
 
-      {/* Footer CTA */}
+      {/* AI Agent Suites */}
+      <div className="border-t border-border/50 bg-gradient-to-br from-card/50 via-background to-card/50">
+        <EssentialTools />
+      </div>
+
       <div className="border-t border-border/50 bg-gradient-to-br from-card via-background to-card">
         <div className="max-w-7xl mx-auto px-6 py-16 text-center">
           <h2 className="text-3xl font-bold text-foreground mb-4">Ready to Transform Your RCM Process?</h2>
