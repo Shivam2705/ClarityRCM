@@ -1292,7 +1292,7 @@ function EligibilitySection({
   onStatusChange,
   onComplete,
   payerName,
-  onGoToDocumentAnalysis,
+  onGoToReadinessCheck,
 }: EligibilitySectionProps) {
   const handleRunCheck = () => {
     onStatusChange("processing");
