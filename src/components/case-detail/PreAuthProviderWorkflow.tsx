@@ -932,7 +932,6 @@ export function PreAuthProviderWorkflow({ caseData }: PreAuthProviderWorkflowPro
   const [eligibilityStatus, setEligibilityStatus] = useState<"idle" | "processing" | "eligible" | "not-eligible">(
     "idle",
   );
-  const [hasAutoRun, setHasAutoRun] = useState(false);
   const [workflowPhase, setWorkflowPhase] = useState<
     "eligibility" | "document-analysis" | "unlocked" | "complete"
   >("eligibility");
@@ -949,59 +948,7 @@ export function PreAuthProviderWorkflow({ caseData }: PreAuthProviderWorkflowPro
   // Determine if this case has gaps based on caseId
   const caseHasGaps = caseId === "CASE-001" || activeCase.hasGaps;
 
-  // Auto-run only eligibility and document analysis, then unlock manual navigation
-  useEffect(() => {
-    if (!hasAutoRun && eligibilityStatus === "idle") {
-      setHasAutoRun(true);
-      setEligibilityStatus("processing");
-
-      // Phase 1: Eligibility (2 seconds)
-      setTimeout(() => {
-        const isEligible = true;
-        const status = isEligible ? "eligible" : "not-eligible";
-        setEligibilityStatus(status);
-        setSteps((prev) =>
-          prev.map((s) => {
-            if (s.id === "eligibility") {
-              return { ...s, status: "completed" as const, eligibilityStatus: status };
-            }
-            if (isEligible && s.id === "document-analysis") {
-              return {
-                ...s,
-                status: "active" as const,
-                documentAnalysisStatus: "in-progress" as const,
-                canEdit: false,
-              };
-            }
-            return s;
-          }),
-        );
-        if (isEligible) {
-          setCurrentStep("document-analysis");
-          setWorkflowPhase("document-analysis");
-        }
-      }, 2000);
-    }
-  }, [hasAutoRun, eligibilityStatus]);
-
-  // Phase 2: Document Analysis auto-run, then mark document analysis complete but keep other steps locked
-  useEffect(() => {
-    if (workflowPhase === "document-analysis") {
-      const timer = setTimeout(() => {
-        setSteps((prev) =>
-          prev.map((s) => {
-            if (s.id === "document-analysis") {
-              return { ...s, status: "completed" as const, documentAnalysisStatus: "analyzed" as const, canEdit: true };
-            }
-            return s;
-          }),
-        );
-        // Stay on document-analysis so user can click "Proceed to Readiness Check"
-        setWorkflowPhase("unlocked");
-      }, 2000);
-      return () => clearTimeout(timer);
-    }
-  }, [workflowPhase]);
+  // No auto-run — user triggers each step manually
 
   // Check if user can access a step based on eligibility and step status
   const canAccessStep = useCallback(
@@ -1064,7 +1011,7 @@ export function PreAuthProviderWorkflow({ caseData }: PreAuthProviderWorkflowPro
       }),
     );
     if (status === "eligible") {
-      setCurrentStep("document-analysis");
+      setWorkflowPhase("unlocked");
     }
   }, []);
 
@@ -1153,6 +1100,16 @@ export function PreAuthProviderWorkflow({ caseData }: PreAuthProviderWorkflowPro
             onCancel={handleCancelEdit}
             onComplete={handleProceedToReadinessCheck}
             caseData={caseData}
+            onAnalysisComplete={() => {
+              setSteps((prev) =>
+                prev.map((s) => {
+                  if (s.id === "document-analysis") {
+                    return { ...s, status: "completed" as const, canEdit: true };
+                  }
+                  return s;
+                }),
+              );
+            }}
           />
         );
       case "prior-auth-decision":
@@ -1474,11 +1431,11 @@ function EligibilitySection({
   );
 }
 
-function DocumentAnalysisSection({ isEditing, onSave, onCancel, onComplete, caseData }: SectionProps & { caseData: PreAuthProviderWorkflowProps['caseData'] }) {
+function DocumentAnalysisSection({ isEditing, onSave, onCancel, onComplete, caseData, onAnalysisComplete }: SectionProps & { caseData: PreAuthProviderWorkflowProps['caseData']; onAnalysisComplete?: () => void }) {
   const navigate = useNavigate();
   const { caseId } = useParams();
   const [isAnalyzing, setIsAnalyzing] = useState(false);
-  const [hasAnalysis, setHasAnalysis] = useState(true);
+  const [hasAnalysis, setHasAnalysis] = useState(false);
 
   const documents = [
     { name: "Clinical Notes - Dr. Chen", date: "2024-01-15", status: "analyzed" },
@@ -1488,13 +1445,13 @@ function DocumentAnalysisSection({ isEditing, onSave, onCancel, onComplete, case
     { name: "Injection Records (3x)", date: "2023-12-15", status: "analyzed" },
   ];
 
-  // const documentSummary = `Patient documentation includes comprehensive clinical notes documenting progressive knee condition with failed conservative management. Imaging studies (X-ray and MRI) confirm significant findings with joint space narrowing. Physical therapy records show 12 weeks of treatment with limited improvement. Three corticosteroid injections administered over 6 months provided temporary relief only. All documentation supports medical necessity for the requested procedure.`;
-const documentSummary = getCaseById(caseId)?.documentSummary || "";
+  const documentSummary = getCaseById(caseId)?.documentSummary || "";
   const handleAnalyze = () => {
     setIsAnalyzing(true);
     setTimeout(() => {
       setIsAnalyzing(false);
       setHasAnalysis(true);
+      onAnalysisComplete?.();
     }, 2000);
   };
 
