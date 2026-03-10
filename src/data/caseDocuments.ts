@@ -463,7 +463,7 @@ IMPRESSION:
 1. Grade I spondylolisthesis at L4-L5 with disc collapse and broad-based disc protrusion.
 2. Severe right foraminal stenosis with L5 nerve root compression — correlates with clinical radiculopathy.
 3. Moderate central canal stenosis at L4-L5.
-4. Mild degenerative changes at adjacent levels without significant stenosis.  <img src='/cases/001/LUMBAR_spine_MRI.png'/>`,
+4. Mild degenerative changes at adjacent levels without significant stenosis.  <img src='/cases/002/LUMBAR_spine_MRI.png'/>`,
   },
   {
     id: "c2-doc-3",
