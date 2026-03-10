@@ -60,7 +60,7 @@ const Landing = () => {
           <div className="max-w-4xl mx-auto text-center">
             <Badge className="mb-6 bg-gradient-to-r from-primary/20 to-accent/20 text-foreground border-primary/30 backdrop-blur-sm">
               <Activity className="h-3 w-3 mr-1.5" />
-              Enterprise-Grade AI for Healthcare Operations
+              Enterprise-Grade AI for Healthcare Operations, Powered by Google
             </Badge>
 
             <h1 className="text-foreground mb-6 tracking-tight">
@@ -132,9 +132,6 @@ const Landing = () => {
           </div>
         </div>
       </div>
-
-
-
 
       {/* Solution Architecture Section */}
       <div className="max-w-7xl mx-auto px-6 py-16">
