@@ -56,6 +56,7 @@ interface MedicalCodingWorkflowProps {
   caseId: string;
   selectedCodes: SelectedCode[];
   onSelectedCodesChange: (codes: SelectedCode[]) => void;
+  onApprove: (codes: SelectedCode[]) => void;
 }
 
 export function MedicalCodingWorkflow({ aiSummary, caseId, selectedCodes, onSelectedCodesChange }: MedicalCodingWorkflowProps) {
