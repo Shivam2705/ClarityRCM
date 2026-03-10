@@ -1,15 +1,15 @@
 import { useState } from "react";
 import { callMedicalCodingApi } from "@/services/medicalCodingApi";
-import { StatusBadge } from "@/components/ui/status-badge";
 import { ConfidenceIndicator } from "@/components/ui/confidence-indicator";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
+import { Checkbox } from "@/components/ui/checkbox";
 import { getClinicalData } from "@/data/clinicalData";
 import { 
-  FileText, Code2, AlertTriangle, CheckCircle2, 
-  Download, ChevronRight, ChevronDown,
-  Loader2, Brain, Link2, Quote
+  FileText, AlertTriangle, CheckCircle2, 
+  ChevronRight, ChevronDown,
+  Loader2, Brain, Quote
 } from "lucide-react";
 
 interface LinkedICD {
@@ -22,6 +22,14 @@ interface LinkedICD {
 interface CPTGroup {
   cpt: { code: string; description: string; confidence: number; reasoning: string };
   icdCodes: LinkedICD[];
+}
+
+export interface SelectedCode {
+  type: "CPT" | "ICD-10";
+  code: string;
+  description: string;
+  confidence: number;
+  parentCpt?: string;
 }
 
 const mockCPTGroups: CPTGroup[] = [
@@ -43,10 +51,15 @@ const mockCPTGroups: CPTGroup[] = [
   },
 ];
 
-export function MedicalCodingWorkflow({ aiSummary, caseId }: { aiSummary: string; caseId: string }) {
+interface MedicalCodingWorkflowProps {
+  aiSummary: string;
+  caseId: string;
+  selectedCodes: SelectedCode[];
+  onSelectedCodesChange: (codes: SelectedCode[]) => void;
+}
+
+export function MedicalCodingWorkflow({ aiSummary, caseId, selectedCodes, onSelectedCodesChange }: MedicalCodingWorkflowProps) {
   const [expandedGroups, setExpandedGroups] = useState<string[]>(["27447", "99223"]);
-  const [editingCode, setEditingCode] = useState<string | null>(null);
-  const [editValues, setEditValues] = useState<{ code: string; description: string }>({ code: "", description: "" });
   const [hasRun, setHasRun] = useState(false);
   const [loading, setLoading] = useState(false);
   const [apiResult, setApiResult] = useState<any>(null);
@@ -70,33 +83,67 @@ export function MedicalCodingWorkflow({ aiSummary, caseId }: { aiSummary: string
     setLoading(false);
   };
 
+  const isCodeSelected = (type: "CPT" | "ICD-10", code: string) => {
+    return selectedCodes.some(sc => sc.type === type && sc.code === code);
+  };
+
+  const toggleCode = (codeItem: SelectedCode) => {
+    if (isCodeSelected(codeItem.type, codeItem.code)) {
+      onSelectedCodesChange(selectedCodes.filter(sc => !(sc.type === codeItem.type && sc.code === codeItem.code)));
+    } else {
+      onSelectedCodesChange([...selectedCodes, codeItem]);
+    }
+  };
+
+  const toggleCptWithIcds = (group: CPTGroup) => {
+    const cptSelected = isCodeSelected("CPT", group.cpt.code);
+    if (cptSelected) {
+      // Remove CPT and all its linked ICDs
+      const icdCodes = group.icdCodes.map(i => i.code);
+      onSelectedCodesChange(selectedCodes.filter(sc => 
+        !(sc.type === "CPT" && sc.code === group.cpt.code) && 
+        !(sc.type === "ICD-10" && icdCodes.includes(sc.code) && sc.parentCpt === group.cpt.code)
+      ));
+    } else {
+      // Add CPT and all its linked ICDs
+      const newCodes: SelectedCode[] = [
+        { type: "CPT", code: group.cpt.code, description: group.cpt.description, confidence: group.cpt.confidence },
+        ...group.icdCodes.map(icd => ({ type: "ICD-10" as const, code: icd.code, description: icd.description, confidence: icd.confidence, parentCpt: group.cpt.code }))
+      ];
+      const existing = selectedCodes.filter(sc => 
+        !(sc.type === "CPT" && sc.code === group.cpt.code) && 
+        !(sc.type === "ICD-10" && group.icdCodes.map(i => i.code).includes(sc.code) && sc.parentCpt === group.cpt.code)
+      );
+      onSelectedCodesChange([...existing, ...newCodes]);
+    }
+  };
+
   return (
     <div className="grid gap-6 lg:grid-cols-12">
-      {/* Left Column - Case Summary */}
-      <div className="lg:col-span-3 space-y-6">
-        <CaseSummaryPanel />
-        <ExportPanel groupCount={mockCPTGroups.length} />
-      </div>
-
-      {/* Middle Column - Coding Suggestions */}
-      <div className="lg:col-span-5 space-y-6">
+      {/* Left Column - Coding Suggestions */}
+      <div className="lg:col-span-7 space-y-6">
         <div className="flex items-center justify-between gap-2">
           <h3 className="text-lg font-semibold text-foreground">Coding Suggestions</h3>
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={handleRun}
-            disabled={loading}
-            className="ml-2"
-          >
-            {loading ? (
-              <span className="flex items-center"><Loader2 className="h-4 w-4 animate-spin mr-1" />{hasRun ? "Rerunning..." : "Running..."}</span>
-            ) : (
-              hasRun ? "Rerun" : "Run"
+          <div className="flex items-center gap-2">
+            {selectedCodes.length > 0 && (
+              <span className="text-xs text-muted-foreground">{selectedCodes.length} codes selected</span>
             )}
-          </Button>
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={handleRun}
+              disabled={loading}
+            >
+              {loading ? (
+                <span className="flex items-center"><Loader2 className="h-4 w-4 animate-spin mr-1" />{hasRun ? "Rerunning..." : "Running..."}</span>
+              ) : (
+                hasRun ? "Rerun" : "Run"
+              )}
+            </Button>
+          </div>
         </div>
-        {hasRun && (
+
+        {hasRun && apiResult && !Array.isArray(apiResult) && (
           <div className="mt-4 p-3 rounded bg-muted border">
             <h5 className="font-medium mb-2">API Response:</h5>
           </div>
@@ -108,27 +155,34 @@ export function MedicalCodingWorkflow({ aiSummary, caseId }: { aiSummary: string
                 const isExpanded = expandedGroups.includes(item.cpt_code);
                 return (
                   <div key={item.cpt_code} className="rounded-xl border bg-card overflow-hidden">
-                    <button
-                      onClick={() => toggleGroup(item.cpt_code)}
-                      className="w-full flex items-start gap-3 p-4 text-left hover:bg-muted/30 transition-colors"
-                    >
-                      <div className="mt-0.5">
-                        {isExpanded ? <ChevronDown className="h-4 w-4 text-muted-foreground" /> : <ChevronRight className="h-4 w-4 text-muted-foreground" />}
-                      </div>
-                      <div className="flex-1 min-w-0">
-                        <div className="flex items-center gap-2 mb-1">
-                          <span className="px-2 py-0.5 rounded text-xs font-medium bg-success/10 text-success">CPT</span>
-                          <span className="font-mono font-semibold text-foreground">{item.cpt_code}</span>
+                    <div className="flex items-start gap-3 p-4">
+                      <Checkbox
+                        checked={isCodeSelected("CPT", item.cpt_code)}
+                        onCheckedChange={() => toggleCode({ type: "CPT", code: item.cpt_code, description: item.justification || "", confidence: item.cpt_score * 100 })}
+                        className="mt-1"
+                      />
+                      <button
+                        onClick={() => toggleGroup(item.cpt_code)}
+                        className="flex-1 flex items-start gap-3 text-left hover:bg-muted/30 transition-colors rounded"
+                      >
+                        <div className="mt-0.5">
+                          {isExpanded ? <ChevronDown className="h-4 w-4 text-muted-foreground" /> : <ChevronRight className="h-4 w-4 text-muted-foreground" />}
                         </div>
-                        <div className="flex flex-col items-start mt-1 ml-7">
-                          <span className="text-[10px] font-medium text-muted-foreground uppercase tracking-wider mb-0.5">Score</span>
-                          <ConfidenceIndicator value={item.cpt_score * 100} size="sm" />
+                        <div className="flex-1 min-w-0">
+                          <div className="flex items-center gap-2 mb-1">
+                            <span className="px-2 py-0.5 rounded text-xs font-medium bg-success/10 text-success">CPT</span>
+                            <span className="font-mono font-semibold text-foreground">{item.cpt_code}</span>
+                          </div>
+                          <div className="flex flex-col items-start mt-1 ml-7">
+                            <span className="text-[10px] font-medium text-muted-foreground uppercase tracking-wider mb-0.5">Score</span>
+                            <ConfidenceIndicator value={item.cpt_score * 100} size="sm" />
+                          </div>
                         </div>
-                      </div>
-                    </button>
+                      </button>
+                    </div>
                     {isExpanded && (
                       <div className="px-4 pb-3">
-                        <div className="ml-7 p-3 rounded-lg bg-primary/5 border border-primary/10">
+                        <div className="ml-11 p-3 rounded-lg bg-primary/5 border border-primary/10">
                           <div className="flex items-center gap-1.5 mb-1.5">
                             <Brain className="h-3.5 w-3.5 text-primary" />
                             <span className="text-xs font-medium text-primary">AI Reasoning</span>
@@ -145,23 +199,30 @@ export function MedicalCodingWorkflow({ aiSummary, caseId }: { aiSummary: string
                         <div className="divide-y">
                           {item.icd_link.map((icd: any, icdIdx: number) => (
                             <div key={icdIdx} className="px-4 py-3 hover:bg-muted/20 transition-colors">
-                              <div className="ml-7">
-                                <div className="flex items-center justify-between mb-1">
-                                  <div className="flex items-center gap-2">
-                                    <span className="px-2 py-0.5 rounded text-xs font-medium bg-info/10 text-info">ICD-10</span>
-                                    <span className="font-mono font-semibold text-sm text-foreground">{icd.icd10_code.code}</span>
+                              <div className="ml-11 flex items-start gap-3">
+                                <Checkbox
+                                  checked={isCodeSelected("ICD-10", icd.icd10_code.code)}
+                                  onCheckedChange={() => toggleCode({ type: "ICD-10", code: icd.icd10_code.code, description: icd.icd10_code.description, confidence: icd.icd10_code.score * 100, parentCpt: item.cpt_code })}
+                                  className="mt-1"
+                                />
+                                <div className="flex-1">
+                                  <div className="flex items-center justify-between mb-1">
+                                    <div className="flex items-center gap-2">
+                                      <span className="px-2 py-0.5 rounded text-xs font-medium bg-info/10 text-info">ICD-10</span>
+                                      <span className="font-mono font-semibold text-sm text-foreground">{icd.icd10_code.code}</span>
+                                    </div>
+                                    <div className="flex flex-col items-start mt-1">
+                                      <span className="text-[10px] font-medium text-muted-foreground uppercase tracking-wider mb-0.5">Score</span>
+                                      <ConfidenceIndicator value={icd.icd10_code.score * 100} size="sm" />
+                                    </div>
                                   </div>
-                                  <div className="flex flex-col items-start mt-1 ml-7">
-                                    <span className="text-[10px] font-medium text-muted-foreground uppercase tracking-wider mb-0.5">Score</span>
-                                    <ConfidenceIndicator value={icd.icd10_code.score * 100} size="sm" />
+                                  <div className="mt-2 p-2.5 rounded-md bg-muted/50 border">
+                                    <div className="flex items-center gap-1.5 mb-1">
+                                      <Brain className="h-3 w-3 text-muted-foreground" />
+                                      <span className="text-[10px] font-medium text-muted-foreground uppercase tracking-wider">Description</span>
+                                    </div>
+                                    <p className="text-xs text-muted-foreground leading-relaxed">{icd.icd10_code.description}</p>
                                   </div>
-                                </div>
-                                <div className="mt-2 p-2.5 rounded-md bg-muted/50 border">
-                                  <div className="flex items-center gap-1.5 mb-1">
-                                    <Brain className="h-3 w-3 text-muted-foreground" />
-                                    <span className="text-[10px] font-medium text-muted-foreground uppercase tracking-wider">Description</span>
-                                  </div>
-                                  <p className="text-xs text-muted-foreground leading-relaxed">{icd.icd10_code.description}</p>
                                 </div>
                               </div>
                             </div>
@@ -176,28 +237,35 @@ export function MedicalCodingWorkflow({ aiSummary, caseId }: { aiSummary: string
                 const isExpanded = expandedGroups.includes(group.cpt.code);
                 return (
                   <div key={group.cpt.code} className="rounded-xl border bg-card overflow-hidden">
-                    <button
-                      onClick={() => toggleGroup(group.cpt.code)}
-                      className="w-full flex items-start gap-3 p-4 text-left hover:bg-muted/30 transition-colors"
-                    >
-                      <div className="mt-0.5">
-                        {isExpanded ? <ChevronDown className="h-4 w-4 text-muted-foreground" /> : <ChevronRight className="h-4 w-4 text-muted-foreground" />}
-                      </div>
-                      <div className="flex-1 min-w-0">
-                        <div className="flex items-center gap-2 mb-1">
-                          <span className="px-2 py-0.5 rounded text-xs font-medium bg-success/10 text-success">CPT</span>
-                          <span className="font-mono font-semibold text-foreground">{group.cpt.code}</span>
-                          <span className="text-sm text-muted-foreground">{group.cpt.description}</span>
+                    <div className="flex items-start gap-3 p-4">
+                      <Checkbox
+                        checked={isCodeSelected("CPT", group.cpt.code)}
+                        onCheckedChange={() => toggleCptWithIcds(group)}
+                        className="mt-1"
+                      />
+                      <button
+                        onClick={() => toggleGroup(group.cpt.code)}
+                        className="flex-1 flex items-start gap-3 text-left hover:bg-muted/30 transition-colors rounded"
+                      >
+                        <div className="mt-0.5">
+                          {isExpanded ? <ChevronDown className="h-4 w-4 text-muted-foreground" /> : <ChevronRight className="h-4 w-4 text-muted-foreground" />}
                         </div>
-                        <div className="flex flex-col items-start mt-1 ml-7">
-                          <span className="text-[10px] font-medium text-muted-foreground uppercase tracking-wider mb-0.5">Confidence</span>
-                          <ConfidenceIndicator value={group.cpt.confidence} size="sm" />
+                        <div className="flex-1 min-w-0">
+                          <div className="flex items-center gap-2 mb-1">
+                            <span className="px-2 py-0.5 rounded text-xs font-medium bg-success/10 text-success">CPT</span>
+                            <span className="font-mono font-semibold text-foreground">{group.cpt.code}</span>
+                            <span className="text-sm text-muted-foreground">{group.cpt.description}</span>
+                          </div>
+                          <div className="flex flex-col items-start mt-1 ml-7">
+                            <span className="text-[10px] font-medium text-muted-foreground uppercase tracking-wider mb-0.5">Confidence</span>
+                            <ConfidenceIndicator value={group.cpt.confidence} size="sm" />
+                          </div>
                         </div>
-                      </div>
-                    </button>
+                      </button>
+                    </div>
                     {isExpanded && (
                       <div className="px-4 pb-3">
-                        <div className="ml-7 p-3 rounded-lg bg-primary/5 border border-primary/10">
+                        <div className="ml-11 p-3 rounded-lg bg-primary/5 border border-primary/10">
                           <div className="flex items-center gap-1.5 mb-1.5">
                             <Brain className="h-3.5 w-3.5 text-primary" />
                             <span className="text-xs font-medium text-primary">AI Reasoning</span>
@@ -214,21 +282,28 @@ export function MedicalCodingWorkflow({ aiSummary, caseId }: { aiSummary: string
                         <div className="divide-y">
                           {group.icdCodes.map((icd) => (
                             <div key={icd.code} className="px-4 py-3 hover:bg-muted/20 transition-colors">
-                              <div className="ml-7">
-                                <div className="flex items-center justify-between mb-1">
-                                  <div className="flex items-center gap-2">
-                                    <span className="px-2 py-0.5 rounded text-xs font-medium bg-info/10 text-info">ICD-10</span>
-                                    <span className="font-mono font-semibold text-sm text-foreground">{icd.code}</span>
-                                    <span className="text-xs text-muted-foreground">{icd.description}</span>
+                              <div className="ml-11 flex items-start gap-3">
+                                <Checkbox
+                                  checked={isCodeSelected("ICD-10", icd.code)}
+                                  onCheckedChange={() => toggleCode({ type: "ICD-10", code: icd.code, description: icd.description, confidence: icd.confidence, parentCpt: group.cpt.code })}
+                                  className="mt-1"
+                                />
+                                <div className="flex-1">
+                                  <div className="flex items-center justify-between mb-1">
+                                    <div className="flex items-center gap-2">
+                                      <span className="px-2 py-0.5 rounded text-xs font-medium bg-info/10 text-info">ICD-10</span>
+                                      <span className="font-mono font-semibold text-sm text-foreground">{icd.code}</span>
+                                      <span className="text-xs text-muted-foreground">{icd.description}</span>
+                                    </div>
+                                    <ConfidenceIndicator value={icd.confidence} size="sm" />
                                   </div>
-                                  <ConfidenceIndicator value={icd.confidence} size="sm" />
-                                </div>
-                                <div className="mt-2 p-2.5 rounded-md bg-muted/50 border">
-                                  <div className="flex items-center gap-1.5 mb-1">
-                                    <Brain className="h-3 w-3 text-muted-foreground" />
-                                    <span className="text-[10px] font-medium text-muted-foreground uppercase tracking-wider">Reasoning</span>
+                                  <div className="mt-2 p-2.5 rounded-md bg-muted/50 border">
+                                    <div className="flex items-center gap-1.5 mb-1">
+                                      <Brain className="h-3 w-3 text-muted-foreground" />
+                                      <span className="text-[10px] font-medium text-muted-foreground uppercase tracking-wider">Reasoning</span>
+                                    </div>
+                                    <p className="text-xs text-muted-foreground leading-relaxed">{icd.reasoning}</p>
                                   </div>
-                                  <p className="text-xs text-muted-foreground leading-relaxed">{icd.reasoning}</p>
                                 </div>
                               </div>
                             </div>
@@ -253,31 +328,14 @@ export function MedicalCodingWorkflow({ aiSummary, caseId }: { aiSummary: string
       </div>
 
       {/* Right Column - Citation from Summary */}
-      <div className="lg:col-span-4 space-y-6">
+      <div className="lg:col-span-5 space-y-6">
         <CitationPanel aiSummary={aiSummary} clinicalData={clinicalData} />
       </div>
     </div>
   );
 }
 
-/* ── Extracted Sub-components ── */
-
-function CaseSummaryPanel() {
-  return (
-    <div className="rounded-xl border bg-card p-5">
-      <h4 className="font-medium text-foreground mb-4">Case Summary</h4>
-      <div className="space-y-3 text-sm">
-        <div><p className="text-xs text-muted-foreground">Patient</p><p className="font-medium">Sarah Johnson (PT-78234)</p></div>
-        <div><p className="text-xs text-muted-foreground">Provider</p><p className="font-medium">Dr. Michael Chen</p></div>
-        <div><p className="text-xs text-muted-foreground">Encounter</p><p className="font-medium">Inpatient Surgery</p></div>
-        <div className="flex items-center justify-between pt-2 border-t">
-          <span className="text-muted-foreground">Coding Status</span>
-          <StatusBadge variant="pa-review">In Progress</StatusBadge>
-        </div>
-      </div>
-    </div>
-  );
-}
+/* ── Citation Sub-component ── */
 
 function CitationPanel({ aiSummary, clinicalData }: { aiSummary: string; clinicalData: any }) {
   return (
@@ -367,28 +425,6 @@ function CitationPanel({ aiSummary, clinicalData }: { aiSummary: string; clinica
             ))}
           </ul>
         </div>
-      </div>
-    </div>
-  );
-}
-
-function ExportPanel({ groupCount }: { groupCount: number }) {
-  return (
-    <div className="rounded-xl border bg-card p-5">
-      <div className="flex items-center gap-2 mb-4">
-        <Download className="h-5 w-5 text-success" />
-        <h4 className="font-medium text-foreground">Export Codes</h4>
-      </div>
-      <div className="space-y-2 mb-4">
-        <p className="text-sm text-muted-foreground">{groupCount} CPT groups with linked ICD-10 codes</p>
-      </div>
-      <div className="space-y-2">
-        <Button variant="outline" size="sm" className="w-full justify-start"><Code2 className="h-4 w-4 mr-2" /> Export as JSON</Button>
-        <Button variant="outline" size="sm" className="w-full justify-start"><FileText className="h-4 w-4 mr-2" /> Export as FHIR</Button>
-        <Button variant="outline" size="sm" className="w-full justify-start"><FileText className="h-4 w-4 mr-2" /> Export as CSV</Button>
-      </div>
-      <div className="mt-4 pt-4 border-t">
-        <Button variant="hero" className="w-full">Send to Pre-Auth Agent</Button>
       </div>
     </div>
   );
