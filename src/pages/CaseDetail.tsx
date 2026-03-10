@@ -67,15 +67,6 @@ export default function CaseDetail() {
               <Code2 className="h-4 w-4 mr-2" />
               Medical Coding
             </TabsTrigger>
-            <TabsTrigger value="procedure" className="h-10 px-6 data-[state=active]:bg-card">
-              <ClipboardList className="h-4 w-4 mr-2" />
-              Procedure
-              {selectedCodes.length > 0 && (
-                <span className="ml-2 px-1.5 py-0.5 rounded-full text-xs font-medium bg-primary text-primary-foreground">
-                  {selectedCodes.length}
-                </span>
-              )}
-            </TabsTrigger>
             <TabsTrigger value="pre-auth" className="h-10 px-6 data-[state=active]:bg-card">
               <FileCheck className="h-4 w-4 mr-2" />
               Pre-Authorization
