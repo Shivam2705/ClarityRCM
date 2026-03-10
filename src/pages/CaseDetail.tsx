@@ -10,11 +10,11 @@ import { InlineDocumentViewer } from "@/components/case-detail/panels/InlineDocu
 import { StatusBadge } from "@/components/ui/status-badge";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { ArrowLeft, FileCheck, Code2, FileText, Receipt, Landmark, ClipboardList, X } from "lucide-react";
+import { ArrowLeft, FileCheck, Code2, FileText, Receipt, Landmark } from "lucide-react";
 import { ClaimsManagementWorkflow } from "@/components/case-detail/ClaimsManagementWorkflow";
 import { AccountsReceivableWorkflow } from "@/components/case-detail/AccountsReceivableWorkflow";
 import { mockCases, Case } from "@/data/mockCases";
-import { ConfidenceIndicator } from "@/components/ui/confidence-indicator";
+import { toast } from "sonner";
 
 export default function CaseDetail() {
   const { caseId } = useParams();
