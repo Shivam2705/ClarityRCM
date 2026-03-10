@@ -276,7 +276,7 @@ IMPRESSION:
 2. Complex degenerative medial meniscal tear with extrusion.
 3. Moderate joint effusion and Baker's cyst.
 4. Ligaments intact.
-5. Findings support clinical indication for total knee arthroplasty.`,
+5. Findings support clinical indication for total knee arthroplasty. <img src='/cases/001/MRI_Knee.png'/>`,
   },
   {
     id: "c1-doc-8",
@@ -320,7 +320,7 @@ IMPRESSION:
 1. Kellgren-Lawrence Grade IV osteoarthritis of the right knee, worst in the medial compartment.
 2. Bone-on-bone medial compartment narrowing with varus deformity of 8°.
 3. Progressive changes compared to prior study from June 2023.
-4. Findings consistent with clinical indication for total knee arthroplasty.`,
+4. Findings consistent with clinical indication for total knee arthroplasty. <img src='/cases/001/X_Ray.jpg'/>`,
   },
   {
     id: "c1-doc-9",
@@ -950,6 +950,38 @@ PREVENTIVE CARE:
 • Last Pap smear: 2023 (normal)
 • Flu vaccine: 2023
 • COVID-19: Fully vaccinated + booster`,
+  },
+  {
+    id: "c3-doc-7",
+    name: "Renal & Bladder Ultrasound Report",
+    type: "imaging-report",
+    date: "Jan 17, 2024",
+    pages: 2,
+    preview:
+`RADIOLOGY REPORT — RENAL & BLADDER ULTRASOUND
+Facility: Regional Medical Center, Radiology Department
+Patient: Maria Garcia | DOB: 11/05/1982 | MRN: PT-91823
+Date of Exam: January 17, 2024
+Ordering Provider: Dr. James Park
+Radiologist: Dr. Helen Morris, MD
+
+PROCEDURE: Limited renal and bladder ultrasound.
+
+CLINICAL INDICATION: Dysuria, urgency, and recurrent lower urinary tract symptoms. Rule out hydronephrosis or urinary retention.
+
+FINDINGS:
+• Right kidney: 10.8 cm, normal cortical thickness and echogenicity.
+• Left kidney: 10.6 cm, normal cortical thickness and echogenicity.
+• No hydronephrosis, focal renal mass, or shadowing renal calculi identified.
+• Urinary bladder wall thickness within normal limits.
+• Pre-void bladder volume: 210 mL.
+• Post-void residual: 18 mL (not clinically significant).
+
+IMPRESSION:
+1. Unremarkable renal ultrasound without hydronephrosis.
+2. No sonographic evidence of obstructive uropathy.
+3. Minimal post-void residual volume.
+4. Imaging findings consistent with uncomplicated lower urinary tract infection. <img src='/cases/003/ultrasound.jpg'/>`,
   },
 ];
 

@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useParams, useNavigate, useLocation } from "react-router-dom";
 import { DashboardHeader } from "@/components/dashboard/DashboardHeader";
 import { PersonaToggle, Persona } from "@/components/dashboard/PersonaToggle";
@@ -13,7 +13,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { ArrowLeft, FileCheck, Code2, FileText, Receipt, Landmark } from "lucide-react";
 import { ClaimsManagementWorkflow } from "@/components/case-detail/ClaimsManagementWorkflow";
 import { AccountsReceivableWorkflow } from "@/components/case-detail/AccountsReceivableWorkflow";
-import { mockCases, Case } from "@/data/mockCases";
+import { mockCases } from "@/data/mockCases";
 import { toast } from "sonner";
 
 export default function CaseDetail() {
@@ -26,18 +26,15 @@ export default function CaseDetail() {
   const [activeTab, setActiveTab] = useState("coding");
   const [selectedCodes, setSelectedCodes] = useState<SelectedCode[]>([]);
   const [approvedCodes, setApprovedCodes] = useState<SelectedCode[]>([]);
+  const [generatedSummary, setGeneratedSummary] = useState<string | null>(null);
 
-  function getAllCases(): Case[] {
-    try {
-      const userCases = JSON.parse(localStorage.getItem("userCases") || "[]");
-      return [...mockCases, ...userCases];
-    } catch {
-      return [...mockCases];
-    }
-  }
-
-  const allCases = getAllCases();
+  const allCases = mockCases;
   const caseData = allCases.find((c) => c.id === caseId) || allCases[0];
+
+  useEffect(() => {
+    // Prevent carrying generated summary to a different case.
+    setGeneratedSummary(null);
+  }, [caseData.id]);
 
   const handleApproveCodes = (codes: SelectedCode[]) => {
     setApprovedCodes(codes);
@@ -69,7 +66,8 @@ export default function CaseDetail() {
           procedureCode={caseData.procedureCode}
           payerName={caseData.payerName}
           orderingProvider={caseData.orderingProvider}
-          aiSummary={caseData.aiSummary}
+          aiSummary={generatedSummary || undefined}
+          hasSummary={!!generatedSummary}
           approvedCodes={approvedCodes}
         />
 
@@ -97,7 +95,7 @@ export default function CaseDetail() {
             </TabsTrigger>
           </TabsList>
 
-          <TabsContent value="coding" className="mt-6">
+          <TabsContent value="coding" className="mt-6" forceMount>
             <MedicalCodingWorkflow 
               aiSummary={caseData.aiSummary} 
               caseId={caseData.id}
@@ -108,7 +106,7 @@ export default function CaseDetail() {
           </TabsContent>
 
 
-          <TabsContent value="pre-auth" className="mt-6">
+          <TabsContent value="pre-auth" className="mt-6" forceMount>
             {persona === "provider" ? (
               <PreAuthProviderWorkflow
                 caseData={caseData}
@@ -120,15 +118,19 @@ export default function CaseDetail() {
             )}
           </TabsContent>
 
-          <TabsContent value="documents" className="mt-6">
-            <InlineDocumentViewer caseId={caseId || "CASE-001"} />
+          <TabsContent value="documents" className="mt-6" forceMount>
+            <InlineDocumentViewer
+              caseId={caseId || "CASE-001"}
+              summaryContent={caseData.aiSummary || caseData.documentSummary || ""}
+              onSummaryGenerated={setGeneratedSummary}
+            />
           </TabsContent>
 
-          <TabsContent value="claims" className="mt-6">
+          <TabsContent value="claims" className="mt-6" forceMount>
             <ClaimsManagementWorkflow />
           </TabsContent>
 
-          <TabsContent value="ar" className="mt-6">
+          <TabsContent value="ar" className="mt-6" forceMount>
             <AccountsReceivableWorkflow />
           </TabsContent>
         </Tabs>

@@ -53,7 +53,7 @@ const case2: ClinicalProfile = {
 
 const case3: ClinicalProfile = {
   gender: "Female",
-  primaryDiagnosis: "Essential Hypertension - Follow-up Visit",
+  primaryDiagnosis: "Urinary Tract Infection",
   icdCode: "",
   severity: "Controlled with medication",
   duration: "5 years",

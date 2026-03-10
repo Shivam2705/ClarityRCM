@@ -1056,10 +1056,6 @@ export function PreAuthProviderWorkflow({ caseData, selectedCodes = [], approved
     );
 
     try {
-      // Build clinical notes from document summary and patient metadata
-      const clinicalNotes = documentSummary;
-      const patientMeta = `Patient: ${activeCase.patientName}, DOB: ${activeCase.dateOfBirth}, ID: ${activeCase.patientId}, Encounter: ${activeCase.encounterType}, Provider: ${activeCase.orderingProvider}`;
-
       const selectedCpts = selectedCodes
         .filter((code) => code.type === "CPT")
         .map((code) => code.code);
@@ -1096,7 +1092,7 @@ export function PreAuthProviderWorkflow({ caseData, selectedCodes = [], approved
     } finally {
       setAgentLoading(false);
     }
-  }, []);
+  }, [activeCase, approvedCodes, documentSummary, selectedCodes]);
 
   const renderPanel = () => {
     switch (currentStep) {

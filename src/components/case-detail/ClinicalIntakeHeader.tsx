@@ -1,10 +1,9 @@
-import { useMemo, useState } from "react";
+import { useMemo } from "react";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { User, Stethoscope, FileText, Phone, CreditCard, Activity, Pill, AlertCircle, Sparkles, FileUp, Eye, Loader2, RefreshCw } from "lucide-react";
-import { useNavigate, useParams } from "react-router-dom";
+import { User, Stethoscope, Phone, CreditCard, Activity, AlertCircle, Sparkles } from "lucide-react";
+import { useParams } from "react-router-dom";
 import { getClinicalData } from "@/data/clinicalData";
 import { format } from "date-fns";
 interface ApprovedCode {
@@ -37,16 +36,11 @@ export function ClinicalIntakeHeader({
   payerName,
   orderingProvider,
   hasDocuments = true,
-  hasSummary = true,
+  hasSummary = false,
   aiSummary,
   approvedCodes = []
 }: ClinicalIntakeHeaderProps) {
-  const navigate = useNavigate();
-  const {
-    caseId
-  } = useParams();
-  const [isGeneratingSummary, setIsGeneratingSummary] = useState(false);
-  const [summaryGenerated, setSummaryGenerated] = useState(hasSummary);
+  const { caseId } = useParams();
   const clinicalData = getClinicalData(caseId || "CASE-001");
   const { formattedDob, ageLabel, ageDescriptor } = useMemo(() => {
     if (!dateOfBirth) {
@@ -149,25 +143,6 @@ export function ClinicalIntakeHeader({
 ];
   // Use aiSummary from props if available, otherwise fallback to template
   const summaryToShow = aiSummary || clinicalData.summaryTemplate(patientName, ageDescriptor, procedureName || "requested procedure", procedureCode || "N/A");
-  const handleGenerateSummary = () => {
-    if (!hasDocuments) {
-      navigate(`/case/${caseId}/documents`);
-      return;
-    }
-    setIsGeneratingSummary(true);
-    // Simulate AI generation
-    setTimeout(() => {
-      setIsGeneratingSummary(false);
-      setSummaryGenerated(true);
-    }, 2000);
-  };
-  const handleRegenerateSummary = () => {
-    setIsGeneratingSummary(true);
-    setTimeout(() => {
-      setIsGeneratingSummary(false);
-      setSummaryGenerated(true);
-    }, 2000);
-  };
   return <>
     <Card className="p-4 bg-card border-border mb-4">
       {/* Compact Header Row with Action Buttons */}
@@ -291,46 +266,18 @@ export function ClinicalIntakeHeader({
     </Card>
 
     {/* AI Generated Summary - Separate Card */}
-    <Card className="p-4 bg-card border-border mb-4">
-      {summaryGenerated && hasDocuments ? <div className="p-3 rounded-lg bg-gradient-to-r from-primary/10 via-primary/5 to-transparent border border-primary/20">
+    {hasSummary && hasDocuments && (
+      <Card className="p-4 bg-card border-border mb-4">
+        <div className="p-3 rounded-lg bg-gradient-to-r from-primary/10 via-primary/5 to-transparent border border-primary/20">
           <div className="flex items-start gap-2">
             <Sparkles className="h-4 w-4 text-primary mt-0.5 flex-shrink-0" />
             <div className="flex-1">
-              <div className="flex items-center justify-between mb-1">
-                <h4 className="text-xs font-semibold text-primary uppercase tracking-wide">AI Patient Summary</h4>
-                <Button size="sm" variant="outline" onClick={handleRegenerateSummary} disabled={isGeneratingSummary}>
-                  {isGeneratingSummary ? <Loader2 className="h-4 w-4 mr-2 animate-spin" /> : <RefreshCw className="h-4 w-4 mr-2" />}
-                  Regenerate Summary
-                </Button>
-              </div>
+              <h4 className="text-xs font-semibold text-primary uppercase tracking-wide mb-1">AI Patient Summary</h4>
               <p className="text-sm text-foreground/90 leading-relaxed">{summaryToShow}</p>
             </div>
           </div>
-        </div> : <div className="p-3 rounded-lg bg-muted/50 border border-border">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-2">
-              <Sparkles className="h-4 w-4 text-muted-foreground" />
-              <div>
-                <h4 className="text-xs font-semibold text-muted-foreground uppercase tracking-wide">AI Patient Summary</h4>
-                <p className="text-xs text-muted-foreground">
-                  {hasDocuments ? "Documents available. Generate an AI summary for quick overview." : "No documents uploaded yet. Upload documents to generate patient summary."}
-                </p>
-              </div>
-            </div>
-            <Button size="sm" onClick={handleGenerateSummary} disabled={isGeneratingSummary}>
-              {isGeneratingSummary ? <>
-                  <Loader2 className="h-4 w-4 mr-2 animate-spin" />
-                  Generating...
-                </> : hasDocuments ? <>
-                  <Sparkles className="h-4 w-4 mr-2" />
-                  Generate Summary
-                </> : <>
-                  <Eye className="h-4 w-4 mr-2" />
-                  Upload & Analyze
-                </>}
-            </Button>
-          </div>
-        </div>}
-    </Card>
+        </div>
+      </Card>
+    )}
   </>;
 }

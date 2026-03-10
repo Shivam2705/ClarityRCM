@@ -1,4 +1,4 @@
-import { useState, useMemo } from "react";
+import { useState, useMemo, ReactNode } from "react";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { getCaseDocuments, CaseDocument } from "@/data/caseDocuments";
@@ -36,14 +36,90 @@ const documentCategories = [
   { type: "medical-test", label: "Medical Tests", icon: TestTube },
   { type: "imaging-report", label: "Imaging Reports", icon: ImageIcon },
   { type: "notes", label: "Notes", icon: StickyNote },
-  { type: "summary", label: "AI Summaries", icon: Sparkles },
+  // { type: "summary", label: "AI Summaries", icon: Sparkles },
 ];
 
 interface InlineDocumentViewerProps {
   caseId: string;
+  summaryContent?: string;
+  onSummaryGenerated?: (summary: string) => void;
 }
 
-export function InlineDocumentViewer({ caseId }: InlineDocumentViewerProps) {
+const IMG_TAG_REGEX = /<img\s+[^>]*src=['"]([^'"]+)['"][^>]*\/?>/gi;
+
+function normalizeImageSrc(src: string): string {
+  const trimmed = src.trim();
+  if (trimmed.startsWith("public/")) {
+    return `/${trimmed.slice("public/".length)}`;
+  }
+  return trimmed;
+}
+
+function renderPreviewWithImages(preview: string): ReactNode[] {
+  const nodes: ReactNode[] = [];
+  let lastIndex = 0;
+  let match: RegExpExecArray | null;
+
+  while ((match = IMG_TAG_REGEX.exec(preview)) !== null) {
+    const [fullMatch, src] = match;
+    const start = match.index;
+
+    if (start > lastIndex) {
+      const textChunk = preview.slice(lastIndex, start);
+      if (textChunk.trim().length > 0) {
+        nodes.push(
+          <p key={`text-${start}`} className="whitespace-pre-wrap font-sans text-slate-700 leading-relaxed text-sm">
+            {textChunk}
+          </p>,
+        );
+      }
+    }
+
+    const normalizedSrc = normalizeImageSrc(src);
+    if (/^(https?:\/\/|\/|\.\/|\.\.\/)/i.test(normalizedSrc)) {
+      nodes.push(
+        <img
+          key={`img-${start}`}
+          src={normalizedSrc}
+          alt="Embedded document preview"
+          className="my-4 w-full rounded-md border border-slate-200"
+          loading="lazy"
+        />,
+      );
+    } else {
+      nodes.push(
+        <p key={`raw-${start}`} className="whitespace-pre-wrap font-sans text-slate-700 leading-relaxed text-sm">
+          {fullMatch}
+        </p>,
+      );
+    }
+
+    lastIndex = start + fullMatch.length;
+  }
+
+  if (lastIndex < preview.length) {
+    const tail = preview.slice(lastIndex);
+    if (tail.trim().length > 0) {
+      nodes.push(
+        <p key={`text-tail-${lastIndex}`} className="whitespace-pre-wrap font-sans text-slate-700 leading-relaxed text-sm">
+          {tail}
+        </p>,
+      );
+    }
+  }
+
+  if (nodes.length === 0) {
+    nodes.push(
+      <p key="text-only" className="whitespace-pre-wrap font-sans text-slate-700 leading-relaxed text-sm">
+        {preview}
+      </p>,
+    );
+  }
+
+  return nodes;
+}
+
+export function InlineDocumentViewer({ caseId, summaryContent, onSummaryGenerated }: InlineDocumentViewerProps) {
   const initialDocs = useMemo(() => getCaseDocuments(caseId), [caseId]);
   const [documents, setDocuments] = useState<Document[]>(initialDocs);
   const [selectedDoc, setSelectedDoc] = useState<Document>(initialDocs[0]);
@@ -111,30 +187,11 @@ export function InlineDocumentViewer({ caseId }: InlineDocumentViewerProps) {
     setGeneratingSummary(true);
     // Simulate AI generation
     setTimeout(() => {
-      const today = new Date().toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" });
-      const summaryDoc: Document = {
-        id: `doc-summary-${Date.now()}`,
-        name: "AI Patient Summary",
-        type: "summary",
-        date: today,
-        pages: 1,
-        preview: `PATIENT SUMMARY — Generated ${today}\n\n` +
-          `DEMOGRAPHICS:\n68-year-old female presenting for total knee arthroplasty evaluation.\n\n` +
-          `PRIMARY DIAGNOSIS:\nKellgren-Lawrence Grade IV osteoarthritis of the right knee with complete loss of articular cartilage in the medial compartment, bone-on-bone contact, subchondral sclerosis, and osteophyte formation.\n\n` +
-          `CLINICAL HISTORY:\nPatient reports chronic right knee pain with progressive functional decline over 3+ years. Failed conservative management including:\n• NSAIDs (Meloxicam 15mg daily × 4 months) — minimal relief\n• Acetaminophen 500mg PRN for breakthrough pain\n• Physical therapy — completed without significant improvement\n• Corticosteroid injections — temporary relief only\n\n` +
-          `IMAGING FINDINGS:\n• MRI (Dec 28, 2023): Complete cartilage loss medial compartment, subchondral bone marrow edema, moderate effusion, degenerative medial meniscus tear. ACL/PCL intact.\n• X-Ray (Dec 15, 2023): Bone-on-bone medial compartment, Grade IV OA changes, varus deformity.\n\n` +
-          `LABORATORY RESULTS (Jan 5, 2024):\n• CBC: All values within normal limits\n• BMP: Glucose slightly elevated at 112 mg/dL; electrolytes and renal function normal\n• HbA1c: 6.8% (Type 2 DM, controlled)\n\n` +
-          `COMORBIDITIES:\n• Hypertension — controlled\n• Type 2 Diabetes Mellitus — HbA1c 6.8%\n• No known drug allergies\n\n` +
-          `SURGICAL HISTORY:\n• Appendectomy (1985)\n• Cholecystectomy (2010)\n\n` +
-          `RECOMMENDATION:\nTotal knee arthroplasty recommended. Patient meets medical necessity criteria with documented failure of conservative treatment, significant functional impairment, and Grade IV radiographic changes.\n\n` +
-          `CONFIDENCE: 96% — Based on analysis of 9 clinical documents.`,
-      };
-      setDocuments((prev) => [...prev, summaryDoc]);
-      setSelectedDoc(summaryDoc);
-      setCurrentPage(1);
+      const summaryText = (summaryContent || "").trim();
+      onSummaryGenerated?.(summaryText);
       setGeneratingSummary(false);
-      toast.success("AI Patient Summary generated successfully");
-    }, 3000);
+      toast.success("AI Patient Summary generated and added to Clinical Intake Header");
+    }, 5000);
   };
 
   return (
@@ -272,9 +329,7 @@ export function InlineDocumentViewer({ caseId }: InlineDocumentViewerProps) {
 
                   {/* Document Body */}
                   <div className="prose prose-sm max-w-none">
-                    <pre className="whitespace-pre-wrap font-sans text-slate-700 leading-relaxed text-sm">
-                      {selectedDoc.preview}
-                    </pre>
+                    {renderPreviewWithImages(selectedDoc.preview)}
 
                     {selectedDoc.pages > 1 && (
                       <div className="mt-6 pt-6 border-t border-slate-200">

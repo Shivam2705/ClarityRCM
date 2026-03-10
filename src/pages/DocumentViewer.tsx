@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, ReactNode } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { DashboardHeader } from "@/components/dashboard/DashboardHeader";
 import { Button } from "@/components/ui/button";
@@ -28,6 +28,80 @@ interface Document {
   date: string;
   pages: number;
   preview: string;
+}
+
+const IMG_TAG_REGEX = /<img\s+[^>]*src=['"]([^'"]+)['"][^>]*\/?>/gi;
+
+function normalizeImageSrc(src: string): string {
+  const trimmed = src.trim();
+  if (trimmed.startsWith("public/")) {
+    return `/${trimmed.slice("public/".length)}`;
+  }
+  return trimmed;
+}
+
+function renderPreviewWithImages(preview: string): ReactNode[] {
+  const nodes: ReactNode[] = [];
+  let lastIndex = 0;
+  let match: RegExpExecArray | null;
+
+  while ((match = IMG_TAG_REGEX.exec(preview)) !== null) {
+    const [fullMatch, src] = match;
+    const start = match.index;
+
+    if (start > lastIndex) {
+      const textChunk = preview.slice(lastIndex, start);
+      if (textChunk.trim().length > 0) {
+        nodes.push(
+          <p key={`text-${start}`} className="whitespace-pre-wrap font-sans text-slate-700 leading-relaxed">
+            {textChunk}
+          </p>,
+        );
+      }
+    }
+
+    const normalizedSrc = normalizeImageSrc(src);
+    if (/^(https?:\/\/|\/|\.\/|\.\.\/)/i.test(normalizedSrc)) {
+      nodes.push(
+        <img
+          key={`img-${start}`}
+          src={normalizedSrc}
+          alt="Embedded document preview"
+          className="my-4 w-full rounded-md border border-slate-200"
+          loading="lazy"
+        />,
+      );
+    } else {
+      nodes.push(
+        <p key={`raw-${start}`} className="whitespace-pre-wrap font-sans text-slate-700 leading-relaxed">
+          {fullMatch}
+        </p>,
+      );
+    }
+
+    lastIndex = start + fullMatch.length;
+  }
+
+  if (lastIndex < preview.length) {
+    const tail = preview.slice(lastIndex);
+    if (tail.trim().length > 0) {
+      nodes.push(
+        <p key={`text-tail-${lastIndex}`} className="whitespace-pre-wrap font-sans text-slate-700 leading-relaxed">
+          {tail}
+        </p>,
+      );
+    }
+  }
+
+  if (nodes.length === 0) {
+    nodes.push(
+      <p key="text-only" className="whitespace-pre-wrap font-sans text-slate-700 leading-relaxed">
+        {preview}
+      </p>,
+    );
+  }
+
+  return nodes;
 }
 
 const documents: Document[] = [
@@ -288,9 +362,7 @@ export default function DocumentViewer() {
 
                   {/* Document Body */}
                   <div className="prose prose-sm max-w-none">
-                    <pre className="whitespace-pre-wrap font-sans text-slate-700 leading-relaxed">
-                      {selectedDoc.preview}
-                    </pre>
+                    {renderPreviewWithImages(selectedDoc.preview)}
 
                     {/* Additional placeholder content for multi-page documents */}
                     {selectedDoc.pages > 1 && (
