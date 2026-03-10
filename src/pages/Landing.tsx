@@ -65,7 +65,10 @@ const Landing = () => {
                 End-to-End Revenue Cycle Platform
               </span>
             </h1>
-            <img alt="Powered by Google" className="h-8 mx-auto mb-6" src="/lovable-uploads/be5eee7e-00d3-458e-8fdc-b61d5f552e8f.png" />
+            <div className="flex flex-col items-center mb-6">
+              <span className="text-xs text-white/70 mb-1">powered by</span>
+              <img alt="Powered by Google" className="h-8" src="/lovable-uploads/be5eee7e-00d3-458e-8fdc-b61d5f552e8f.png" />
+            </div>
             <p className="text-xl text-muted-foreground leading-relaxed mb-12 max-w-3xl mx-auto">
               Transform your Revenue Cycle Management with intelligent multi-agent orchestration. Leveraging hybrid
               retrieval, advanced reasoning, and real-time decision-making to streamline prior authorizations from days
