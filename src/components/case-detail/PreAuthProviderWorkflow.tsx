@@ -1425,7 +1425,7 @@ function DocumentAnalysisSection({ isEditing, onSave, onCancel, onComplete, case
   const navigate = useNavigate();
   const { caseId } = useParams();
   const [isAnalyzing, setIsAnalyzing] = useState(false);
-  const [hasAnalysis, setHasAnalysis] = useState(true);
+  const [hasAnalysis, setHasAnalysis] = useState(false);
 
   const documents = [
     { name: "Clinical Notes - Dr. Chen", date: "2024-01-15", status: "analyzed" },
