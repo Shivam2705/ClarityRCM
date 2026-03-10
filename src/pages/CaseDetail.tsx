@@ -75,6 +75,10 @@ export default function CaseDetail() {
 
         <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
           <TabsList className="h-12 p-1 bg-muted">
+            <TabsTrigger value="documents" className="h-10 px-6 data-[state=active]:bg-card">
+              <FileText className="h-4 w-4 mr-2" />
+              Document Analysis
+            </TabsTrigger>
             <TabsTrigger value="coding" className="h-10 px-6 data-[state=active]:bg-card">
               <Code2 className="h-4 w-4 mr-2" />
               Medical Coding
@@ -82,10 +86,6 @@ export default function CaseDetail() {
             <TabsTrigger value="pre-auth" className="h-10 px-6 data-[state=active]:bg-card">
               <FileCheck className="h-4 w-4 mr-2" />
               Pre-Authorization
-            </TabsTrigger>
-            <TabsTrigger value="documents" className="h-10 px-6 data-[state=active]:bg-card">
-              <FileText className="h-4 w-4 mr-2" />
-              View Documents
             </TabsTrigger>
             <TabsTrigger value="claims" className="h-10 px-6 data-[state=active]:bg-card">
               <Receipt className="h-4 w-4 mr-2" />
