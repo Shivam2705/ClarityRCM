@@ -1187,6 +1187,7 @@ export function PreAuthProviderWorkflow({ caseData }: PreAuthProviderWorkflowPro
             eligibilityStatus={eligibilityStatus}
             onStatusChange={setEligibilityStatus}
             onComplete={handleEligibilityComplete}
+            payerName={activeCase.payerName}
           />
         );
     }
