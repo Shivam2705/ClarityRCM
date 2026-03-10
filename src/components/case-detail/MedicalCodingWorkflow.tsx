@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { callMedicalCodingApi } from "@/services/medicalCodingApi";
+import { HumanOverridePanel } from "./HumanOverridePanel";
 import { ConfidenceIndicator } from "@/components/ui/confidence-indicator";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
