@@ -1142,6 +1142,7 @@ export function PreAuthProviderWorkflow({ caseData }: PreAuthProviderWorkflowPro
             eligibilityStatus={eligibilityStatus}
             onStatusChange={setEligibilityStatus}
             onComplete={handleEligibilityComplete}
+            payerName={activeCase.payerName}
           />
         );
       case "document-analysis":
@@ -1186,6 +1187,7 @@ export function PreAuthProviderWorkflow({ caseData }: PreAuthProviderWorkflowPro
             eligibilityStatus={eligibilityStatus}
             onStatusChange={setEligibilityStatus}
             onComplete={handleEligibilityComplete}
+            payerName={activeCase.payerName}
           />
         );
     }
@@ -1241,6 +1243,7 @@ interface EligibilitySectionProps {
   eligibilityStatus: "idle" | "processing" | "eligible" | "not-eligible";
   onStatusChange: (status: "idle" | "processing" | "eligible" | "not-eligible") => void;
   onComplete: (status: "eligible" | "not-eligible") => void;
+  payerName: string;
 }
 
 function EligibilityHeader({
@@ -1358,6 +1361,7 @@ function EligibilitySection({
   eligibilityStatus,
   onStatusChange,
   onComplete,
+  payerName,
 }: EligibilitySectionProps) {
   const handleRunCheck = () => {
     onStatusChange("processing");
@@ -1412,7 +1416,7 @@ function EligibilitySection({
                 <InfoCard
                   icon={<Shield className="h-4 w-4" />}
                   label="Payer"
-                  value="Aetna"
+                  value={payerName}
                   editable={isEditing}
                 />
                 <InfoCard icon={<Shield className="h-4 w-4" />} label="Plan Type" value="PPO" editable={isEditing} />
