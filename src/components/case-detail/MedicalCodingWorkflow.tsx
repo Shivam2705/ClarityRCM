@@ -141,6 +141,14 @@ export function MedicalCodingWorkflow({ aiSummary, caseId, selectedCodes, onSele
                 hasRun ? "Rerun" : "Run"
               )}
             </Button>
+            <Button
+              size="sm"
+              onClick={() => onApprove(selectedCodes)}
+              disabled={selectedCodes.length === 0}
+            >
+              <CheckCircle2 className="h-4 w-4 mr-1" />
+              Approve
+            </Button>
           </div>
         </div>
 
