@@ -22,7 +22,7 @@ export default function CaseDetail() {
   const initialPersona = (location.state as { persona?: Persona })?.persona || "provider";
   
   const [persona, setPersona] = useState<Persona>(initialPersona);
-  const [activeTab, setActiveTab] = useState("pre-auth");
+  const [activeTab, setActiveTab] = useState("coding");
 
   function getAllCases(): Case[] {
     try {
