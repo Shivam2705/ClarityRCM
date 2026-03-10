@@ -1145,10 +1145,8 @@ export function PreAuthProviderWorkflow({ caseData }: PreAuthProviderWorkflowPro
               onEditStep={handleEditStep}
               lockedSteps={
                 eligibilityStatus !== "eligible"
-                  ? ["document-analysis", "prior-auth-decision", "gap-analysis", "submit-to-payer"]
-                  : workflowPhase === "document-analysis"
-                    ? ["prior-auth-decision", "gap-analysis", "submit-to-payer"]
-                    : []
+                  ? ["prior-auth-decision", "gap-analysis", "submit-to-payer"]
+                  : []
               }
             />
           </Card>
