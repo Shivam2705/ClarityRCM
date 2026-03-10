@@ -7,6 +7,14 @@ import { User, Stethoscope, FileText, Phone, CreditCard, Activity, Pill, AlertCi
 import { useNavigate, useParams } from "react-router-dom";
 import { getClinicalData } from "@/data/clinicalData";
 import { format } from "date-fns";
+interface ApprovedCode {
+  type: "CPT" | "ICD-10";
+  code: string;
+  description: string;
+  confidence: number;
+  parentCpt?: string;
+}
+
 interface ClinicalIntakeHeaderProps {
   patientName: string;
   patientId: string;
@@ -18,6 +26,7 @@ interface ClinicalIntakeHeaderProps {
   hasDocuments?: boolean;
   hasSummary?: boolean;
   aiSummary?: string;
+  approvedCodes?: ApprovedCode[];
 }
 export function ClinicalIntakeHeader({
   patientName,
