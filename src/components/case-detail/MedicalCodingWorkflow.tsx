@@ -268,12 +268,9 @@ function CitationPanel({ aiSummary, clinicalData, markdown }: { aiSummary: strin
           />
         </div>
       ) : (
-        <div className="p-4 rounded-lg bg-primary/5 border border-primary/10 mb-4">
-          <div className="flex items-center gap-1.5 mb-2">
-            <Brain className="h-3.5 w-3.5 text-primary" />
-            <span className="text-xs font-medium text-primary uppercase tracking-wider">AI Patient Summary</span>
-          </div>
-          <p className="text-sm text-foreground leading-relaxed">{aiSummary}</p>
+        <div className="p-4 rounded-lg bg-muted/30 border border-border mb-4 text-center py-8">
+          <Quote className="h-8 w-8 text-muted-foreground mx-auto mb-2" />
+          <p className="text-sm text-muted-foreground">Run the coding agent to generate citations from the clinical summary.</p>
         </div>
       )}
 

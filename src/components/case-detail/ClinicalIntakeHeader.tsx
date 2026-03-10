@@ -224,15 +224,25 @@ export function ClinicalIntakeHeader({
           )}
         </div>
 
-        {/* Diagnosis */}
-        <div className="p-2 rounded-md bg-warning/10 border border-warning/20">
-          <div className="flex items-center gap-1.5 mb-1">
-            <AlertCircle className="h-3 w-3 text-warning" />
-            <span className="text-[10px] font-medium text-muted-foreground uppercase">Diagnosis</span>
+        {/* Diagnosis - only shown after AI summary is generated */}
+        {hasSummary ? (
+          <div className="p-2 rounded-md bg-warning/10 border border-warning/20">
+            <div className="flex items-center gap-1.5 mb-1">
+              <AlertCircle className="h-3 w-3 text-warning" />
+              <span className="text-[10px] font-medium text-muted-foreground uppercase">Diagnosis</span>
+            </div>
+            <p className="text-xs font-medium text-foreground truncate">{patientInfo.clinical.primaryDiagnosis}</p>
+            <p className="text-[10px] text-muted-foreground">{patientInfo.clinical.severity}</p>
           </div>
-          <p className="text-xs font-medium text-foreground truncate">{patientInfo.clinical.primaryDiagnosis}</p>
-          <p className="text-[10px] text-muted-foreground">{patientInfo.clinical.severity}</p>
-        </div>
+        ) : (
+          <div className="p-2 rounded-md bg-muted/30 border border-border/50">
+            <div className="flex items-center gap-1.5 mb-1">
+              <AlertCircle className="h-3 w-3 text-muted-foreground" />
+              <span className="text-[10px] font-medium text-muted-foreground uppercase">Diagnosis</span>
+            </div>
+            <p className="text-xs text-muted-foreground italic">Generate summary to populate</p>
+          </div>
+        )}
 
         {/* Allergies & Meds */}
         
