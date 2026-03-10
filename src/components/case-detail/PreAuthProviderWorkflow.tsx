@@ -1421,7 +1421,7 @@ function EligibilitySection({
   );
 }
 
-function DocumentAnalysisSection({ isEditing, onSave, onCancel, onComplete, caseData }: SectionProps & { caseData: PreAuthProviderWorkflowProps['caseData'] }) {
+function DocumentAnalysisSection({ isEditing, onSave, onCancel, onComplete, caseData, onAnalysisComplete }: SectionProps & { caseData: PreAuthProviderWorkflowProps['caseData']; onAnalysisComplete?: () => void }) {
   const navigate = useNavigate();
   const { caseId } = useParams();
   const [isAnalyzing, setIsAnalyzing] = useState(false);
@@ -1435,13 +1435,13 @@ function DocumentAnalysisSection({ isEditing, onSave, onCancel, onComplete, case
     { name: "Injection Records (3x)", date: "2023-12-15", status: "analyzed" },
   ];
 
-  // const documentSummary = `Patient documentation includes comprehensive clinical notes documenting progressive knee condition with failed conservative management. Imaging studies (X-ray and MRI) confirm significant findings with joint space narrowing. Physical therapy records show 12 weeks of treatment with limited improvement. Three corticosteroid injections administered over 6 months provided temporary relief only. All documentation supports medical necessity for the requested procedure.`;
-const documentSummary = getCaseById(caseId)?.documentSummary || "";
+  const documentSummary = getCaseById(caseId)?.documentSummary || "";
   const handleAnalyze = () => {
     setIsAnalyzing(true);
     setTimeout(() => {
       setIsAnalyzing(false);
       setHasAnalysis(true);
+      onAnalysisComplete?.();
     }, 2000);
   };
 
