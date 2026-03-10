@@ -62,10 +62,9 @@ const Landing = () => {
               Enterprise-Grade AI for Healthcare Operations
             </Badge>
 
-            <h1 className="text-7xl font-bold text-foreground mb-6 tracking-tight">
-              EXL RevFlow.AI
-              <br />
-              <span className="bg-gradient-to-r from-primary via-accent to-secondary bg-clip-text text-transparent">
+            <h1 className="text-foreground mb-6 tracking-tight">
+              <span className="block text-8xl lg:text-9xl font-extrabold">EXL RevFlow.AI</span>
+              <span className="block text-3xl lg:text-4xl font-medium mt-3 bg-gradient-to-r from-primary via-accent to-secondary bg-clip-text text-transparent">
                 End-to-End Revenue Cycle Platform
               </span>
             </h1>
