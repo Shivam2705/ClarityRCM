@@ -1011,7 +1011,7 @@ export function PreAuthProviderWorkflow({ caseData }: PreAuthProviderWorkflowPro
       }),
     );
     if (status === "eligible") {
-      setCurrentStep("document-analysis");
+      setWorkflowPhase("unlocked");
     }
   }, []);
 
