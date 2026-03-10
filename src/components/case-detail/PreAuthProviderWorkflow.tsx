@@ -1321,6 +1321,7 @@ function EligibilitySection({
   onStatusChange,
   onComplete,
   payerName,
+  onGoToDocumentAnalysis,
 }: EligibilitySectionProps) {
   const handleRunCheck = () => {
     onStatusChange("processing");
