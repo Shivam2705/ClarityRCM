@@ -876,13 +876,6 @@ const initialSteps: WorkflowStep[] = [
     canEdit: true,
   },
   {
-    id: "document-analysis",
-    title: "Document Analysis",
-    description: "Document summary & review",
-    status: "pending",
-    canEdit: false,
-  },
-  {
     id: "prior-auth-decision",
     title: "Prior Auth Readiness Check",
     description: "Pre-certification & policy check",
