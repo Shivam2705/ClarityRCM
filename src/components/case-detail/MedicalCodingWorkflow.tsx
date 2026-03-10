@@ -59,7 +59,7 @@ interface MedicalCodingWorkflowProps {
   onApprove: (codes: SelectedCode[]) => void;
 }
 
-export function MedicalCodingWorkflow({ aiSummary, caseId, selectedCodes, onSelectedCodesChange }: MedicalCodingWorkflowProps) {
+export function MedicalCodingWorkflow({ aiSummary, caseId, selectedCodes, onSelectedCodesChange, onApprove }: MedicalCodingWorkflowProps) {
   const [expandedGroups, setExpandedGroups] = useState<string[]>(["27447", "99223"]);
   const [hasRun, setHasRun] = useState(false);
   const [loading, setLoading] = useState(false);
