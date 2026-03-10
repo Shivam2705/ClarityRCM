@@ -58,18 +58,16 @@ const Landing = () => {
 
         <div className="relative max-w-7xl mx-auto px-6 py-20">
           <div className="max-w-4xl mx-auto text-center">
-            <Badge className="mb-6 bg-gradient-to-r from-primary/20 to-accent/20 text-foreground border-primary/30 backdrop-blur-sm">
-              <Activity className="h-3 w-3 mr-1.5" />
-              Enterprise-Grade AI for Healthcare Operations, Powered by Google
-            </Badge>
-
             <h1 className="text-foreground mb-6 tracking-tight">
               <span className="block text-8xl lg:text-9xl font-extrabold">EXL RevFlow.AI</span>
               <span className="block text-3xl lg:text-4xl font-medium mt-3 bg-gradient-to-r from-primary via-accent to-secondary bg-clip-text text-transparent">
                 End-to-End Revenue Cycle Platform
               </span>
             </h1>
-
+            <Badge className="mb-6 bg-gradient-to-r from-primary/20 to-accent/20 text-foreground border-primary/30 backdrop-blur-sm">
+              <Activity className="h-3 w-3 mr-1.5" />
+              Enterprise-Grade AI for Healthcare Operations, Powered by Google
+            </Badge>
             <p className="text-xl text-muted-foreground leading-relaxed mb-12 max-w-3xl mx-auto">
               Transform your Revenue Cycle Management with intelligent multi-agent orchestration. Leveraging hybrid
               retrieval, advanced reasoning, and real-time decision-making to streamline prior authorizations from days
