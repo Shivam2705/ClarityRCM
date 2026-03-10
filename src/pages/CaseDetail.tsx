@@ -27,6 +27,18 @@ export default function CaseDetail() {
   const [selectedCodes, setSelectedCodes] = useState<SelectedCode[]>([]);
   const [approvedCodes, setApprovedCodes] = useState<SelectedCode[]>([]);
 
+  function getAllCases(): Case[] {
+    try {
+      const userCases = JSON.parse(localStorage.getItem("userCases") || "[]");
+      return [...mockCases, ...userCases];
+    } catch {
+      return [...mockCases];
+    }
+  }
+
+  const allCases = getAllCases();
+  const caseData = allCases.find((c) => c.id === caseId) || allCases[0];
+
   const handleApproveCodes = (codes: SelectedCode[]) => {
     setApprovedCodes(codes);
     toast.success(`${codes.length} codes approved and applied to Clinical Intake Header`);

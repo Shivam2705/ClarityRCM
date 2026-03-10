@@ -217,15 +217,36 @@ export function ClinicalIntakeHeader({
             <Activity className="h-3 w-3 text-primary" />
             <span className="text-[10px] font-medium text-muted-foreground uppercase">Procedure</span>
           </div>
-          <p className="text-xs font-medium text-foreground truncate">{procedureName}</p>
-          <div className="flex gap-1 mt-0.5">
-            <Badge variant="outline" className="text-[10px] px-1 py-0 h-4 bg-primary/20 text-primary border-primary/30">
-              {procedureCode}
-            </Badge>
-            <Badge variant="outline" className="text-[10px] px-1 py-0 h-4 bg-success/20 text-success border-success/30">
-              {patientInfo.clinical.icdCode}
-            </Badge>
-          </div>
+          {approvedCodes.length > 0 ? (
+            <div className="space-y-0.5">
+              {approvedCodes.filter(c => c.type === "CPT").map(c => (
+                <div key={c.code} className="flex items-center gap-1">
+                  <Badge variant="outline" className="text-[10px] px-1 py-0 h-4 bg-primary/20 text-primary border-primary/30">
+                    CPT: {c.code}
+                  </Badge>
+                </div>
+              ))}
+              {approvedCodes.filter(c => c.type === "ICD-10").map(c => (
+                <div key={c.code} className="flex items-center gap-1">
+                  <Badge variant="outline" className="text-[10px] px-1 py-0 h-4 bg-success/20 text-success border-success/30">
+                    ICD: {c.code}
+                  </Badge>
+                </div>
+              ))}
+            </div>
+          ) : (
+            <>
+              <p className="text-xs font-medium text-foreground truncate">{procedureName}</p>
+              <div className="flex gap-1 mt-0.5">
+                <Badge variant="outline" className="text-[10px] px-1 py-0 h-4 bg-primary/20 text-primary border-primary/30">
+                  {procedureCode}
+                </Badge>
+                <Badge variant="outline" className="text-[10px] px-1 py-0 h-4 bg-success/20 text-success border-success/30">
+                  {patientInfo.clinical.icdCode}
+                </Badge>
+              </div>
+            </>
+          )}
         </div>
 
         {/* Diagnosis */}
