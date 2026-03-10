@@ -56,9 +56,10 @@ interface MedicalCodingWorkflowProps {
   caseId: string;
   selectedCodes: SelectedCode[];
   onSelectedCodesChange: (codes: SelectedCode[]) => void;
+  onApprove: (codes: SelectedCode[]) => void;
 }
 
-export function MedicalCodingWorkflow({ aiSummary, caseId, selectedCodes, onSelectedCodesChange }: MedicalCodingWorkflowProps) {
+export function MedicalCodingWorkflow({ aiSummary, caseId, selectedCodes, onSelectedCodesChange, onApprove }: MedicalCodingWorkflowProps) {
   const [expandedGroups, setExpandedGroups] = useState<string[]>(["27447", "99223"]);
   const [hasRun, setHasRun] = useState(false);
   const [loading, setLoading] = useState(false);
@@ -139,6 +140,14 @@ export function MedicalCodingWorkflow({ aiSummary, caseId, selectedCodes, onSele
               ) : (
                 hasRun ? "Rerun" : "Run"
               )}
+            </Button>
+            <Button
+              size="sm"
+              onClick={() => onApprove(selectedCodes)}
+              disabled={selectedCodes.length === 0}
+            >
+              <CheckCircle2 className="h-4 w-4 mr-1" />
+              Approve
             </Button>
           </div>
         </div>
