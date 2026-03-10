@@ -11,6 +11,56 @@
 @import url("https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&display=swap");
 
 @layer base {
+  .landing-theme,
+  .landing-theme.dark {
+    --background: 222 47% 11%;
+    --foreground: 210 40% 98%;
+    --card: 223 45% 14%;
+    --card-foreground: 210 40% 98%;
+    --popover: 223 45% 14%;
+    --popover-foreground: 210 40% 98%;
+    --primary: 14 100% 68%;
+    --primary-foreground: 222 47% 11%;
+    --secondary: 280 85% 65%;
+    --secondary-foreground: 222 47% 11%;
+    --muted: 217 32% 20%;
+    --muted-foreground: 215 20% 65%;
+    --accent: 330 81% 67%;
+    --accent-foreground: 222 47% 11%;
+    --destructive: 0 84% 60%;
+    --destructive-foreground: 210 40% 98%;
+    --border: 217 32% 25%;
+    --input: 217 32% 20%;
+    --ring: 14 100% 68%;
+    --radius: 1rem;
+
+    --success: 142 71% 58%;
+    --success-foreground: 222 47% 11%;
+    --warning: 45 93% 58%;
+    --warning-foreground: 222 47% 11%;
+    --info: 199 89% 58%;
+    --info-foreground: 222 47% 11%;
+
+    --agent-primary: 210 90% 60%;
+    --agent-secondary: 280 85% 65%;
+    --agent-analyzer: 170 80% 55%;
+    --agent-orchestrator: 330 81% 67%;
+    --agent-coordinator: 14 100% 68%;
+
+    --status-processing: 45 93% 58%;
+    --status-approved: 142 71% 58%;
+    --status-rejected: 0 84% 60%;
+    --status-pending: 220 13% 55%;
+
+    --gradient-primary: linear-gradient(135deg, hsl(14 100% 68%) 0%, hsl(330 81% 67%) 100%);
+    --gradient-secondary: linear-gradient(135deg, hsl(280 85% 65%) 0%, hsl(210 90% 60%) 100%);
+    --gradient-success: linear-gradient(135deg, hsl(142 71% 58%) 0%, hsl(170 80% 55%) 100%);
+    --gradient-card: linear-gradient(180deg, hsl(223 45% 16%) 0%, hsl(223 45% 12%) 100%);
+
+    --shadow-glow: 0 0 40px -10px hsl(14 100% 68% / 0.3);
+    --shadow-card: 0 8px 32px -8px hsl(222 47% 8% / 0.4);
+  }
+
   :root {
     /* Purple Primary */
     --primary: 266 4% 20.8%;
@@ -118,6 +168,8 @@
     --popover: 266 4% 20.8%;
     --popover-foreground: 248 0.3% 98.4%;
     --primary: 256 1.3% 92.9%;
+    --agent-analyzer: 170 80% 55%;
+    --agent-orchestrator: 330 81% 67%;
     --primary-foreground: 266 4% 20.8%;
     --secondary: 260 4.1% 27.9%;
     --secondary-foreground: 248 0.3% 98.4%;

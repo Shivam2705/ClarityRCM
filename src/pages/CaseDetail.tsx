@@ -110,7 +110,11 @@ export default function CaseDetail() {
 
           <TabsContent value="pre-auth" className="mt-6">
             {persona === "provider" ? (
-              <PreAuthProviderWorkflow caseData={caseData} />
+              <PreAuthProviderWorkflow
+                caseData={caseData}
+                selectedCodes={selectedCodes}
+                approvedCodes={approvedCodes}
+              />
             ) : (
               <PreAuthPayerWorkflow />
             )}

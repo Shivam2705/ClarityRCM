@@ -49,6 +49,11 @@ export default {
   			]
   		},
   		colors: {
+			'agent-primary': 'hsl(var(--agent-primary))',
+			'agent-secondary': 'hsl(var(--agent-secondary))',
+			'agent-analyzer': 'hsl(var(--agent-analyzer))',
+			'agent-orchestrator': 'hsl(var(--agent-orchestrator))',
+			'agent-coordinator': 'hsl(var(--agent-coordinator))',
   			border: 'hsl(var(--border))',
   			input: 'hsl(var(--input))',
   			ring: 'hsl(var(--ring))',

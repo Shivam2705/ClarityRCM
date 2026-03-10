@@ -36,7 +36,14 @@ import {
   Target,
   CircleDot,
 } from "lucide-react";
-import { get } from "node:http";
+
+interface SelectedCodeInput {
+  type: "CPT" | "ICD-10";
+  code: string;
+  description: string;
+  confidence: number;
+  parentCpt?: string;
+}
 
 // Type for the agent API response
 interface PriorAuthAgentResponse {
@@ -78,7 +85,7 @@ interface PriorAuthAgentResponse {
 const BASE_URL = "https://rcmhc-agents-1037311574972.us-central1.run.app";
 const APP_NAME = "Prior_Auth_Version2";
 
-async function callPriorAuthAgent(payload: { cpt: string; payer: string; state: string; notes: string }): Promise<PriorAuthAgentResponse> {
+async function callPriorAuthAgent(payload: { cpts: string[]; payer: string; state: string; notes: string }): Promise<PriorAuthAgentResponse> {
   const userId = "u_web_client";
   const sessionId = crypto.randomUUID();
 
@@ -93,7 +100,11 @@ async function callPriorAuthAgent(payload: { cpt: string; payer: string; state: 
     user_id: userId,
     session_id: sessionId,
     new_message: {
-      parts: [{ text: `Analyze CPT ${payload.cpt} for ${payload.payer} in ${payload.state}. Clinical Notes: ${payload.notes}` }]
+      parts: [
+        {
+          text: `Analyze checked CPT codes (${payload.cpts.join(", ")}) for ${payload.payer} in ${payload.state}. Clinical Notes: ${payload.notes}`,
+        },
+      ]
     }
   };
 
@@ -911,9 +922,11 @@ interface PreAuthProviderWorkflowProps {
     procedureName?: string;
     hasGaps?: boolean;
   };
+  selectedCodes?: SelectedCodeInput[];
+  approvedCodes?: SelectedCodeInput[];
 }
 
-export function PreAuthProviderWorkflow({ caseData }: PreAuthProviderWorkflowProps) {
+export function PreAuthProviderWorkflow({ caseData, selectedCodes = [], approvedCodes = [] }: PreAuthProviderWorkflowProps) {
   const { caseId } = useParams();
   const [currentStep, setCurrentStep] = useState("eligibility");
   const [steps, setSteps] = useState<WorkflowStep[]>(initialSteps);
@@ -1047,8 +1060,22 @@ export function PreAuthProviderWorkflow({ caseData }: PreAuthProviderWorkflowPro
       const clinicalNotes = documentSummary;
       const patientMeta = `Patient: ${activeCase.patientName}, DOB: ${activeCase.dateOfBirth}, ID: ${activeCase.patientId}, Encounter: ${activeCase.encounterType}, Provider: ${activeCase.orderingProvider}`;
 
+      const selectedCpts = selectedCodes
+        .filter((code) => code.type === "CPT")
+        .map((code) => code.code);
+
+      const approvedCpts = approvedCodes
+        .filter((code) => code.type === "CPT")
+        .map((code) => code.code);
+
+      const cptCodes = [...new Set([...selectedCpts, ...approvedCpts])];
+
+      if (cptCodes.length === 0 && activeCase.procedureCode) {
+        cptCodes.push(activeCase.procedureCode);
+      }
+
       const result = await callPriorAuthAgent({
-        cpt: activeCase.procedureCode || "29881",
+        cpts: cptCodes.length > 0 ? cptCodes : ["29881"],
         payer: activeCase.payerName,
         state: "Florida",
         notes: documentSummary,
