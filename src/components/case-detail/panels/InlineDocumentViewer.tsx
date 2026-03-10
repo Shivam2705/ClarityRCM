@@ -27,97 +27,7 @@ import {
   FileUp,
 } from "lucide-react";
 
-interface Document {
-  id: string;
-  name: string;
-  type: "medical-records" | "medical-history" | "prescription" | "medical-test" | "imaging-report" | "notes" | "summary";
-  date: string;
-  pages: number;
-  preview: string;
-}
-
-const initialDocuments: Document[] = [
-  {
-    id: "doc-1",
-    name: "Clinical Progress Notes",
-    type: "medical-records",
-    date: "Jan 10, 2024",
-    pages: 5,
-    preview:
-      "Patient presents with chronic right knee pain, Kellgren-Lawrence Grade IV osteoarthritis confirmed. Conservative treatment including physical therapy, NSAIDs, and corticosteroid injections have failed to provide adequate relief over the past 6 months.",
-  },
-  {
-    id: "doc-2",
-    name: "Orthopedic Consultation",
-    type: "medical-records",
-    date: "Jan 8, 2024",
-    pages: 3,
-    preview:
-      "Recommendation for total knee arthroplasty based on clinical examination and imaging findings. Patient has exhausted conservative treatment options and meets surgical criteria.",
-  },
-  {
-    id: "doc-3",
-    name: "Patient Medical History",
-    type: "medical-history",
-    date: "Dec 15, 2023",
-    pages: 8,
-    preview:
-      "68-year-old female with history of hypertension (controlled), Type 2 Diabetes (HbA1c 6.8%), and osteoarthritis. No known drug allergies. Previous surgeries: Appendectomy (1985), Cholecystectomy (2010).",
-  },
-  {
-    id: "doc-4",
-    name: "Meloxicam 15mg",
-    type: "prescription",
-    date: "Nov 20, 2023",
-    pages: 1,
-    preview:
-      "Meloxicam 15mg once daily for pain management. Patient has been on this medication for 4 months with minimal relief of symptoms.",
-  },
-  {
-    id: "doc-5",
-    name: "Acetaminophen 500mg",
-    type: "prescription",
-    date: "Nov 20, 2023",
-    pages: 1,
-    preview: "Acetaminophen 500mg as needed for breakthrough pain. Maximum 3000mg per day.",
-  },
-  {
-    id: "doc-6",
-    name: "Complete Blood Count",
-    type: "medical-test",
-    date: "Jan 5, 2024",
-    pages: 2,
-    preview:
-      "WBC: 7.2 x10^9/L (Normal)\nRBC: 4.5 x10^12/L (Normal)\nHemoglobin: 13.8 g/dL (Normal)\nHematocrit: 41.2% (Normal)\nPlatelets: 245 x10^9/L (Normal)",
-  },
-  {
-    id: "doc-7",
-    name: "Basic Metabolic Panel",
-    type: "medical-test",
-    date: "Jan 5, 2024",
-    pages: 2,
-    preview:
-      "Glucose: 112 mg/dL (Slightly elevated)\nBUN: 18 mg/dL (Normal)\nCreatinine: 0.9 mg/dL (Normal)\nSodium: 140 mEq/L (Normal)\nPotassium: 4.2 mEq/L (Normal)",
-  },
-  {
-    id: "doc-8",
-    name: "MRI Right Knee",
-    type: "imaging-report",
-    date: "Dec 28, 2023",
-    pages: 4,
-    preview:
-      "FINDINGS:\n- Complete loss of articular cartilage in medial compartment\n- Subchondral bone marrow edema\n- Moderate joint effusion\n- Medial meniscus: Degenerative changes with complex tear\n- ACL/PCL: Intact\n\nIMPRESSION: Advanced tricompartmental osteoarthritis, most severe in medial compartment.",
-  },
-  {
-    id: "doc-9",
-    name: "X-Ray Right Knee",
-    type: "imaging-report",
-    date: "Dec 15, 2023",
-    pages: 2,
-    preview:
-      "Weight-bearing AP and lateral views demonstrate:\n- Bone-on-bone contact in medial compartment\n- Osteophyte formation\n- Subchondral sclerosis\n- Kellgren-Lawrence Grade IV osteoarthritis",
-  },
-];
+type Document = CaseDocument;
 
 const documentCategories = [
   { type: "medical-records", label: "Medical Documents", icon: FileText },
@@ -134,8 +44,9 @@ interface InlineDocumentViewerProps {
 }
 
 export function InlineDocumentViewer({ caseId }: InlineDocumentViewerProps) {
-  const [documents, setDocuments] = useState<Document[]>(initialDocuments);
-  const [selectedDoc, setSelectedDoc] = useState<Document>(documents[0]);
+  const initialDocs = useMemo(() => getCaseDocuments(caseId), [caseId]);
+  const [documents, setDocuments] = useState<Document[]>(initialDocs);
+  const [selectedDoc, setSelectedDoc] = useState<Document>(initialDocs[0]);
   const [zoom, setZoom] = useState(100);
   const [currentPage, setCurrentPage] = useState(1);
 
