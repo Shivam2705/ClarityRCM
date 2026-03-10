@@ -926,7 +926,7 @@ export function PreAuthProviderWorkflow({ caseData }: PreAuthProviderWorkflowPro
     "idle",
   );
   const [workflowPhase, setWorkflowPhase] = useState<
-    "eligibility" | "document-analysis" | "unlocked" | "complete"
+    "eligibility" | "unlocked" | "complete"
   >("eligibility");
 
   // Fetch case data from mockCases based on caseId
