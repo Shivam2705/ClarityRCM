@@ -2,7 +2,7 @@ import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Brain, Eye, EyeOff } from "lucide-react";
+import { Eye, EyeOff } from "lucide-react";
 import { Link, useNavigate } from "react-router-dom";
 
 export default function Login() {
@@ -28,10 +28,8 @@ export default function Login() {
         <div className="w-full max-w-md space-y-8">
           <div className="text-center">
             <Link to="/" className="inline-flex items-center gap-2 mb-8">
-              <div className="flex h-10 w-10 items-center justify-center rounded-xl gradient-primary">
-                <Brain className="h-5 w-5 text-primary-foreground" />
-              </div>
-              <span className="text-2xl font-bold text-foreground">Revflow</span>
+              <img alt="EXL logo" className="h-8" src="/lovable-uploads/839f6e7a-47b4-4683-b09f-b439c68af2fe.png" />
+              <span className="text-2xl font-bold text-foreground">RevFlow.AI</span>
             </Link>
             <h1 className="text-2xl font-bold tracking-tight text-foreground">
               Welcome back
@@ -105,8 +103,8 @@ export default function Login() {
       {/* Right side - Decorative */}
       <div className="hidden lg:flex flex-1 gradient-hero items-center justify-center p-8">
         <div className="max-w-lg text-center">
-          <div className="mb-8 mx-auto flex h-20 w-20 items-center justify-center rounded-2xl gradient-primary shadow-lg">
-            <Brain className="h-10 w-10 text-primary-foreground" />
+          <div className="mb-8 mx-auto flex items-center justify-center">
+            <img alt="EXL logo" className="h-16" src="/lovable-uploads/839f6e7a-47b4-4683-b09f-b439c68af2fe.png" />
           </div>
           <h2 className="text-3xl font-bold text-white mb-4">
             Intelligent Revenue Cycle Management
