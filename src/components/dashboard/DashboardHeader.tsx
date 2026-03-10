@@ -1,4 +1,4 @@
-import { Brain, LogOut, Settings, Bell } from "lucide-react";
+import { LogOut, Settings, Bell } from "lucide-react";
 import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 
