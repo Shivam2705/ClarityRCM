@@ -932,7 +932,6 @@ export function PreAuthProviderWorkflow({ caseData }: PreAuthProviderWorkflowPro
   const [eligibilityStatus, setEligibilityStatus] = useState<"idle" | "processing" | "eligible" | "not-eligible">(
     "idle",
   );
-  const [hasAutoRun, setHasAutoRun] = useState(false);
   const [workflowPhase, setWorkflowPhase] = useState<
     "eligibility" | "document-analysis" | "unlocked" | "complete"
   >("eligibility");
