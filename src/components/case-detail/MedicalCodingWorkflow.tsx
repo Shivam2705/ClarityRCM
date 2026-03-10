@@ -133,7 +133,7 @@ export function MedicalCodingWorkflow({ aiSummary, caseId, selectedCodes, onSele
                   <div className="flex items-start gap-3 p-4">
                     <Checkbox
                       checked={isCodeSelected("CPT", item.cpt_code)}
-                      onCheckedChange={() => toggleCptWithIcds(item)}
+                      onCheckedChange={() => toggleCptOnly(item)}
                       className="mt-1"
                     />
                     <button
