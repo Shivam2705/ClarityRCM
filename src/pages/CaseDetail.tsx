@@ -23,7 +23,7 @@ export default function CaseDetail() {
   const initialPersona = (location.state as { persona?: Persona })?.persona || "provider";
   
   const [persona, setPersona] = useState<Persona>(initialPersona);
-  const [activeTab, setActiveTab] = useState("coding");
+  const [activeTab, setActiveTab] = useState("documents");
   const [selectedCodes, setSelectedCodes] = useState<SelectedCode[]>([]);
   const [approvedCodes, setApprovedCodes] = useState<SelectedCode[]>([]);
   const [generatedSummary, setGeneratedSummary] = useState<string | null>(null);
