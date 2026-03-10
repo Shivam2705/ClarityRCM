@@ -3,6 +3,9 @@ import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { DocumentChatbot } from "@/components/document-viewer/DocumentChatbot";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
+import { Textarea } from "@/components/ui/textarea";
+import { toast } from "sonner";
 import {
   FileText,
   ClipboardList,
@@ -15,18 +18,24 @@ import {
   RotateCw,
   ChevronLeft,
   ChevronRight,
+  Upload,
+  StickyNote,
+  Sparkles,
+  Loader2,
+  X,
+  FileUp,
 } from "lucide-react";
 
 interface Document {
   id: string;
   name: string;
-  type: "medical-records" | "medical-history" | "prescription" | "medical-test" | "imaging-report";
+  type: "medical-records" | "medical-history" | "prescription" | "medical-test" | "imaging-report" | "notes" | "summary";
   date: string;
   pages: number;
   preview: string;
 }
 
-const documents: Document[] = [
+const initialDocuments: Document[] = [
   {
     id: "doc-1",
     name: "Clinical Progress Notes",
@@ -115,6 +124,8 @@ const documentCategories = [
   { type: "prescription", label: "Prescriptions", icon: Pill },
   { type: "medical-test", label: "Medical Tests", icon: TestTube },
   { type: "imaging-report", label: "Imaging Reports", icon: ImageIcon },
+  { type: "notes", label: "Notes", icon: StickyNote },
+  { type: "summary", label: "AI Summaries", icon: Sparkles },
 ];
 
 interface InlineDocumentViewerProps {
@@ -122,9 +133,22 @@ interface InlineDocumentViewerProps {
 }
 
 export function InlineDocumentViewer({ caseId }: InlineDocumentViewerProps) {
+  const [documents, setDocuments] = useState<Document[]>(initialDocuments);
   const [selectedDoc, setSelectedDoc] = useState<Document>(documents[0]);
   const [zoom, setZoom] = useState(100);
   const [currentPage, setCurrentPage] = useState(1);
+
+  // Upload dialog
+  const [showUpload, setShowUpload] = useState(false);
+  const [uploadFiles, setUploadFiles] = useState<File[]>([]);
+
+  // Notes dialog
+  const [showNotes, setShowNotes] = useState(false);
+  const [noteTitle, setNoteTitle] = useState("");
+  const [noteContent, setNoteContent] = useState("");
+
+  // Summary generation
+  const [generatingSummary, setGeneratingSummary] = useState(false);
 
   const getDocsByType = (type: string) => documents.filter((d) => d.type === type);
   const getCategoryIcon = (type: string) => {
@@ -132,9 +156,103 @@ export function InlineDocumentViewer({ caseId }: InlineDocumentViewerProps) {
     return category?.icon || FileText;
   };
 
+  const handleUpload = () => {
+    if (uploadFiles.length === 0) return;
+    const today = new Date().toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" });
+    const newDocs: Document[] = uploadFiles.map((file, i) => ({
+      id: `doc-upload-${Date.now()}-${i}`,
+      name: file.name.replace(/\.[^/.]+$/, ""),
+      type: "medical-records" as const,
+      date: today,
+      pages: 1,
+      preview: `Uploaded document: ${file.name}\nSize: ${(file.size / 1024).toFixed(1)} KB\nType: ${file.type || "Unknown"}`,
+    }));
+    setDocuments((prev) => [...prev, ...newDocs]);
+    setSelectedDoc(newDocs[0]);
+    setCurrentPage(1);
+    setUploadFiles([]);
+    setShowUpload(false);
+    toast.success(`${newDocs.length} document${newDocs.length > 1 ? "s" : ""} uploaded successfully`);
+  };
+
+  const handleSaveNote = () => {
+    if (!noteContent.trim()) return;
+    const today = new Date().toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" });
+    const newDoc: Document = {
+      id: `doc-note-${Date.now()}`,
+      name: noteTitle.trim() || "Untitled Note",
+      type: "notes",
+      date: today,
+      pages: 1,
+      preview: noteContent,
+    };
+    setDocuments((prev) => [...prev, newDoc]);
+    setSelectedDoc(newDoc);
+    setCurrentPage(1);
+    setNoteTitle("");
+    setNoteContent("");
+    setShowNotes(false);
+    toast.success("Note saved as document");
+  };
+
+  const handleGenerateSummary = () => {
+    setGeneratingSummary(true);
+    // Simulate AI generation
+    setTimeout(() => {
+      const today = new Date().toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" });
+      const summaryDoc: Document = {
+        id: `doc-summary-${Date.now()}`,
+        name: "AI Patient Summary",
+        type: "summary",
+        date: today,
+        pages: 1,
+        preview: `PATIENT SUMMARY — Generated ${today}\n\n` +
+          `DEMOGRAPHICS:\n68-year-old female presenting for total knee arthroplasty evaluation.\n\n` +
+          `PRIMARY DIAGNOSIS:\nKellgren-Lawrence Grade IV osteoarthritis of the right knee with complete loss of articular cartilage in the medial compartment, bone-on-bone contact, subchondral sclerosis, and osteophyte formation.\n\n` +
+          `CLINICAL HISTORY:\nPatient reports chronic right knee pain with progressive functional decline over 3+ years. Failed conservative management including:\n• NSAIDs (Meloxicam 15mg daily × 4 months) — minimal relief\n• Acetaminophen 500mg PRN for breakthrough pain\n• Physical therapy — completed without significant improvement\n• Corticosteroid injections — temporary relief only\n\n` +
+          `IMAGING FINDINGS:\n• MRI (Dec 28, 2023): Complete cartilage loss medial compartment, subchondral bone marrow edema, moderate effusion, degenerative medial meniscus tear. ACL/PCL intact.\n• X-Ray (Dec 15, 2023): Bone-on-bone medial compartment, Grade IV OA changes, varus deformity.\n\n` +
+          `LABORATORY RESULTS (Jan 5, 2024):\n• CBC: All values within normal limits\n• BMP: Glucose slightly elevated at 112 mg/dL; electrolytes and renal function normal\n• HbA1c: 6.8% (Type 2 DM, controlled)\n\n` +
+          `COMORBIDITIES:\n• Hypertension — controlled\n• Type 2 Diabetes Mellitus — HbA1c 6.8%\n• No known drug allergies\n\n` +
+          `SURGICAL HISTORY:\n• Appendectomy (1985)\n• Cholecystectomy (2010)\n\n` +
+          `RECOMMENDATION:\nTotal knee arthroplasty recommended. Patient meets medical necessity criteria with documented failure of conservative treatment, significant functional impairment, and Grade IV radiographic changes.\n\n` +
+          `CONFIDENCE: 96% — Based on analysis of 9 clinical documents.`,
+      };
+      setDocuments((prev) => [...prev, summaryDoc]);
+      setSelectedDoc(summaryDoc);
+      setCurrentPage(1);
+      setGeneratingSummary(false);
+      toast.success("AI Patient Summary generated successfully");
+    }, 3000);
+  };
+
   return (
     <div className="relative">
-      <div className="flex rounded-xl border bg-card overflow-hidden" style={{ height: "calc(100vh - 340px)", minHeight: "500px" }}>
+      {/* Action Buttons */}
+      <div className="flex items-center gap-2 mb-4">
+        <Button variant="outline" className="gap-2" onClick={() => setShowUpload(true)}>
+          <Upload className="h-4 w-4" />
+          Upload Documents
+        </Button>
+        <Button variant="outline" className="gap-2" onClick={() => setShowNotes(true)}>
+          <StickyNote className="h-4 w-4" />
+          Add Notes
+        </Button>
+        <Button
+          variant="default"
+          className="gap-2"
+          onClick={handleGenerateSummary}
+          disabled={generatingSummary}
+        >
+          {generatingSummary ? (
+            <Loader2 className="h-4 w-4 animate-spin" />
+          ) : (
+            <Sparkles className="h-4 w-4" />
+          )}
+          {generatingSummary ? "Generating..." : "Generate Summary"}
+        </Button>
+      </div>
+
+      <div className="flex rounded-xl border bg-card overflow-hidden" style={{ height: "calc(100vh - 390px)", minHeight: "500px" }}>
         {/* Left Sidebar - Document List */}
         <div className="w-72 border-r border-border bg-muted/30 flex flex-col">
           <div className="p-3 border-b border-border">
@@ -223,9 +341,7 @@ export function InlineDocumentViewer({ caseId }: InlineDocumentViewerProps) {
           {/* Document Content */}
           <div className="flex-1 overflow-auto p-4">
             <div className="flex justify-center">
-              <Card
-                className="bg-white text-slate-900 shadow-lg w-full max-w-2xl"
-              >
+              <Card className="bg-white text-slate-900 shadow-lg w-full max-w-2xl">
                 <div className="p-6">
                   {/* Document Header */}
                   <div className="border-b border-slate-200 pb-3 mb-4">
@@ -294,6 +410,112 @@ export function InlineDocumentViewer({ caseId }: InlineDocumentViewerProps) {
 
       {/* AI Chatbot */}
       <DocumentChatbot documentName={selectedDoc.name} documentContent={selectedDoc.preview} />
+
+      {/* Upload Dialog */}
+      <Dialog open={showUpload} onOpenChange={setShowUpload}>
+        <DialogContent className="sm:max-w-md">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2">
+              <Upload className="h-5 w-5 text-primary" />
+              Upload Documents
+            </DialogTitle>
+          </DialogHeader>
+          <div className="space-y-4">
+            <div
+              className="border-2 border-dashed border-border rounded-xl p-8 text-center hover:border-primary/50 transition-colors cursor-pointer"
+              onClick={() => document.getElementById("file-upload-input")?.click()}
+            >
+              <FileUp className="h-10 w-10 text-muted-foreground mx-auto mb-3" />
+              <p className="text-sm font-medium text-foreground">Click to browse or drag files here</p>
+              <p className="text-xs text-muted-foreground mt-1">PDF, DOCX, JPG, PNG up to 20MB each</p>
+              <input
+                id="file-upload-input"
+                type="file"
+                multiple
+                className="hidden"
+                accept=".pdf,.docx,.doc,.jpg,.jpeg,.png,.dicom"
+                onChange={(e) => {
+                  if (e.target.files) setUploadFiles(Array.from(e.target.files));
+                }}
+              />
+            </div>
+            {uploadFiles.length > 0 && (
+              <div className="space-y-2">
+                {uploadFiles.map((file, i) => (
+                  <div key={i} className="flex items-center justify-between p-2 rounded-lg bg-muted">
+                    <div className="flex items-center gap-2 min-w-0">
+                      <FileText className="h-4 w-4 text-primary flex-shrink-0" />
+                      <span className="text-sm truncate">{file.name}</span>
+                      <span className="text-xs text-muted-foreground flex-shrink-0">
+                        {(file.size / 1024).toFixed(0)} KB
+                      </span>
+                    </div>
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      className="h-6 w-6"
+                      onClick={() => setUploadFiles((prev) => prev.filter((_, idx) => idx !== i))}
+                    >
+                      <X className="h-3 w-3" />
+                    </Button>
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => { setShowUpload(false); setUploadFiles([]); }}>
+              Cancel
+            </Button>
+            <Button onClick={handleUpload} disabled={uploadFiles.length === 0}>
+              <Upload className="h-4 w-4 mr-2" />
+              Upload {uploadFiles.length > 0 ? `(${uploadFiles.length})` : ""}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* Notes Dialog */}
+      <Dialog open={showNotes} onOpenChange={setShowNotes}>
+        <DialogContent className="sm:max-w-lg">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2">
+              <StickyNote className="h-5 w-5 text-primary" />
+              Add Notes
+            </DialogTitle>
+          </DialogHeader>
+          <div className="space-y-4">
+            <div>
+              <label className="text-sm font-medium text-foreground">Title</label>
+              <input
+                type="text"
+                placeholder="Note title..."
+                value={noteTitle}
+                onChange={(e) => setNoteTitle(e.target.value)}
+                className="mt-1 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+              />
+            </div>
+            <div>
+              <label className="text-sm font-medium text-foreground">Content</label>
+              <Textarea
+                placeholder="Write your notes here..."
+                value={noteContent}
+                onChange={(e) => setNoteContent(e.target.value)}
+                className="mt-1 min-h-[200px]"
+              />
+            </div>
+          </div>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => { setShowNotes(false); setNoteTitle(""); setNoteContent(""); }}>
+              Cancel
+            </Button>
+            <Button onClick={handleSaveNote} disabled={!noteContent.trim()}>
+              <StickyNote className="h-4 w-4 mr-2" />
+              Save Note
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }
