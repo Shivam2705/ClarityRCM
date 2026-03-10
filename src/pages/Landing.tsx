@@ -45,6 +45,7 @@ import {
   Users,
 } from "lucide-react";
 import { RCMValueChain } from "@/components/landing/RCMValueChain";
+import EssentialTools from "@/components/landing/EssentialTools";
 
 const Landing = () => {
   const navigate = useNavigate();
@@ -132,132 +133,8 @@ const Landing = () => {
         </div>
       </div>
 
-      {/* RCM Value Chain */}
-      <div className="border-t border-border/50 bg-gradient-to-br from-card/50 via-background to-card/50 py-16">
-        <div className="max-w-[1400px] mx-auto px-6">
-          <RCMValueChain />
-        </div>
-      </div>
 
-      {/* Challenges Section */}
-      <div className="max-w-7xl mx-auto px-6 py-16">
-        <div className="text-center mb-12">
-          <h2 className="text-3xl font-bold text-foreground mb-4">Transforming Prior Authorization Challenges</h2>
-          <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
-            Traditional manual processes create significant operational and financial barriers
-          </p>
-        </div>
 
-        <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6 mb-16">
-          <Card className="p-6 bg-gradient-to-br from-destructive/5 to-card border-destructive/20">
-            <div className="flex items-start gap-4">
-              <div className="flex items-center justify-center w-10 h-10 rounded-full bg-destructive/20 text-destructive font-bold flex-shrink-0">
-                <Clock className="h-5 w-5" />
-              </div>
-              <div>
-                <h4 className="font-semibold mb-2">Extended Processing Times</h4>
-                <p className="text-sm text-muted-foreground mb-2">
-                  Manual authorization requests take 3-7 days on average, with RCM teams spending hours navigating
-                  complex payer portals and waiting on hold.
-                </p>
-                <div className="text-xs text-destructive font-medium">
-                  Impact: Delayed patient care and lost revenue opportunities
-                </div>
-              </div>
-            </div>
-          </Card>
-
-          <Card className="p-6 bg-gradient-to-br from-destructive/5 to-card border-destructive/20">
-            <div className="flex items-start gap-4">
-              <div className="flex items-center justify-center w-10 h-10 rounded-full bg-destructive/20 text-destructive font-bold flex-shrink-0">
-                <XCircle className="h-5 w-5" />
-              </div>
-              <div>
-                <h4 className="font-semibold mb-2">High Denial & Rejection Rates</h4>
-                <p className="text-sm text-muted-foreground mb-2">
-                  30-40% of initial authorization requests are denied due to incomplete documentation, missing clinical
-                  justification, or policy mismatches.
-                </p>
-                <div className="text-xs text-destructive font-medium">
-                  Impact: $2.5M+ in annual write-offs per 100-bed facility
-                </div>
-              </div>
-            </div>
-          </Card>
-
-          <Card className="p-6 bg-gradient-to-br from-destructive/5 to-card border-destructive/20">
-            <div className="flex items-start gap-4">
-              <div className="flex items-center justify-center w-10 h-10 rounded-full bg-destructive/20 text-destructive font-bold flex-shrink-0">
-                <TrendingUp className="h-5 w-5" />
-              </div>
-              <div>
-                <h4 className="font-semibold mb-2">Complex Payer Policy Variations</h4>
-                <p className="text-sm text-muted-foreground mb-2">
-                  Each payer maintains different authorization requirements, frequently updated guidelines, and varied
-                  clinical criteria across 500+ policy documents.
-                </p>
-                <div className="text-xs text-destructive font-medium">
-                  Impact: 60% staff time spent on policy research vs. patient care
-                </div>
-              </div>
-            </div>
-          </Card>
-
-          <Card className="p-6 bg-gradient-to-br from-destructive/5 to-card border-destructive/20">
-            <div className="flex items-start gap-4">
-              <div className="flex items-center justify-center w-10 h-10 rounded-full bg-destructive/20 text-destructive font-bold flex-shrink-0">
-                <Activity className="h-5 w-5" />
-              </div>
-              <div>
-                <h4 className="font-semibold mb-2">Resource-Intensive Manual Review</h4>
-                <p className="text-sm text-muted-foreground mb-2">
-                  Clinical staff spend 15-20 hours per week on authorization tasks, including document gathering, form
-                  completion, and peer-to-peer reviews.
-                </p>
-                <div className="text-xs text-destructive font-medium">
-                  Impact: $250K+ annual cost in staff time per authorization specialist
-                </div>
-              </div>
-            </div>
-          </Card>
-
-          <Card className="p-6 bg-gradient-to-br from-destructive/5 to-card border-destructive/20">
-            <div className="flex items-start gap-4">
-              <div className="flex items-center justify-center w-10 h-10 rounded-full bg-destructive/20 text-destructive font-bold flex-shrink-0">
-                <Users className="h-5 w-5" />
-              </div>
-              <div>
-                <h4 className="font-semibold mb-2">Patient Satisfaction Impact</h4>
-                <p className="text-sm text-muted-foreground mb-2">
-                  Authorization delays lead to postponed procedures, medication interruptions, and frustrated patients
-                  who often blame the provider organization.
-                </p>
-                <div className="text-xs text-destructive font-medium">
-                  Impact: 25% decrease in patient satisfaction scores
-                </div>
-              </div>
-            </div>
-          </Card>
-
-          <Card className="p-6 bg-gradient-to-br from-destructive/5 to-card border-destructive/20">
-            <div className="flex items-start gap-4">
-              <div className="flex items-center justify-center w-10 h-10 rounded-full bg-destructive/20 text-destructive font-bold flex-shrink-0">
-                <CheckCircle2 className="h-5 w-5" />
-              </div>
-              <div>
-                <h4 className="font-semibold mb-2">Compliance & Audit Risk</h4>
-                <p className="text-sm text-muted-foreground mb-2">
-                  Manual processes lack comprehensive audit trails, documentation standards, and consistent
-                  decision-making frameworks required for regulatory compliance.
-                </p>
-                <div className="text-xs text-destructive font-medium">
-                  Impact: Increased audit liability and potential penalties
-                </div>
-              </div>
-            </div>
-          </Card>
-        </div>
-      </div>
 
       {/* Solution Architecture Section */}
       <div className="max-w-7xl mx-auto px-6 py-16">
@@ -410,7 +287,11 @@ const Landing = () => {
         </Card>
       </div>
 
-      {/* Footer CTA */}
+      {/* AI Agent Suites */}
+      <div className="border-t border-border/50 bg-gradient-to-br from-card/50 via-background to-card/50">
+        <EssentialTools />
+      </div>
+
       <div className="border-t border-border/50 bg-gradient-to-br from-card via-background to-card">
         <div className="max-w-7xl mx-auto px-6 py-16 text-center">
           <h2 className="text-3xl font-bold text-foreground mb-4">Ready to Transform Your RCM Process?</h2>
