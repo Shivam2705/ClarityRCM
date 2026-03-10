@@ -1100,6 +1100,16 @@ export function PreAuthProviderWorkflow({ caseData }: PreAuthProviderWorkflowPro
             onCancel={handleCancelEdit}
             onComplete={handleProceedToReadinessCheck}
             caseData={caseData}
+            onAnalysisComplete={() => {
+              setSteps((prev) =>
+                prev.map((s) => {
+                  if (s.id === "document-analysis") {
+                    return { ...s, status: "completed" as const, canEdit: true };
+                  }
+                  return s;
+                }),
+              );
+            }}
           />
         );
       case "prior-auth-decision":
