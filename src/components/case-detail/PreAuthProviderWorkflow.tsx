@@ -876,13 +876,6 @@ const initialSteps: WorkflowStep[] = [
     canEdit: true,
   },
   {
-    id: "document-analysis",
-    title: "Document Analysis",
-    description: "Document summary & review",
-    status: "pending",
-    canEdit: false,
-  },
-  {
     id: "prior-auth-decision",
     title: "Prior Auth Readiness Check",
     description: "Pre-certification & policy check",
@@ -933,7 +926,7 @@ export function PreAuthProviderWorkflow({ caseData }: PreAuthProviderWorkflowPro
     "idle",
   );
   const [workflowPhase, setWorkflowPhase] = useState<
-    "eligibility" | "document-analysis" | "unlocked" | "complete"
+    "eligibility" | "unlocked" | "complete"
   >("eligibility");
 
   // Fetch case data from mockCases based on caseId
@@ -1004,7 +997,7 @@ export function PreAuthProviderWorkflow({ caseData }: PreAuthProviderWorkflowPro
             eligibilityStatus: status === "eligible" ? "eligible" : "not-eligible",
           };
         }
-        if (status === "eligible" && s.id === "document-analysis") {
+        if (status === "eligible" && s.id === "prior-auth-decision") {
           return { ...s, status: "active" as const, canEdit: true };
         }
         return s;
@@ -1090,27 +1083,7 @@ export function PreAuthProviderWorkflow({ caseData }: PreAuthProviderWorkflowPro
             onStatusChange={setEligibilityStatus}
             onComplete={handleEligibilityComplete}
             payerName={activeCase.payerName}
-            onGoToDocumentAnalysis={() => setCurrentStep("document-analysis")}
-          />
-        );
-      case "document-analysis":
-        return (
-          <DocumentAnalysisSection
-            isEditing={editingStep === "document-analysis"}
-            onSave={() => handleSaveCorrection("document-analysis")}
-            onCancel={handleCancelEdit}
-            onComplete={handleProceedToReadinessCheck}
-            caseData={caseData}
-            onAnalysisComplete={() => {
-              setSteps((prev) =>
-                prev.map((s) => {
-                  if (s.id === "document-analysis") {
-                    return { ...s, status: "completed" as const, canEdit: true };
-                  }
-                  return s;
-                }),
-              );
-            }}
+            onGoToReadinessCheck={() => setCurrentStep("prior-auth-decision")}
           />
         );
       case "prior-auth-decision":
@@ -1172,10 +1145,8 @@ export function PreAuthProviderWorkflow({ caseData }: PreAuthProviderWorkflowPro
               onEditStep={handleEditStep}
               lockedSteps={
                 eligibilityStatus !== "eligible"
-                  ? ["document-analysis", "prior-auth-decision", "gap-analysis", "submit-to-payer"]
-                  : workflowPhase === "document-analysis"
-                    ? ["prior-auth-decision", "gap-analysis", "submit-to-payer"]
-                    : []
+                  ? ["prior-auth-decision", "gap-analysis", "submit-to-payer"]
+                  : []
               }
             />
           </Card>
@@ -1202,7 +1173,7 @@ interface EligibilitySectionProps {
   onStatusChange: (status: "idle" | "processing" | "eligible" | "not-eligible") => void;
   onComplete: (status: "eligible" | "not-eligible") => void;
   payerName: string;
-  onGoToDocumentAnalysis?: () => void;
+  onGoToReadinessCheck?: () => void;
 }
 
 function EligibilityHeader({
@@ -1321,7 +1292,7 @@ function EligibilitySection({
   onStatusChange,
   onComplete,
   payerName,
-  onGoToDocumentAnalysis,
+  onGoToReadinessCheck,
 }: EligibilitySectionProps) {
   const handleRunCheck = () => {
     onStatusChange("processing");
@@ -1401,9 +1372,9 @@ function EligibilitySection({
                   <DataRow label="Network Status" value="In-Network Provider" />
                 </div>
               </Card>
-              {onGoToDocumentAnalysis && (
-                <Button onClick={onGoToDocumentAnalysis} className="w-full mt-2">
-                  Go to Document Analysis
+              {onGoToReadinessCheck && (
+                <Button onClick={onGoToReadinessCheck} className="w-full mt-2">
+                  Go to Prior Auth Readiness Check
                   <ArrowRight className="h-4 w-4 ml-2" />
                 </Button>
               )}
