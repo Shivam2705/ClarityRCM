@@ -25,26 +25,12 @@ export default function CaseDetail() {
   const [persona, setPersona] = useState<Persona>(initialPersona);
   const [activeTab, setActiveTab] = useState("coding");
   const [selectedCodes, setSelectedCodes] = useState<SelectedCode[]>([]);
+  const [approvedCodes, setApprovedCodes] = useState<SelectedCode[]>([]);
 
-  function getAllCases(): Case[] {
-    try {
-      const userCases = JSON.parse(localStorage.getItem("userCases") || "[]");
-      return [...mockCases, ...userCases];
-    } catch {
-      return [...mockCases];
-    }
-  }
-
-  const allCases = getAllCases();
-  const caseData = allCases.find((c) => c.id === caseId) || allCases[0];
-
-  const removeCode = (type: "CPT" | "ICD-10", code: string) => {
-    setSelectedCodes(prev => prev.filter(sc => !(sc.type === type && sc.code === code)));
+  const handleApproveCodes = (codes: SelectedCode[]) => {
+    setApprovedCodes(codes);
+    toast.success(`${codes.length} codes approved and applied to Clinical Intake Header`);
   };
-
-  // Group selected codes by CPT
-  const selectedCptCodes = selectedCodes.filter(sc => sc.type === "CPT");
-  const selectedIcdCodes = selectedCodes.filter(sc => sc.type === "ICD-10");
 
   return (
     <div className="min-h-screen bg-background">
