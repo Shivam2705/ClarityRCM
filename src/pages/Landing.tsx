@@ -46,6 +46,7 @@ import {
 } from "lucide-react";
 import { RCMValueChain } from "@/components/landing/RCMValueChain";
 import EssentialTools from "@/components/landing/EssentialTools";
+import poweredByGoogle from "@/assets/powered-by-google.png";
 
 const Landing = () => {
   const navigate = useNavigate();
