@@ -1120,6 +1120,7 @@ export function PreAuthProviderWorkflow({ caseData, selectedCodes = [], approved
             agentLoading={agentLoading}
             agentError={agentError}
             onRetry={handleProceedToReadinessCheck}
+            activeCase={activeCase}
           />
         );
       case "gap-analysis":
