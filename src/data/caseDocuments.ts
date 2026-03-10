@@ -505,7 +505,7 @@ FLEXION/EXTENSION VIEWS:
 IMPRESSION:
 1. Grade I spondylolisthesis at L4-L5 with dynamic instability (3mm translation on flexion/extension).
 2. Significant L4-L5 disc space narrowing with endplate changes.
-3. Dynamic instability supports surgical stabilization.`,
+3. Dynamic instability supports surgical stabilization. <img src='/cases/002/Lumbar_X_Ray.png'/>`,
   },
   {
     id: "c2-doc-4",
