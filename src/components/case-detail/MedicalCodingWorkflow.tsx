@@ -213,6 +213,39 @@ export function MedicalCodingWorkflow({ aiSummary, caseId, selectedCodes, onSele
           </div>
         )}
 
+        {/* Display manually added codes */}
+        {selectedCodes.filter(sc => sc.confidence === 100 && !agentOps.some(op => op.cpt_code === sc.code || op.icd_link.some(icd => icd.icd10_code.code === sc.code))).length > 0 && (
+          <div className="rounded-xl border bg-card p-4">
+            <h4 className="text-sm font-medium text-foreground mb-3 flex items-center gap-2">
+              <CheckCircle2 className="h-4 w-4 text-primary" />
+              Manually Added Codes
+            </h4>
+            <div className="space-y-2">
+              {selectedCodes
+                .filter(sc => sc.confidence === 100 && !agentOps.some(op => op.cpt_code === sc.code || op.icd_link.some(icd => icd.icd10_code.code === sc.code)))
+                .map((sc, idx) => (
+                  <div key={`${sc.type}-${sc.code}-${idx}`} className="flex items-center justify-between p-2.5 rounded-lg bg-muted/30 border">
+                    <div className="flex items-center gap-2">
+                      <span className={`px-2 py-0.5 rounded text-xs font-medium ${sc.type === "CPT" ? "bg-success/10 text-success" : "bg-info/10 text-info"}`}>
+                        {sc.type}
+                      </span>
+                      <span className="font-mono font-semibold text-sm text-foreground">{sc.code}</span>
+                      <span className="text-sm text-muted-foreground">{sc.description}</span>
+                    </div>
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      className="h-7 w-7"
+                      onClick={() => onSelectedCodesChange(selectedCodes.filter(c => !(c.type === sc.type && c.code === sc.code)))}
+                    >
+                      <AlertTriangle className="h-3.5 w-3.5 text-muted-foreground" />
+                    </Button>
+                  </div>
+                ))}
+            </div>
+          </div>
+        )}
+
         {/* Human Override Panel */}
         <HumanOverridePanel selectedCodes={selectedCodes} onSelectedCodesChange={onSelectedCodesChange} />
       </div>
