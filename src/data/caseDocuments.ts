@@ -423,7 +423,7 @@ ASSESSMENT:
 Grade I spondylolisthesis at L4-L5 with foraminal stenosis, right L5 radiculopathy, and degenerative disc disease. Failed >12 weeks of comprehensive conservative management.
 
 PLAN:
-Recommend lumbar decompression with posterior interbody fusion at L4-L5 (CPT 22630). Initiate pre-authorization with UnitedHealthcare.`,
+Recommend lumbar decompression with posterior interbody fusion at L4-L5 (CPT 22630).`,
   },
   {
     id: "c2-doc-2",
