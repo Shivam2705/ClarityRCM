@@ -64,10 +64,7 @@ const Landing = () => {
                 End-to-End Revenue Cycle Platform
               </span>
             </h1>
-            <Badge className="mb-6 bg-gradient-to-r from-primary/20 to-accent/20 text-foreground border-primary/30 backdrop-blur-sm">
-              <Activity className="h-3 w-3 mr-1.5" />
-              Powered by Google
-            </Badge>
+            <img src={poweredByGoogle} alt="Powered by Google" className="h-8 mx-auto mb-6" />
             <p className="text-xl text-muted-foreground leading-relaxed mb-12 max-w-3xl mx-auto">
               Transform your Revenue Cycle Management with intelligent multi-agent orchestration. Leveraging hybrid
               retrieval, advanced reasoning, and real-time decision-making to streamline prior authorizations from days
