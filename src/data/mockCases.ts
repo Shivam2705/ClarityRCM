@@ -76,7 +76,7 @@ export const mockCases: Case[] = JSON.parse(localStorage.getItem("userCases") ||
     dateOfBirth: "1982-11-05",
     encounterType: "Procedure",
     orderingProvider: "Dr. James Park",
-    payerName: "UnitedHealthcare",
+    payerName: "Aetna",
     groupId: "GRP-11223",
     status: "New",
     priority: "Low",

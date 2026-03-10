@@ -666,7 +666,7 @@ RESPONSE: Minimal relief of back pain after 4 months of use.`,
     pages: 4,
     preview: `COMPREHENSIVE MEDICAL HISTORY
 Patient: Robert Williams | DOB: 07/22/1979 | Age: 47 | Sex: Male
-MRN: PT-45129 | Insurance: UnitedHealthcare | Group: GRP-67890
+MRN: PT-45129 | Group: GRP-67890
 
 ALLERGIES:
 • Iodine contrast — Anaphylactoid reaction
@@ -901,7 +901,7 @@ ADHERENCE NOTES: Patient reports good compliance with chronic medications. Couns
     pages: 3,
     preview: `COMPREHENSIVE MEDICAL HISTORY
 Patient: Maria Garcia | DOB: 11/05/1982 | Age: 43 | Sex: Female
-MRN: PT-91823 | Insurance: UnitedHealthcare | Group: GRP-11223
+MRN: PT-91823 | Group: GRP-11223
 
 ALLERGIES:
 • Penicillin — Rash
