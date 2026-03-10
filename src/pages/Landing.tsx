@@ -81,7 +81,6 @@ const Landing = () => {
                 Access Dashboard
                 <ArrowRight className="ml-2 h-5 w-5" />
               </Button>
-              <Button
             </div>
 
             {/* Stats Grid */}
