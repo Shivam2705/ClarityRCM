@@ -36,6 +36,17 @@ export default function CaseDetail() {
     setGeneratedSummary(null);
   }, [caseData.id]);
 
+  // Auto-approve manually added codes (confidence === 100) immediately
+  useEffect(() => {
+    const manualCodes = selectedCodes.filter(sc => sc.confidence === 100);
+    if (manualCodes.length > 0) {
+      setApprovedCodes(prev => {
+        const nonManual = prev.filter(p => p.confidence !== 100);
+        return [...nonManual, ...manualCodes];
+      });
+    }
+  }, [selectedCodes]);
+
   const handleApproveCodes = (codes: SelectedCode[]) => {
     setApprovedCodes(codes);
     toast.success(`${codes.length} codes approved and applied to Clinical Intake Header`);
