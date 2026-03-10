@@ -1083,27 +1083,7 @@ export function PreAuthProviderWorkflow({ caseData }: PreAuthProviderWorkflowPro
             onStatusChange={setEligibilityStatus}
             onComplete={handleEligibilityComplete}
             payerName={activeCase.payerName}
-            onGoToDocumentAnalysis={() => setCurrentStep("document-analysis")}
-          />
-        );
-      case "document-analysis":
-        return (
-          <DocumentAnalysisSection
-            isEditing={editingStep === "document-analysis"}
-            onSave={() => handleSaveCorrection("document-analysis")}
-            onCancel={handleCancelEdit}
-            onComplete={handleProceedToReadinessCheck}
-            caseData={caseData}
-            onAnalysisComplete={() => {
-              setSteps((prev) =>
-                prev.map((s) => {
-                  if (s.id === "document-analysis") {
-                    return { ...s, status: "completed" as const, canEdit: true };
-                  }
-                  return s;
-                }),
-              );
-            }}
+            onGoToReadinessCheck={() => setCurrentStep("prior-auth-decision")}
           />
         );
       case "prior-auth-decision":
