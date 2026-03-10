@@ -1401,6 +1401,12 @@ function EligibilitySection({
                   <DataRow label="Network Status" value="In-Network Provider" />
                 </div>
               </Card>
+              {onGoToDocumentAnalysis && (
+                <Button onClick={onGoToDocumentAnalysis} className="w-full mt-2">
+                  Go to Document Analysis
+                  <ArrowRight className="h-4 w-4 ml-2" />
+                </Button>
+              )}
             </>
           )}
         </div>
