@@ -1416,7 +1416,7 @@ function EligibilitySection({
                 <InfoCard
                   icon={<Shield className="h-4 w-4" />}
                   label="Payer"
-                  value={caseData.payerName}
+                  value={payerName}
                   editable={isEditing}
                 />
                 <InfoCard icon={<Shield className="h-4 w-4" />} label="Plan Type" value="PPO" editable={isEditing} />
