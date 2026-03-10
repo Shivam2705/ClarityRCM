@@ -1090,6 +1090,7 @@ export function PreAuthProviderWorkflow({ caseData }: PreAuthProviderWorkflowPro
             onStatusChange={setEligibilityStatus}
             onComplete={handleEligibilityComplete}
             payerName={activeCase.payerName}
+            onGoToDocumentAnalysis={() => setCurrentStep("document-analysis")}
           />
         );
       case "document-analysis":
@@ -1201,6 +1202,7 @@ interface EligibilitySectionProps {
   onStatusChange: (status: "idle" | "processing" | "eligible" | "not-eligible") => void;
   onComplete: (status: "eligible" | "not-eligible") => void;
   payerName: string;
+  onGoToDocumentAnalysis?: () => void;
 }
 
 function EligibilityHeader({
@@ -1319,6 +1321,7 @@ function EligibilitySection({
   onStatusChange,
   onComplete,
   payerName,
+  onGoToDocumentAnalysis,
 }: EligibilitySectionProps) {
   const handleRunCheck = () => {
     onStatusChange("processing");
@@ -1398,6 +1401,12 @@ function EligibilitySection({
                   <DataRow label="Network Status" value="In-Network Provider" />
                 </div>
               </Card>
+              {onGoToDocumentAnalysis && (
+                <Button onClick={onGoToDocumentAnalysis} className="w-full mt-2">
+                  Go to Document Analysis
+                  <ArrowRight className="h-4 w-4 ml-2" />
+                </Button>
+              )}
             </>
           )}
         </div>
