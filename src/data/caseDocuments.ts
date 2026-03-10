@@ -1,7 +1,14 @@
 export interface CaseDocument {
   id: string;
   name: string;
-  type: "medical-records" | "medical-history" | "prescription" | "medical-test" | "imaging-report" | "notes" | "summary";
+  type:
+    | "medical-records"
+    | "medical-history"
+    | "prescription"
+    | "medical-test"
+    | "imaging-report"
+    | "notes"
+    | "summary";
   date: string;
   pages: number;
   preview: string;
@@ -15,8 +22,7 @@ const case001Documents: CaseDocument[] = [
     type: "medical-records",
     date: "Jan 10, 2024",
     pages: 5,
-    preview:
-`CLINICAL PROGRESS NOTE
+    preview: `CLINICAL PROGRESS NOTE
 Provider: Dr. Michael Chen, Orthopedic Surgery
 Date: January 10, 2024
 Patient: Sarah Johnson | DOB: 03/12/1958 | MRN: PT-78234
@@ -54,8 +60,7 @@ Recommend total knee arthroplasty (CPT 27447). Initiate pre-authorization. Pre-o
     type: "medical-records",
     date: "Jan 8, 2024",
     pages: 3,
-    preview:
-`ORTHOPEDIC CONSULTATION REPORT
+    preview: `ORTHOPEDIC CONSULTATION REPORT
 Referring Physician: Dr. James Park, Primary Care
 Consulting Physician: Dr. Michael Chen, Orthopedic Surgery
 Date: January 8, 2024
@@ -85,8 +90,7 @@ SURGICAL PLAN:
     type: "medical-history",
     date: "Dec 15, 2023",
     pages: 8,
-    preview:
-`COMPREHENSIVE MEDICAL HISTORY
+    preview: `COMPREHENSIVE MEDICAL HISTORY
 Patient: Sarah Johnson | DOB: 03/12/1958 | Age: 68 | Sex: Female
 MRN: PT-78234 | Insurance: Aetna | Group: GRP-12345
 
@@ -129,8 +133,7 @@ SOCIAL HISTORY:
     type: "medical-test",
     date: "Jan 5, 2024",
     pages: 2,
-    preview:
-`LABORATORY REPORT — COMPLETE BLOOD COUNT (CBC)
+    preview: `LABORATORY REPORT — COMPLETE BLOOD COUNT (CBC)
 Facility: Regional Medical Center Laboratory
 Patient: Sarah Johnson | DOB: 03/12/1958 | MRN: PT-78234
 Specimen: Venous Blood | Collection Date: January 5, 2024
@@ -167,8 +170,7 @@ Pathologist: Dr. Patricia Hayes, MD`,
     type: "medical-test",
     date: "Jan 5, 2024",
     pages: 2,
-    preview:
-`LABORATORY REPORT — BASIC METABOLIC PANEL & HbA1c
+    preview: `LABORATORY REPORT — BASIC METABOLIC PANEL & HbA1c
 Facility: Regional Medical Center Laboratory
 Patient: Sarah Johnson | DOB: 03/12/1958 | MRN: PT-78234
 Specimen: Venous Blood | Collection Date: January 5, 2024
@@ -203,8 +205,7 @@ Pathologist: Dr. Patricia Hayes, MD`,
     type: "medical-test",
     date: "Jan 5, 2024",
     pages: 1,
-    preview:
-`LABORATORY REPORT — COAGULATION STUDIES
+    preview: `LABORATORY REPORT — COAGULATION STUDIES
 Facility: Regional Medical Center Laboratory
 Patient: Sarah Johnson | DOB: 03/12/1958 | MRN: PT-78234
 Specimen: Citrated Venous Blood | Collection Date: January 5, 2024
@@ -230,8 +231,7 @@ Pathologist: Dr. Patricia Hayes, MD`,
     type: "imaging-report",
     date: "Dec 28, 2023",
     pages: 4,
-    preview:
-`RADIOLOGY REPORT — MRI RIGHT KNEE WITHOUT CONTRAST
+    preview: `RADIOLOGY REPORT — MRI RIGHT KNEE WITHOUT CONTRAST
 Facility: Regional Medical Center, Radiology Department
 Patient: Sarah Johnson | DOB: 03/12/1958 | MRN: PT-78234
 Date of Exam: December 28, 2023
@@ -284,8 +284,7 @@ IMPRESSION:
     type: "imaging-report",
     date: "Dec 15, 2023",
     pages: 2,
-    preview:
-`RADIOLOGY REPORT — X-RAY RIGHT KNEE
+    preview: `RADIOLOGY REPORT — X-RAY RIGHT KNEE
 Facility: Regional Medical Center, Radiology Department
 Patient: Sarah Johnson | DOB: 03/12/1958 | MRN: PT-78234
 Date of Exam: December 15, 2023
@@ -328,8 +327,7 @@ IMPRESSION:
     type: "prescription",
     date: "Nov 20, 2023",
     pages: 1,
-    preview:
-`PRESCRIPTION RECORD
+    preview: `PRESCRIPTION RECORD
 Patient: Sarah Johnson | DOB: 03/12/1958 | MRN: PT-78234
 Prescriber: Dr. Michael Chen | DEA: FC1234567
 Pharmacy: CVS Pharmacy #4521
@@ -355,8 +353,7 @@ Patient counseled on GI precautions. Monitor renal function given concurrent met
     type: "medical-records",
     date: "Jan 3, 2024",
     pages: 2,
-    preview:
-`PRE-OPERATIVE CARDIAC CLEARANCE LETTER
+    preview: `PRE-OPERATIVE CARDIAC CLEARANCE LETTER
 Cardiologist: Dr. Robert Singh, MD, FACC
 Date: January 3, 2024
 Patient: Sarah Johnson | DOB: 03/12/1958 | MRN: PT-78234
@@ -398,8 +395,7 @@ const case002Documents: CaseDocument[] = [
     type: "medical-records",
     date: "Jan 18, 2024",
     pages: 5,
-    preview:
-`ORTHOPEDIC SPINE CONSULTATION
+    preview: `ORTHOPEDIC SPINE CONSULTATION
 Provider: Dr. Anil Patel, Spine Surgery
 Date: January 18, 2024
 Patient: Robert Williams | DOB: 07/22/1979 | MRN: PT-45129
@@ -435,8 +431,7 @@ Recommend lumbar decompression with posterior interbody fusion at L4-L5 (CPT 226
     type: "imaging-report",
     date: "Jan 12, 2024",
     pages: 4,
-    preview:
-`RADIOLOGY REPORT — MRI LUMBAR SPINE WITHOUT CONTRAST
+    preview: `RADIOLOGY REPORT — MRI LUMBAR SPINE WITHOUT CONTRAST
 Facility: Regional Medical Center, Radiology Department
 Patient: Robert Williams | DOB: 07/22/1979 | MRN: PT-45129
 Date of Exam: January 12, 2024
@@ -468,7 +463,7 @@ IMPRESSION:
 1. Grade I spondylolisthesis at L4-L5 with disc collapse and broad-based disc protrusion.
 2. Severe right foraminal stenosis with L5 nerve root compression — correlates with clinical radiculopathy.
 3. Moderate central canal stenosis at L4-L5.
-4. Mild degenerative changes at adjacent levels without significant stenosis.`,
+4. Mild degenerative changes at adjacent levels without significant stenosis.  <img src='/cases/001/LUMBAR_spine_MRI.png'/>`,
   },
   {
     id: "c2-doc-3",
@@ -476,8 +471,7 @@ IMPRESSION:
     type: "imaging-report",
     date: "Jan 10, 2024",
     pages: 2,
-    preview:
-`RADIOLOGY REPORT — X-RAY LUMBAR SPINE (FLEXION/EXTENSION)
+    preview: `RADIOLOGY REPORT — X-RAY LUMBAR SPINE (FLEXION/EXTENSION)
 Facility: Regional Medical Center, Radiology Department
 Patient: Robert Williams | DOB: 07/22/1979 | MRN: PT-45129
 Date of Exam: January 10, 2024
@@ -519,8 +513,7 @@ IMPRESSION:
     type: "medical-test",
     date: "Jan 8, 2024",
     pages: 3,
-    preview:
-`ELECTRODIAGNOSTIC REPORT — EMG / NERVE CONDUCTION STUDY
+    preview: `ELECTRODIAGNOSTIC REPORT — EMG / NERVE CONDUCTION STUDY
 Facility: Regional Medical Center, Neurophysiology Lab
 Patient: Robert Williams | DOB: 07/22/1979 | MRN: PT-45129
 Date of Study: January 8, 2024
@@ -561,8 +554,7 @@ Electrodiagnostic findings consistent with RIGHT L5 RADICULOPATHY — active/acu
     type: "medical-test",
     date: "Jan 15, 2024",
     pages: 2,
-    preview:
-`LABORATORY REPORT — CBC & COMPREHENSIVE METABOLIC PANEL
+    preview: `LABORATORY REPORT — CBC & COMPREHENSIVE METABOLIC PANEL
 Facility: Regional Medical Center Laboratory
 Patient: Robert Williams | DOB: 07/22/1979 | MRN: PT-45129
 Specimen: Venous Blood | Collection Date: January 15, 2024
@@ -603,8 +595,7 @@ Pathologist: Dr. Patricia Hayes, MD`,
     type: "medical-records",
     date: "Dec 20, 2023",
     pages: 3,
-    preview:
-`PHYSICAL THERAPY DISCHARGE SUMMARY
+    preview: `PHYSICAL THERAPY DISCHARGE SUMMARY
 Facility: ProMotion Physical Therapy
 Patient: Robert Williams | DOB: 07/22/1979 | MRN: PT-45129
 Referring Provider: Dr. Anil Patel
@@ -641,8 +632,7 @@ Patient has reached a plateau with physical therapy. Conservative management has
     type: "prescription",
     date: "Jul 15, 2023",
     pages: 1,
-    preview:
-`PRESCRIPTION RECORD
+    preview: `PRESCRIPTION RECORD
 Patient: Robert Williams | DOB: 07/22/1979 | MRN: PT-45129
 Prescriber: Dr. Emily Watson | DEA: EW9876543
 Pharmacy: Walgreens #7832
@@ -674,8 +664,7 @@ RESPONSE: Minimal relief of back pain after 4 months of use.`,
     type: "medical-history",
     date: "Jan 18, 2024",
     pages: 4,
-    preview:
-`COMPREHENSIVE MEDICAL HISTORY
+    preview: `COMPREHENSIVE MEDICAL HISTORY
 Patient: Robert Williams | DOB: 07/22/1979 | Age: 47 | Sex: Male
 MRN: PT-45129 | Insurance: UnitedHealthcare | Group: GRP-67890
 
@@ -716,8 +705,7 @@ const case003Documents: CaseDocument[] = [
     type: "medical-records",
     date: "Jan 16, 2024",
     pages: 3,
-    preview:
-`OFFICE VISIT NOTE
+    preview: `OFFICE VISIT NOTE
 Provider: Dr. James Park, Internal Medicine
 Date: January 16, 2024
 Patient: Maria Garcia | DOB: 11/05/1982 | MRN: PT-91823
@@ -773,8 +761,7 @@ PLAN:
     type: "medical-records",
     date: "Jan 14, 2024",
     pages: 2,
-    preview:
-`HOME BLOOD PRESSURE MONITORING LOG
+    preview: `HOME BLOOD PRESSURE MONITORING LOG
 Patient: Maria Garcia | DOB: 11/05/1982
 Monitoring Period: January 1–14, 2024
 Device: Omron BP7350 (validated, proper cuff size)
@@ -809,8 +796,7 @@ SUMMARY: Blood pressure is well-controlled within target range (<130/80) on curr
     type: "medical-test",
     date: "Jan 12, 2024",
     pages: 2,
-    preview:
-`LABORATORY REPORT — HbA1c & LIPID PANEL
+    preview: `LABORATORY REPORT — HbA1c & LIPID PANEL
 Facility: Regional Medical Center Laboratory
 Patient: Maria Garcia | DOB: 11/05/1982 | MRN: PT-91823
 Specimen: Venous Blood | Collection Date: January 12, 2024
@@ -849,8 +835,7 @@ Pathologist: Dr. Patricia Hayes, MD`,
     type: "medical-test",
     date: "Jan 18, 2024",
     pages: 1,
-    preview:
-`MICROBIOLOGY REPORT — URINE CULTURE & SENSITIVITY
+    preview: `MICROBIOLOGY REPORT — URINE CULTURE & SENSITIVITY
 Facility: Regional Medical Center Laboratory
 Patient: Maria Garcia | DOB: 11/05/1982 | MRN: PT-91823
 Specimen: Clean-Catch Midstream Urine | Collection Date: January 16, 2024
@@ -883,8 +868,7 @@ Microbiologist: Dr. Linda Torres, PhD`,
     type: "prescription",
     date: "Jan 16, 2024",
     pages: 1,
-    preview:
-`MEDICATION RECONCILIATION
+    preview: `MEDICATION RECONCILIATION
 Patient: Maria Garcia | DOB: 11/05/1982 | MRN: PT-91823
 Date: January 16, 2024
 Provider: Dr. James Park
@@ -915,8 +899,7 @@ ADHERENCE NOTES: Patient reports good compliance with chronic medications. Couns
     type: "medical-history",
     date: "Jan 16, 2024",
     pages: 3,
-    preview:
-`COMPREHENSIVE MEDICAL HISTORY
+    preview: `COMPREHENSIVE MEDICAL HISTORY
 Patient: Maria Garcia | DOB: 11/05/1982 | Age: 43 | Sex: Female
 MRN: PT-91823 | Insurance: UnitedHealthcare | Group: GRP-11223
 
@@ -957,8 +940,7 @@ PREVENTIVE CARE:
     type: "imaging-report",
     date: "Jan 17, 2024",
     pages: 2,
-    preview:
-`RADIOLOGY REPORT — RENAL & BLADDER ULTRASOUND
+    preview: `RADIOLOGY REPORT — RENAL & BLADDER ULTRASOUND
 Facility: Regional Medical Center, Radiology Department
 Patient: Maria Garcia | DOB: 11/05/1982 | MRN: PT-91823
 Date of Exam: January 17, 2024
@@ -993,8 +975,7 @@ const case004Documents: CaseDocument[] = [
     type: "medical-records",
     date: "Jan 10, 2024",
     pages: 5,
-    preview:
-`CARDIOLOGY CONSULTATION
+    preview: `CARDIOLOGY CONSULTATION
 Provider: Dr. Lisa Martinez, Cardiothoracic Surgery
 Date: January 10, 2024
 Patient: David Thompson | DOB: 09/18/1955 | MRN: PT-33847
@@ -1024,8 +1005,7 @@ Recommend coronary artery bypass grafting — single arterial graft (LIMA to LAD
     type: "imaging-report",
     date: "Jan 8, 2024",
     pages: 4,
-    preview:
-`CARDIAC CATHETERIZATION REPORT
+    preview: `CARDIAC CATHETERIZATION REPORT
 Facility: Regional Heart Center
 Patient: David Thompson | DOB: 09/18/1955 | MRN: PT-33847
 Date of Procedure: January 8, 2024
@@ -1069,8 +1049,7 @@ RECOMMENDATION: CABG with LIMA-LAD graft. Heart Team discussion recommended.`,
     type: "imaging-report",
     date: "Jan 9, 2024",
     pages: 1,
-    preview:
-`RADIOLOGY REPORT — CHEST X-RAY PA & LATERAL
+    preview: `RADIOLOGY REPORT — CHEST X-RAY PA & LATERAL
 Facility: Regional Medical Center, Radiology Department
 Patient: David Thompson | DOB: 09/18/1955 | MRN: PT-33847
 Date of Exam: January 9, 2024
@@ -1104,8 +1083,7 @@ IMPRESSION:
     type: "imaging-report",
     date: "Jan 7, 2024",
     pages: 3,
-    preview:
-`ECHOCARDIOGRAPHY REPORT — TRANSTHORACIC
+    preview: `ECHOCARDIOGRAPHY REPORT — TRANSTHORACIC
 Facility: Regional Heart Center
 Patient: David Thompson | DOB: 09/18/1955 | MRN: PT-33847
 Date of Study: January 7, 2024
@@ -1151,8 +1129,7 @@ IMPRESSION:
     type: "medical-test",
     date: "Jan 9, 2024",
     pages: 3,
-    preview:
-`LABORATORY REPORT — PRE-OPERATIVE PANEL
+    preview: `LABORATORY REPORT — PRE-OPERATIVE PANEL
 Facility: Regional Medical Center Laboratory
 Patient: David Thompson | DOB: 09/18/1955 | MRN: PT-33847
 Specimen: Venous Blood | Collection Date: January 9, 2024
@@ -1204,8 +1181,7 @@ Pathologist: Dr. Patricia Hayes, MD`,
     type: "medical-history",
     date: "Jan 10, 2024",
     pages: 4,
-    preview:
-`COMPREHENSIVE MEDICAL HISTORY
+    preview: `COMPREHENSIVE MEDICAL HISTORY
 Patient: David Thompson | DOB: 09/18/1955 | Age: 69 | Sex: Male
 MRN: PT-33847 | Insurance: Cigna | Group: GRP-44556
 
@@ -1249,8 +1225,7 @@ const case005Documents: CaseDocument[] = [
     type: "imaging-report",
     date: "Jan 10, 2024",
     pages: 2,
-    preview:
-`RADIOLOGY REPORT — BILATERAL SCREENING MAMMOGRAPHY
+    preview: `RADIOLOGY REPORT — BILATERAL SCREENING MAMMOGRAPHY
 Facility: Regional Women's Health Center
 Patient: Jennifer Brown | DOB: 01/30/1990 | MRN: PT-62951
 Date of Exam: January 10, 2024
@@ -1290,8 +1265,7 @@ RECOMMENDATION: Routine annual screening mammography in 12 months. Given heterog
     type: "imaging-report",
     date: "Jan 10, 2024",
     pages: 2,
-    preview:
-`RADIOLOGY REPORT — BILATERAL BREAST ULTRASOUND
+    preview: `RADIOLOGY REPORT — BILATERAL BREAST ULTRASOUND
 Facility: Regional Women's Health Center
 Patient: Jennifer Brown | DOB: 01/30/1990 | MRN: PT-62951
 Date of Exam: January 10, 2024
@@ -1329,8 +1303,7 @@ RECOMMENDATION: Routine follow-up in 12 months.`,
     type: "medical-test",
     date: "Jan 8, 2024",
     pages: 2,
-    preview:
-`LABORATORY REPORT — ANNUAL WELLNESS PANEL
+    preview: `LABORATORY REPORT — ANNUAL WELLNESS PANEL
 Facility: Regional Medical Center Laboratory
 Patient: Jennifer Brown | DOB: 01/30/1990 | MRN: PT-62951
 Specimen: Venous Blood | Collection Date: January 8, 2024
@@ -1368,8 +1341,7 @@ Pathologist: Dr. Patricia Hayes, MD`,
     type: "medical-history",
     date: "Jan 10, 2024",
     pages: 2,
-    preview:
-`COMPREHENSIVE MEDICAL HISTORY
+    preview: `COMPREHENSIVE MEDICAL HISTORY
 Patient: Jennifer Brown | DOB: 01/30/1990 | Age: 34 | Sex: Female
 MRN: PT-62951 | Insurance: Humana | Group: GRP-78901
 
@@ -1410,8 +1382,7 @@ const case006Documents: CaseDocument[] = [
     type: "medical-records",
     date: "Jan 12, 2024",
     pages: 4,
-    preview:
-`PAIN MANAGEMENT CONSULTATION
+    preview: `PAIN MANAGEMENT CONSULTATION
 Provider: Dr. Sarah Lee, Pain Medicine
 Date: January 12, 2024
 Patient: Michael Davis | DOB: 06/14/1970 | MRN: PT-18293
@@ -1446,8 +1417,7 @@ Lumbar epidural steroid injection at L5-S1 under fluoroscopic guidance (CPT 6448
     type: "imaging-report",
     date: "Dec 20, 2023",
     pages: 3,
-    preview:
-`RADIOLOGY REPORT — MRI LUMBAR SPINE WITHOUT CONTRAST
+    preview: `RADIOLOGY REPORT — MRI LUMBAR SPINE WITHOUT CONTRAST
 Facility: Regional Medical Center, Radiology Department
 Patient: Michael Davis | DOB: 06/14/1970 | MRN: PT-18293
 Date of Exam: December 20, 2023
@@ -1486,8 +1456,7 @@ IMPRESSION:
     type: "medical-test",
     date: "Jan 10, 2024",
     pages: 1,
-    preview:
-`LABORATORY REPORT — PRE-PROCEDURE PANEL
+    preview: `LABORATORY REPORT — PRE-PROCEDURE PANEL
 Facility: Regional Medical Center Laboratory
 Patient: Michael Davis | DOB: 06/14/1970 | MRN: PT-18293
 Specimen: Venous Blood | Collection Date: January 10, 2024
@@ -1522,8 +1491,7 @@ Pathologist: Dr. Patricia Hayes, MD`,
     type: "imaging-report",
     date: "Aug 15, 2023",
     pages: 2,
-    preview:
-`RADIOLOGY REPORT — X-RAY LUMBAR SPINE
+    preview: `RADIOLOGY REPORT — X-RAY LUMBAR SPINE
 Facility: Regional Medical Center, Radiology Department
 Patient: Michael Davis | DOB: 06/14/1970 | MRN: PT-18293
 Date of Exam: August 15, 2023
@@ -1563,8 +1531,7 @@ IMPRESSION:
     type: "medical-history",
     date: "Jan 12, 2024",
     pages: 3,
-    preview:
-`COMPREHENSIVE MEDICAL HISTORY
+    preview: `COMPREHENSIVE MEDICAL HISTORY
 Patient: Michael Davis | DOB: 06/14/1970 | Age: 54 | Sex: Male
 MRN: PT-18293 | Insurance: Medicare | Group: GRP-33445
 
@@ -1604,7 +1571,8 @@ const defaultDocuments: CaseDocument[] = [
     type: "medical-records",
     date: "Jan 15, 2024",
     pages: 3,
-    preview: "Clinical progress notes for this patient case. Please refer to the case summary for detailed information.",
+    preview:
+      "Clinical progress notes for this patient case. Please refer to the case summary for detailed information.",
   },
   {
     id: "default-doc-2",
