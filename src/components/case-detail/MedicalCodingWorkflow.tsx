@@ -68,24 +68,17 @@ export function MedicalCodingWorkflow({ aiSummary, caseId, selectedCodes, onSele
     }
   };
 
-  const toggleCptWithIcds = (item: AgentOp) => {
+  const toggleCptOnly = (item: AgentOp) => {
     const cptSelected = isCodeSelected("CPT", item.cpt_code);
     if (cptSelected) {
-      const icdCodes = item.icd_link.map(i => i.icd10_code.code);
       onSelectedCodesChange(selectedCodes.filter(sc => 
-        !(sc.type === "CPT" && sc.code === item.cpt_code) && 
-        !(sc.type === "ICD-10" && icdCodes.includes(sc.code) && sc.parentCpt === item.cpt_code)
+        !(sc.type === "CPT" && sc.code === item.cpt_code)
       ));
     } else {
-      const newCodes: SelectedCode[] = [
-        { type: "CPT", code: item.cpt_code, description: item.definition, confidence: Math.round(item.cpt_score * 100) },
-        ...item.icd_link.map(icd => ({ type: "ICD-10" as const, code: icd.icd10_code.code, description: icd.icd10_code.description, confidence: Math.round(icd.icd10_code.score * 100), parentCpt: item.cpt_code }))
-      ];
       const existing = selectedCodes.filter(sc => 
-        !(sc.type === "CPT" && sc.code === item.cpt_code) && 
-        !(sc.type === "ICD-10" && item.icd_link.map(i => i.icd10_code.code).includes(sc.code) && sc.parentCpt === item.cpt_code)
+        !(sc.type === "CPT" && sc.code === item.cpt_code)
       );
-      onSelectedCodesChange([...existing, ...newCodes]);
+      onSelectedCodesChange([...existing, { type: "CPT", code: item.cpt_code, description: item.definition, confidence: Math.round(item.cpt_score * 100) }]);
     }
   };
 
