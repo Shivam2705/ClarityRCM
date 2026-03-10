@@ -45,6 +45,7 @@ import {
   Users,
 } from "lucide-react";
 import { RCMValueChain } from "@/components/landing/RCMValueChain";
+import EssentialTools from "@/components/landing/EssentialTools";
 
 const Landing = () => {
   const navigate = useNavigate();
