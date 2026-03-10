@@ -1788,9 +1788,22 @@ function PriorAuthDecisionSection({ isEditing, onSave, onCancel, onComplete, age
 
           {/* ── Final Recommendation ── */}
           <Card className={`p-5 ${data.final_recommendation.decision === "SUBMIT" ? "bg-primary/10 border-primary/30" : "bg-warning/10 border-warning/30"}`}>
-            <div className="flex items-center gap-2 mb-3">
-              <Target className="h-5 w-5 text-primary" />
-              <h4 className="font-medium text-foreground">Final Recommendation & Reason</h4>
+            <div className="flex items-center justify-between mb-3">
+              <div className="flex items-center gap-2">
+                <Target className="h-5 w-5 text-primary" />
+                <h4 className="font-medium text-foreground">Final Recommendation & Reason</h4>
+              </div>
+              {data.final_recommendation.decision === "DO_NOT_SUBMIT" && (
+                <Button
+                  size="sm"
+                  variant="outline"
+                  className="border-warning/50 text-warning hover:bg-warning/10"
+                  onClick={() => setShowEnquireDialog(true)}
+                >
+                  <Mail className="h-4 w-4 mr-2" />
+                  Enquire
+                </Button>
+              )}
             </div>
             <p className="text-sm text-foreground/90 leading-relaxed mb-4">
               {data.final_recommendation.primary_reason}
@@ -1824,6 +1837,64 @@ function PriorAuthDecisionSection({ isEditing, onSave, onCancel, onComplete, age
               ))}
             </div>
           </Card>
+
+          {/* ── Enquire Mail Dialog ── */}
+          {showEnquireDialog && data.final_recommendation.decision === "DO_NOT_SUBMIT" && (() => {
+            const providerName = activeCase.orderingProvider.replace(/^Dr\.\s*/i, "").replace(/\s+/g, "").toLowerCase();
+            const patientNameFormatted = activeCase.patientName.replace(/\s+/g, "").toLowerCase();
+            const toField = `${providerName}@provider.com, ${providerName}nursingstation@provider.com, ${patientNameFormatted}@gmail.com`;
+            const mailBody = `Decision: ${data.final_recommendation.decision}\n\nReason: ${data.final_recommendation.primary_reason}\n\nRisk of Denial: ${data.final_recommendation.risk_of_denial}\n\nRecommended Next Steps:\n${data.final_recommendation.next_steps.map((s, i) => `${i + 1}. ${s}`).join("\n")}`;
+
+            return (
+              <Card className="p-5 border-2 border-warning/30 bg-card mt-4">
+                <div className="flex items-center justify-between mb-4">
+                  <div className="flex items-center gap-2">
+                    <Mail className="h-5 w-5 text-warning" />
+                    <h4 className="font-medium text-foreground">Enquire – Send Notification</h4>
+                  </div>
+                  <Button variant="ghost" size="sm" onClick={() => setShowEnquireDialog(false)}>
+                    <XCircle className="h-4 w-4" />
+                  </Button>
+                </div>
+                <div className="space-y-4">
+                  <div>
+                    <label className="text-xs font-medium text-muted-foreground mb-1 block">To</label>
+                    <textarea
+                      className="w-full rounded-lg border border-border bg-muted/30 p-3 text-sm text-foreground resize-none"
+                      rows={2}
+                      defaultValue={toField}
+                      readOnly
+                    />
+                  </div>
+                  <div>
+                    <label className="text-xs font-medium text-muted-foreground mb-1 block">Subject</label>
+                    <input
+                      className="w-full rounded-lg border border-border bg-muted/30 p-3 text-sm text-foreground"
+                      defaultValue={`Prior Authorization Enquiry – ${activeCase.patientName} – Decision: ${data.final_recommendation.decision}`}
+                      readOnly
+                    />
+                  </div>
+                  <div>
+                    <label className="text-xs font-medium text-muted-foreground mb-1 block">Body</label>
+                    <textarea
+                      className="w-full rounded-lg border border-border bg-muted/30 p-3 text-sm text-foreground resize-none"
+                      rows={10}
+                      defaultValue={mailBody}
+                    />
+                  </div>
+                  <div className="flex justify-end gap-2">
+                    <Button variant="outline" size="sm" onClick={() => setShowEnquireDialog(false)}>
+                      Cancel
+                    </Button>
+                    <Button size="sm" onClick={() => { setShowEnquireDialog(false); toast.success("Enquiry email sent successfully"); }}>
+                      <Send className="h-4 w-4 mr-2" />
+                      Send Enquiry
+                    </Button>
+                  </div>
+                </div>
+              </Card>
+            );
+          })()}
         </div>
       ) : (
         <Card className="p-6 bg-muted/30 border-border/50 text-center">
