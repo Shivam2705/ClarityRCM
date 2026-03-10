@@ -61,8 +61,8 @@ export const mockCases: Case[] = JSON.parse(localStorage.getItem("userCases") ||
     status: "New",
     priority: "Medium",
     lastUpdated: "2024-01-15T09:15:00Z",
-    procedureCode: "22630",
-    procedureName: "Lumbar Spinal Fusion (Posterior Interbody Technique)",
+    procedureCode: "",
+    procedureName: "",
     hasGaps: false,
   },
   {
