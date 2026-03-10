@@ -58,6 +58,7 @@ export default function CaseDetail() {
           payerName={caseData.payerName}
           orderingProvider={caseData.orderingProvider}
           aiSummary={caseData.aiSummary}
+          approvedCodes={approvedCodes}
         />
 
         <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
