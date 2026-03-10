@@ -81,14 +81,6 @@ const Landing = () => {
                 Access Dashboard
                 <ArrowRight className="ml-2 h-5 w-5" />
               </Button>
-              <Button
-                size="lg"
-                variant="outline"
-                className="text-white border-white/40 hover:text-black hover:bg-white"
-                onClick={() => window.open("https://docs.lovable.dev", "_blank")}
-              >
-                Learn More
-              </Button>
             </div>
 
             {/* Stats Grid */}

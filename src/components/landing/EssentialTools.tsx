@@ -23,7 +23,7 @@ const EssentialTools = () => {
           {tools.map((tool) => (
             <Card
               key={tool.id}
-              className="relative p-6 bg-gradient-to-br from-card to-card/50 border-border/50 flex flex-col items-start gap-4 hover:border-primary/40 transition-colors"
+              className="relative p-6 bg-gradient-to-br from-card to-card/50 border-border/50 flex flex-col items-center text-center gap-4 hover:border-primary/40 transition-colors"
             >
               {/* Icon */}
               <div
