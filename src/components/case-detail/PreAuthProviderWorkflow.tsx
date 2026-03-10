@@ -1173,7 +1173,7 @@ interface EligibilitySectionProps {
   onStatusChange: (status: "idle" | "processing" | "eligible" | "not-eligible") => void;
   onComplete: (status: "eligible" | "not-eligible") => void;
   payerName: string;
-  onGoToDocumentAnalysis?: () => void;
+  onGoToReadinessCheck?: () => void;
 }
 
 function EligibilityHeader({
