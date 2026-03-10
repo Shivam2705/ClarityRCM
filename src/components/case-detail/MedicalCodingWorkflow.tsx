@@ -326,14 +326,7 @@ export function MedicalCodingWorkflow({ aiSummary, caseId, selectedCodes, onSele
         </div>
 
         {/* Human Override Panel */}
-        <div className="rounded-xl border bg-card p-5">
-          <h4 className="font-medium text-foreground mb-4">Human Override / Add Custom Code</h4>
-          <div className="flex gap-2">
-            <Input placeholder="Enter code (e.g., 99213)" className="flex-1" />
-            <Button variant="outline">Add Code</Button>
-          </div>
-          <Textarea placeholder="Justification for manual override (required)..." className="mt-3" />
-        </div>
+        <HumanOverridePanel selectedCodes={selectedCodes} onSelectedCodesChange={onSelectedCodesChange} />
       </div>
 
       {/* Right Column - Citation from Summary */}
