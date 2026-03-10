@@ -1090,6 +1090,7 @@ export function PreAuthProviderWorkflow({ caseData }: PreAuthProviderWorkflowPro
             onStatusChange={setEligibilityStatus}
             onComplete={handleEligibilityComplete}
             payerName={activeCase.payerName}
+            onGoToDocumentAnalysis={() => setCurrentStep("document-analysis")}
           />
         );
       case "document-analysis":
