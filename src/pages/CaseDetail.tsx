@@ -22,7 +22,7 @@ export default function CaseDetail() {
   const initialPersona = (location.state as { persona?: Persona })?.persona || "provider";
   
   const [persona, setPersona] = useState<Persona>(initialPersona);
-  const [activeTab, setActiveTab] = useState("pre-auth");
+  const [activeTab, setActiveTab] = useState("coding");
 
   function getAllCases(): Case[] {
     try {
@@ -80,13 +80,13 @@ export default function CaseDetail() {
         {/* Tabs */}
         <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
           <TabsList className="h-12 p-1 bg-muted">
-            <TabsTrigger value="pre-auth" className="h-10 px-6 data-[state=active]:bg-card">
-              <FileCheck className="h-4 w-4 mr-2" />
-              Pre-Authorization
-            </TabsTrigger>
             <TabsTrigger value="coding" className="h-10 px-6 data-[state=active]:bg-card">
               <Code2 className="h-4 w-4 mr-2" />
               Medical Coding
+            </TabsTrigger>
+            <TabsTrigger value="pre-auth" className="h-10 px-6 data-[state=active]:bg-card">
+              <FileCheck className="h-4 w-4 mr-2" />
+              Pre-Authorization
             </TabsTrigger>
             <TabsTrigger value="documents" className="h-10 px-6 data-[state=active]:bg-card">
               <FileText className="h-4 w-4 mr-2" />
@@ -102,16 +102,16 @@ export default function CaseDetail() {
             </TabsTrigger>
           </TabsList>
 
+          <TabsContent value="coding" className="mt-6">
+            <MedicalCodingWorkflow aiSummary={caseData.aiSummary} caseId={caseData.id} />
+          </TabsContent>
+
           <TabsContent value="pre-auth" className="mt-6">
             {persona === "provider" ? (
               <PreAuthProviderWorkflow caseData={caseData} />
             ) : (
               <PreAuthPayerWorkflow />
             )}
-          </TabsContent>
-
-          <TabsContent value="coding" className="mt-6">
-            <MedicalCodingWorkflow aiSummary={caseData.aiSummary} />
           </TabsContent>
 
           <TabsContent value="documents" className="mt-6">
