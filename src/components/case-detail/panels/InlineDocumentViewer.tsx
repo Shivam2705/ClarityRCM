@@ -1,6 +1,7 @@
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
+import { getCaseDocuments, CaseDocument } from "@/data/caseDocuments";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { DocumentChatbot } from "@/components/document-viewer/DocumentChatbot";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
