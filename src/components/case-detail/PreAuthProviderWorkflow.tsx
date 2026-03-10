@@ -997,7 +997,7 @@ export function PreAuthProviderWorkflow({ caseData }: PreAuthProviderWorkflowPro
             eligibilityStatus: status === "eligible" ? "eligible" : "not-eligible",
           };
         }
-        if (status === "eligible" && s.id === "document-analysis") {
+        if (status === "eligible" && s.id === "prior-auth-decision") {
           return { ...s, status: "active" as const, canEdit: true };
         }
         return s;
