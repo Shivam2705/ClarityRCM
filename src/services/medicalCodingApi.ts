@@ -27,23 +27,57 @@ export interface MedicalCodingResponse {
   markdown: string;
 }
 
+const BASE_URL = "https://rcmhc-agents-1037311574972.us-central1.run.app";
+const APP_NAME = "Medical_Coding";
+
 export async function callMedicalCodingApi(medicalText: string): Promise<MedicalCodingResponse> {
-  const url = "https://rcm-medical-coding-caller-1037311574972.us-central1.run.app/rcm_coding_agent";
-  const payload = { medical_text: medicalText };
+  const userId = "user";
+  const sessionId = crypto.randomUUID();
 
   try {
-    const response = await fetch(url, {
+    // 1. Initialize Session
+    const sessionUrl = `${BASE_URL}/apps/${APP_NAME}/users/${userId}/sessions/${sessionId}`;
+    await fetch(sessionUrl, { method: 'POST' });
+
+    // 2. Run the Medical Coding Agent
+    const runUrl = `${BASE_URL}/run`;
+    const runPayload = {
+      appName: APP_NAME,
+      userId,
+      sessionId,
+      newMessage: {
+        role: "user",
+        parts: [{ text: medicalText }]
+      },
+      streaming: false,
+      stateDelta: null,
+    };
+
+    const response = await fetch(runUrl, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(payload),
+      body: JSON.stringify(runPayload),
     });
+
     if (!response.ok) {
       throw new Error(`API error: ${response.status}`);
     }
-    return await response.json();
+
+    const events = await response.json();
+
+    // Find the event containing medical_coding_result in actions.stateDelta
+    for (const event of Array.isArray(events) ? events : [events]) {
+      const medicalCodingResult =
+        event?.actions?.stateDelta?.medical_coding_result;
+      if (medicalCodingResult) {
+        return medicalCodingResult as MedicalCodingResponse;
+      }
+    }
+
+    throw new Error("medical_coding_result not found in response");
   } catch (error: any) {
     console.error("Medical coding API error:", error);
-    // Fallback mock data matching the new response structure
+    // Fallback mock data
     return {
       agent_op: [
         {
