@@ -1851,8 +1851,7 @@ function PriorAuthDecisionSection({ isEditing, onSave, onCancel, onComplete, age
               </DialogHeader>
               {data.final_recommendation.decision === "DO_NOT_SUBMIT" && (() => {
                 const providerName = activeCase.orderingProvider.replace(/^Dr\.\s*/i, "").replace(/\s+/g, "").toLowerCase();
-                const patientNameFormatted = activeCase.patientName.replace(/\s+/g, "").toLowerCase();
-                const toField = `${providerName}@provider.com, ${providerName}nursingstation@provider.com, ${patientNameFormatted}@gmail.com`;
+                const toField = `${providerName}@provider.com, ${providerName}nursingstation@provider.com`;
                 const mailBody = `Decision: ${data.final_recommendation.decision}\n\nReason: ${data.final_recommendation.primary_reason}\n\nRisk of Denial: ${data.final_recommendation.risk_of_denial}\n\nRecommended Next Steps:\n${data.final_recommendation.next_steps.map((s, i) => `${i + 1}. ${s}`).join("\n")}`;
 
                 return (
