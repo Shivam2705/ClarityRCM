@@ -1136,7 +1136,7 @@ export function PreAuthProviderWorkflow({ caseData, selectedCodes = [], approved
           />
         );
       case "submit-to-payer":
-        return <SubmitToPayerSection />;
+        return <SubmitToPayerSection caseData={activeCase} />;
       default:
         return (
           <EligibilitySection
