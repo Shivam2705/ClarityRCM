@@ -1136,7 +1136,7 @@ export function PreAuthProviderWorkflow({ caseData, selectedCodes = [], approved
           />
         );
       case "submit-to-payer":
-        return <SubmitToPayerSection />;
+        return <SubmitToPayerSection caseData={activeCase} />;
       default:
         return (
           <EligibilitySection
@@ -1557,7 +1557,7 @@ interface PriorAuthDecisionSectionProps extends SectionProps {
   agentLoading: boolean;
   agentError: string | null;
   onRetry: () => void;
-  activeCase: { patientName: string; orderingProvider: string };
+  activeCase: { id: string; patientName: string; orderingProvider: string };
 }
 
 function PriorAuthDecisionSection({ isEditing, onSave, onCancel, onComplete, agentData, agentLoading, agentError, onRetry, activeCase }: PriorAuthDecisionSectionProps) {
@@ -1803,7 +1803,7 @@ function PriorAuthDecisionSection({ isEditing, onSave, onCancel, onComplete, age
                   onClick={() => setShowEnquireDialog(true)}
                 >
                   <Mail className="h-4 w-4 mr-2" />
-                  Enquire
+                  Message
                 </Button>
               )}
             </div>
@@ -1846,13 +1846,12 @@ function PriorAuthDecisionSection({ isEditing, onSave, onCancel, onComplete, age
               <DialogHeader>
                 <DialogTitle className="flex items-center gap-2">
                   <Mail className="h-5 w-5 text-warning" />
-                  Enquire – Send Notification
+                  Message – Send Notification
                 </DialogTitle>
               </DialogHeader>
               {data.final_recommendation.decision === "DO_NOT_SUBMIT" && (() => {
                 const providerName = activeCase.orderingProvider.replace(/^Dr\.\s*/i, "").replace(/\s+/g, "").toLowerCase();
-                const patientNameFormatted = activeCase.patientName.replace(/\s+/g, "").toLowerCase();
-                const toField = `${providerName}@provider.com, ${providerName}nursingstation@provider.com, ${patientNameFormatted}@gmail.com`;
+                const toField = `${providerName}@provider.com, ${providerName}nursingstation@provider.com`;
                 const mailBody = `Decision: ${data.final_recommendation.decision}\n\nReason: ${data.final_recommendation.primary_reason}\n\nRisk of Denial: ${data.final_recommendation.risk_of_denial}\n\nRecommended Next Steps:\n${data.final_recommendation.next_steps.map((s, i) => `${i + 1}. ${s}`).join("\n")}`;
 
                 return (
@@ -1870,7 +1869,7 @@ function PriorAuthDecisionSection({ isEditing, onSave, onCancel, onComplete, age
                       <label className="text-xs font-medium text-muted-foreground mb-1 block">Subject</label>
                       <input
                         className="w-full rounded-lg border border-border bg-muted/30 p-3 text-sm text-foreground"
-                        defaultValue={`Prior Authorization Enquiry – ${activeCase.patientName} – Decision: ${data.final_recommendation.decision}`}
+                        defaultValue={`Prior Auth Alert > ${data.final_recommendation.decision} Recommendation > ${activeCase.id}`}
                         readOnly
                       />
                     </div>
@@ -1886,9 +1885,9 @@ function PriorAuthDecisionSection({ isEditing, onSave, onCancel, onComplete, age
                       <Button variant="outline" size="sm" onClick={() => setShowEnquireDialog(false)}>
                         Cancel
                       </Button>
-                      <Button size="sm" onClick={() => { setShowEnquireDialog(false); toast.success("Enquiry email sent successfully"); }}>
+                      <Button size="sm" onClick={() => { setShowEnquireDialog(false); toast.success("Message sent successfully"); }}>
                         <Send className="h-4 w-4 mr-2" />
-                        Send Enquiry
+                        Send
                       </Button>
                     </div>
                   </div>
@@ -2190,7 +2189,7 @@ function GapAnalysisSection({ onProceed, onEditStep, corrections, hasGaps, agent
   );
 }
 
-function SubmitToPayerSection() {
+function SubmitToPayerSection({ caseData }: { caseData: { payerName: string } }) {
   const [submitted, setSubmitted] = useState(false);
 
   return (
@@ -2203,9 +2202,9 @@ function SubmitToPayerSection() {
           <Card className="p-4 bg-secondary/30 border-border/50 mb-4">
             <h4 className="text-sm font-medium text-foreground mb-3">Submission Summary</h4>
             <div className="space-y-2 text-sm">
-              <DataRow label="Payer" value="Blue Cross Blue Shield" />
+              <DataRow label="Payer" value={caseData.payerName} />
               <DataRow label="Submission Method" value="API - Real-time" />
-              <DataRow label="Request Type" value="Prior Authorization - Elective Surgery" />
+              <DataRow label="Request Type" value="Prior Authorization" />
               <DataRow label="Expected Response" value="5 business days" />
             </div>
           </Card>
@@ -2235,7 +2234,7 @@ function SubmitToPayerSection() {
               <span className="text-base font-medium text-success">Successfully Submitted</span>
             </div>
             <p className="text-sm text-muted-foreground">
-              Prior authorization request has been submitted to Blue Cross Blue Shield via API.
+              Prior authorization request has been submitted to {caseData.payerName} via API.
             </p>
           </Card>
 
