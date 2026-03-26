@@ -1557,7 +1557,7 @@ interface PriorAuthDecisionSectionProps extends SectionProps {
   agentLoading: boolean;
   agentError: string | null;
   onRetry: () => void;
-  activeCase: { patientName: string; orderingProvider: string };
+  activeCase: { id: string; patientName: string; orderingProvider: string };
 }
 
 function PriorAuthDecisionSection({ isEditing, onSave, onCancel, onComplete, agentData, agentLoading, agentError, onRetry, activeCase }: PriorAuthDecisionSectionProps) {
