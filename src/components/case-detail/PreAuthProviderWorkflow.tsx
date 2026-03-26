@@ -1870,7 +1870,7 @@ function PriorAuthDecisionSection({ isEditing, onSave, onCancel, onComplete, age
                       <label className="text-xs font-medium text-muted-foreground mb-1 block">Subject</label>
                       <input
                         className="w-full rounded-lg border border-border bg-muted/30 p-3 text-sm text-foreground"
-                        defaultValue={`Prior Authorization Enquiry – ${activeCase.patientName} – Decision: ${data.final_recommendation.decision}`}
+                        defaultValue={`Prior Auth Alert > ${data.final_recommendation.decision} Recommendation > ${activeCase.id}`}
                         readOnly
                       />
                     </div>
