@@ -1846,7 +1846,7 @@ function PriorAuthDecisionSection({ isEditing, onSave, onCancel, onComplete, age
               <DialogHeader>
                 <DialogTitle className="flex items-center gap-2">
                   <Mail className="h-5 w-5 text-warning" />
-                  Enquire – Send Notification
+                  Message – Send Notification
                 </DialogTitle>
               </DialogHeader>
               {data.final_recommendation.decision === "DO_NOT_SUBMIT" && (() => {
