@@ -2235,7 +2235,7 @@ function SubmitToPayerSection() {
               <span className="text-base font-medium text-success">Successfully Submitted</span>
             </div>
             <p className="text-sm text-muted-foreground">
-              Prior authorization request has been submitted to Blue Cross Blue Shield via API.
+              Prior authorization request has been submitted to {caseData.payerName} via API.
             </p>
           </Card>
 
