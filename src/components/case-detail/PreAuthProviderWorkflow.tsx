@@ -2189,7 +2189,7 @@ function GapAnalysisSection({ onProceed, onEditStep, corrections, hasGaps, agent
   );
 }
 
-function SubmitToPayerSection() {
+function SubmitToPayerSection({ caseData }: { caseData: { payerName: string } }) {
   const [submitted, setSubmitted] = useState(false);
 
   return (
@@ -2202,9 +2202,9 @@ function SubmitToPayerSection() {
           <Card className="p-4 bg-secondary/30 border-border/50 mb-4">
             <h4 className="text-sm font-medium text-foreground mb-3">Submission Summary</h4>
             <div className="space-y-2 text-sm">
-              <DataRow label="Payer" value="Blue Cross Blue Shield" />
+              <DataRow label="Payer" value={caseData.payerName} />
               <DataRow label="Submission Method" value="API - Real-time" />
-              <DataRow label="Request Type" value="Prior Authorization - Elective Surgery" />
+              <DataRow label="Request Type" value="Prior Authorization" />
               <DataRow label="Expected Response" value="5 business days" />
             </div>
           </Card>
