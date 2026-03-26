@@ -1885,9 +1885,9 @@ function PriorAuthDecisionSection({ isEditing, onSave, onCancel, onComplete, age
                       <Button variant="outline" size="sm" onClick={() => setShowEnquireDialog(false)}>
                         Cancel
                       </Button>
-                      <Button size="sm" onClick={() => { setShowEnquireDialog(false); toast.success("Enquiry email sent successfully"); }}>
+                      <Button size="sm" onClick={() => { setShowEnquireDialog(false); toast.success("Message sent successfully"); }}>
                         <Send className="h-4 w-4 mr-2" />
-                        Send Enquiry
+                        Send
                       </Button>
                     </div>
                   </div>
